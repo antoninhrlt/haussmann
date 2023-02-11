@@ -5,6 +5,8 @@
 pub mod shapes;
 pub mod colours;
 
+pub use shapes::{ Shape, ShapeBuilder };
+
 /// Vector of type `T` with 2 values.
 pub type Vec2<T> = [T; 2];
 

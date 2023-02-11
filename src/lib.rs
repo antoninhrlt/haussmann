@@ -9,7 +9,9 @@ pub mod graphics;
 mod border;
 mod font;
 mod radius;
+mod theme;
 
 pub use border::Border;
-pub use font::Font;
+pub use font::*;
 pub use radius::Radius;
+pub use theme::Theme;

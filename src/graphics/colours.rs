@@ -36,9 +36,6 @@ impl RGBA {
 
     /// Converts the `RGBA` values into an hexadecimal value.
     pub fn to_hex(&self) -> u32 {
-        ((self.r & 0xFF) << 24) 
-            + ((self.g & 0xFF) << 16) 
-            + ((self.b & 0xFF) << 8)
-            + (self.a & 0xFF)
+        (self.a << 24) | (self.b << 16) | (self.g << 8) | self.r
     }
 }

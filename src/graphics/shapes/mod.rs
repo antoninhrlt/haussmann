@@ -3,7 +3,7 @@
 // Copyright (c) 2023 Antonin Hérault
 
 use super::{ Size, Point };
-use crate::Border;
+use crate::{Border, Radius, radius};
 use super::colours::RGBA;
 
 /// Creates a `Shape` with `N` points and `N` borders.
@@ -23,6 +23,23 @@ pub struct ShapeBuilder<const N: usize> {
     shape: Option<Shape>,
 }
 
+/// Implementation for a rectangle shape.
+impl ShapeBuilder<4> {
+    pub fn rectangle(&mut self, position: Point, size: Size, borders: Option<[Border; 4]>) -> &mut Self {
+        self.create([
+            // top left
+            [position[0], position[1]],
+            // top right
+            [position[0] + size[0] as isize, position[1]],
+            // bottom right
+            [position[0] + size[0] as isize, position[1] + size[1] as isize], 
+            // bottom left
+            [position[0], position[1] + size[1] as isize],
+        ], borders)
+    }
+}
+
+/// Implementation for any type of shape.
 impl<const N: usize> ShapeBuilder<N> {
     /// Creates a new `ShapeBuilder` object. The `shape` is `None`.
     pub fn new() -> Self {
@@ -43,6 +60,7 @@ impl<const N: usize> ShapeBuilder<N> {
                 points: points.to_vec(),
                 borders,
                 filled: (false, None),
+                radius: Radius::new(0.0),
             }
         );
 
@@ -52,6 +70,12 @@ impl<const N: usize> ShapeBuilder<N> {
     /// Fills the shape.
     pub fn fill(&mut self, colour: RGBA) -> &mut Self {
         self.shape.as_mut().unwrap().filled = (true, Some(colour));
+        self
+    }
+
+    /// Rounds the shape with `radius`.
+    pub fn round(&mut self, radius: Radius) -> &mut Self {
+        self.shape.as_mut().unwrap().radius = radius;
         self
     }
 
@@ -82,6 +106,8 @@ pub struct Shape {
     /// If the shape is designed to be filled, the second value must be not 
     /// `None`.
     filled: (bool, Option<RGBA>),
+    /// The radius of the shape, in degrees.
+    radius: Radius,
 }
 
 impl Shape {

@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use haussmann::graphics::{ ShapeBuilder, colours::RGBA, };
+use haussmann::graphics::{ shapes, colours::RGBA, };
 
 #[test]
 fn shape_builder() {
@@ -12,7 +12,7 @@ fn shape_builder() {
 
     let colour = RGBA::new(255, 0, 0, 255);
 
-    let triangle = ShapeBuilder::<3>::new()
+    let triangle = shapes::Builder::<3>::new()
         .create([a, b, c], None)
         .fill(colour)
         .finish();

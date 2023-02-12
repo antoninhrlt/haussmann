@@ -2,88 +2,15 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use super::{ Size, Point };
-use crate::{Border, Radius, radius};
+use crate::{Border, Radius};
+use super::Point;
 use super::colours::RGBA;
 
-/// Creates a `Shape` with `N` points and `N` borders.
-/// 
-/// ## Why a shape builder 
-/// The purpose of this builder is to create a safe `Shape` object. Indeed, if 
-/// the shape were proposing build functions itself, the user could define a 
-/// structure with a different number of points than the borders or create a 
-/// filled shape without a fill colour.
-/// 
-/// > But, why not just using the const template argument `N` with `Shape` ?
-/// 
-/// The `Shape` structure wants to be a sort of parent for all the type of 
-/// shapes. Adding a `N` const template argument would not permit to have 
-/// different sort of shapes in a same widget. 
-pub struct ShapeBuilder<const N: usize> {
-    shape: Option<Shape>,
-}
+mod builder;
+pub mod rectangle;
 
-/// Implementation for a rectangle shape.
-impl ShapeBuilder<4> {
-    pub fn rectangle(&mut self, position: Point, size: Size, borders: Option<[Border; 4]>) -> &mut Self {
-        self.create([
-            // top left
-            [position[0], position[1]],
-            // top right
-            [position[0] + size[0] as isize, position[1]],
-            // bottom right
-            [position[0] + size[0] as isize, position[1] + size[1] as isize], 
-            // bottom left
-            [position[0], position[1] + size[1] as isize],
-        ], borders)
-    }
-}
-
-/// Implementation for any type of shape.
-impl<const N: usize> ShapeBuilder<N> {
-    /// Creates a new `ShapeBuilder` object. The `shape` is `None`.
-    pub fn new() -> Self {
-        Self { shape: None }
-    }
-
-    /// Creates the shape with its `points` and `borders`.
-    pub fn create(&mut self, points: [Point; N], borders: Option<[Border; N]>) -> &mut Self {
-        // If there is no border specified, gives an empty vector.
-        let borders = if borders == None {
-            vec![] 
-        } else { 
-            borders.unwrap().to_vec() 
-        };
-        
-        self.shape = Some(
-            Shape {
-                points: points.to_vec(),
-                borders,
-                filled: (false, None),
-                radius: Radius::new(0.0),
-            }
-        );
-
-        self
-    }
-
-    /// Fills the shape.
-    pub fn fill(&mut self, colour: RGBA) -> &mut Self {
-        self.shape.as_mut().unwrap().filled = (true, Some(colour));
-        self
-    }
-
-    /// Rounds the shape with `radius`.
-    pub fn round(&mut self, radius: Radius) -> &mut Self {
-        self.shape.as_mut().unwrap().radius = radius;
-        self
-    }
-
-    /// Returns the shape finished.
-    pub fn finish(&mut self) -> Shape {
-        self.shape.clone().unwrap()
-    }
-}
+/// `Builder` is accessible from `crate::graphics::shapes::Builder`.
+pub use builder::Builder;
 
 /// The parent of any sort of shape. To create a `Shape` object, see 
 /// `ShapeBuilder`.
@@ -96,6 +23,9 @@ impl<const N: usize> ShapeBuilder<N> {
 #[derive(Debug, Clone)]
 pub struct Shape {
     /// The points of the shape.
+    /// 
+    /// The first point is the top left point. It is also relative to the layout
+    /// where the shape is, it is not a fixed point.
     points: Vec<Point>,
     /// Borders for each side of the shape. An empty `borders` vector is used to 
     /// define no borders.

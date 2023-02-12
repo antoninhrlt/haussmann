@@ -73,4 +73,9 @@ impl Shape {
             self.filled.1
         }
     }
+
+    /// Returns the radius for the shape's corners.
+    pub fn radius(&self) -> Radius {
+        self.radius
+    }
 }

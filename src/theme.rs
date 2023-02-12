@@ -2,14 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{graphics::colours::RGBA, font::FontWeight, FontFamily};
-
-#[derive(Debug, Clone)]
-pub enum TextAlign {
-    Left,
-    Center,
-    Right,
-}
+use crate::{graphics::colours::RGBA, font::FontWeight, FontFamily, TextAlign};
 
 #[derive(Debug, Clone)]
 pub struct TextTheme {

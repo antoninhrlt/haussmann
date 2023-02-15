@@ -8,3 +8,4 @@ edition = "2021"
 
 [dev-dependencies]
 svg = "0.13.0"
+sdl2 = "0.35.2"

@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{graphics::{Shape, shapes, colours::RGBA, Size}, Border, Radius};
+use crate::{graphics::{Shape, shapes, colours::RGBA, Size}, Border, Radius, DebugWidget};
 use super::{Widget, SurfacedWidget};
 
 /// Button widget, without text.
@@ -13,6 +13,8 @@ pub struct Button {
     radius: Radius,
     borders: Option<[Border; 4]>,
 }
+
+crate::dynamic_widget!(Button);
 
 impl Button {
     /// Creates the most complex button possible. 

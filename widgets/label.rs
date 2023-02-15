@@ -3,7 +3,7 @@
 // Copyright (c) 2023 Antonin Hérault
 
 use crate::theme::TextTheme;
-use super::Widget;
+use super::{Widget, DebugWidget};
 
 /// Label widget, which is not a "surfaced" widget. The text has to be rendered, 
 /// following its text theme.
@@ -17,6 +17,8 @@ pub struct Label {
     /// If the theme is `None`, the global theme for texts is used.
     pub theme: Option<TextTheme>,
 }
+
+crate::dynamic_widget!(Label);
 
 impl Label {
     pub fn new(text: &str) -> Self {

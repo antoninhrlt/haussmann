@@ -7,7 +7,7 @@ pub mod colours;
 
 pub use shapes::Shape;
 
-use crate::{widgets::{Layout, Widget, FixedLayout}, Align};
+use crate::{widgets::{Layout, Widget, SurfacedWidget}, Align};
 
 /// Vector of type `T` with 2 values.
 pub type Vec2<T> = [T; 2];
@@ -54,23 +54,15 @@ pub fn calculate_size(shape: &Shape) -> (isize, isize) {
 }
 
 /// Returns the (X, Y) position of the shape according to where it should be 
-/// placed from the layout containing it.
-pub fn place_in_layout<T: Widget>(layout: &Layout<T>, shape: &Shape) -> (isize, isize) {
-    let cast = FixedLayout::new(
-        [0, 0],
-        layout.size,
-        layout.widgets.as_slice(),
-        layout.overflow.clone(),
-        layout.wx_align.clone(),
-        layout.wy_align.clone(),
-    );
-
-    place_in_fixed_layout(&cast, shape)
-}
-
-/// Returns the (X, Y) position of the shape according to where it should be 
 /// placed from the fixed layout containing it.
-pub fn place_in_fixed_layout<T: Widget>(layout: &FixedLayout<T>, shape: &Shape) -> (isize, isize) {
+/// 
+/// The layout must have a non-`None` `position` field: it must be a "fixed" 
+/// layout. Otherwise, this function panics.
+pub fn place_in_fixed_layout(layout: &Layout, shape: &Shape) -> (isize, isize) {
+    if !layout.is_fixed() {
+        panic!("not a fixed layout : {:?}", layout);
+    }
+
     // Calculates the size of the `shape`.
     let (width, height) = calculate_size(shape);
 
@@ -78,13 +70,13 @@ pub fn place_in_fixed_layout<T: Widget>(layout: &FixedLayout<T>, shape: &Shape) 
     (
         match layout.wx_align {
             Align::Center => {
-                layout.position[0] + (layout.size[0] as isize - width) / 2
+                layout.position()[0] + (layout.size[0] as isize - width) / 2
             }
             _ => todo!()
         },
         match layout.wy_align {
             Align::Center => {
-                layout.position[1] + (layout.size[1] as isize - height) / 2
+                layout.position()[1] + (layout.size[1] as isize - height) / 2
             }
             _ => todo!()
         }

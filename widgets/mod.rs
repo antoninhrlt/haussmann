@@ -2,6 +2,8 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+use std::fmt::Debug;
+
 use crate::{
     graphics::{
         Size, 
@@ -18,14 +20,26 @@ pub mod layout;
 
 pub use button::Button;
 pub use label::Label;
-pub use layout::{ Layout, FixedLayout };
+pub use layout::Layout;
 
 /// The simplest functionalities and property getters of any widget.
 /// 
 /// A widget contains one or more shapes. Its size is the larger size being a 
 /// zone containing all the shapes.
-pub trait Widget: Clone {
+pub trait Widget: DebugWidget {
 
+}
+
+/// Implements the `Debug` trait for dynamic `Widget` objects.
+impl std::fmt::Debug for dyn Widget {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.fmt(f)
+    }
+}
+
+/// Automatically implemented by the macro `dynamic_widget`.
+pub trait DebugWidget {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
 }
 
 /// Trait for widgets having a surface of shapes

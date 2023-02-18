@@ -7,7 +7,7 @@ pub mod colours;
 
 pub use shapes::Shape;
 
-use crate::{widgets::{Layout, Widget, SurfacedWidget}, Align};
+use crate::{widgets::Layout, Align};
 
 /// Vector of type `T` with 2 values.
 pub type Vec2<T> = [T; 2];
@@ -47,9 +47,6 @@ pub fn calculate_size(shape: &Shape) -> (isize, isize) {
     let smallest_y = y_values[y_values.len() -1];
 
     let height = smallest_y - greatest_y;
-
-    println!("width: {width}, height: {height}");
-
     (width, height)
 }
 

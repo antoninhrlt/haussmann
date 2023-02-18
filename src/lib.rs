@@ -26,36 +26,3 @@ pub use widgets::{ Widget, DebugWidget };
 pub trait ToAny {
     fn as_any(&self) -> &dyn std::any::Any;
 }
-
-#[macro_export]
-macro_rules! dynamic_widget {
-    ($t:ty) => {
-        impl ToAny for $t {
-            fn as_any(&self) -> &dyn std::any::Any {
-                self
-            }
-        }
-        
-        impl From<$t> for Box<dyn Widget> {
-            fn from(value: $t) -> Self {
-                Box::new(value)
-            }
-        }
-
-        impl DebugWidget for $t {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                write!(f, "{:?}", self)
-            }
-        }
-    };
-}
-
-#[macro_export]
-macro_rules! widgets {
-    ($first:expr $(, $widget:expr) *) => {
-        {
-            let widgets: Vec<Box<dyn Widget>> = vec![$first.into(), $($widget.into()),*];
-            widgets
-        }
-    };
-}

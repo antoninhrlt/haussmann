@@ -6,10 +6,14 @@ use crate::{graphics::colours::RGBA, font::FontWeight, FontFamily, TextAlign};
 
 #[derive(Debug, Clone)]
 pub struct TextTheme {
+    /// The height of the text.
     pub font_size: f32,
+    /// The weight of the letters.
     pub font_weight: FontWeight,
+    /// The colour of the text.
     pub colour: RGBA,
-    pub align: TextAlign, 
+    /// Text alignment.
+    pub align: TextAlign,
 }
 
 /// Global search to be used as a fallback theme when a widget has a theme set 

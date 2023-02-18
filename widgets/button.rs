@@ -2,16 +2,16 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{graphics::{Shape, shapes, colours::RGBA, Size}, Border, Radius, DebugWidget, ToAny};
-use super::{Widget, SurfacedWidget};
+use crate::{graphics::{Shape, shapes, colours::RGBA, Size}, Border, Radius, ToAny};
+use super::{Widget, CreateWidget, DebugWidget, Label};
 
 /// Button widget, without text.
 #[derive(Debug, Clone)]
 pub struct Button {
     size: Size,
     colour: RGBA,
-    radius: Radius,
-    borders: Option<[Border; 4]>,
+    pub radius: Radius,
+    pub borders: Option<[Border; 4]>,
 }
 
 crate::dynamic_widget!(Button);
@@ -30,11 +30,7 @@ impl Button {
     }
 }
 
-impl Widget for Button {
-
-}
-
-impl SurfacedWidget for Button {
+impl CreateWidget for Button {
     /// Creates the simplest button possible.
     fn new(size: Size, colour: RGBA) -> Self {
         Self::all(size, colour, None, None)
@@ -49,7 +45,9 @@ impl SurfacedWidget for Button {
     fn bordered(size: Size, colour: RGBA, borders: [Border; 4]) -> Self {
         Self::all(size, colour, None, Some(borders))
     }
-        
+}
+
+impl Widget for Button {
     /// Returns the drawable shapes of the widget.
     fn shapes(&self) -> Vec<Shape> {
         vec![
@@ -61,7 +59,6 @@ impl SurfacedWidget for Button {
         ]
     }
 
-    /// Returns the larger size possible of the widget, from its shapes.
     fn size(&self) -> Size {
         self.size
     }

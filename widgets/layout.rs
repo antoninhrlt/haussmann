@@ -2,8 +2,8 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{ Overflow, Align, graphics::{Size, Point} };
-use super::Widget;
+use crate::{ Overflow, Align, graphics::{Size, Point, shapes, colours::RGBA}, Border, ToAny };
+use super::{ Widget, DebugWidget };
 
 /// Layout to contain several widgets.
 /// 
@@ -16,6 +16,10 @@ pub struct Layout {
     /// The size of the layout is the a zone containing all the widgets, indeed
     /// no widget can be out of this zone.
     pub size: Size,
+    /// The colour of the layout.
+    pub colour: RGBA,
+    /// The borders of the layout.
+    pub borders: Option<[Border; 4]>,
     /// The widgets contained in the layout.
     pub widgets: Vec<Box<dyn Widget>>,
     /// Rules about widget overflowing.
@@ -34,16 +38,56 @@ pub struct Layout {
     pub wy_align: Align,
 }
 
+crate::dynamic_widget!(Layout);
+
+impl Widget for Layout {
+    fn shapes(&self) -> Vec<crate::graphics::Shape> {
+        let mut shape = shapes::Builder::new()
+            .rectangle(self.size, self.borders)
+            .fill(self.colour)
+            .finish();
+
+        if self.is_fixed() {
+            shape.move_at(self.position.unwrap());
+        }
+        
+        vec![shape]
+    }
+
+    fn size(&self) -> Size {
+        self.size
+    }
+}
+
 impl Layout {
     /// Creates a normal layout, without position defined. It is not "fixed".
     pub fn new(widgets: Vec<Box<dyn Widget>>, overflow: Overflow, x_align: Align, y_align: Align, wx_align: Align, wy_align: Align) -> Self {
         Self {
             position: None,
             size: [0, 0],
+            colour: RGBA::default(),
+            borders: None,
             widgets,
             overflow,
             x_align: Some(x_align),
             y_align: Some(y_align),
+            wx_align,
+            wy_align,
+        }
+    }
+    
+    /// Creates a normal layout with borders, without position defined. It is 
+    /// not "fixed".
+    pub fn bordered(size: Size, borders: [Border; 4], widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align) -> Self {
+        Self {
+            position: None,
+            size,
+            colour: RGBA::default(),
+            borders: Some(borders),
+            widgets,
+            overflow,
+            x_align: None,
+            y_align: None,
             wx_align,
             wy_align,
         }
@@ -54,6 +98,8 @@ impl Layout {
         Self {
             position: Some(position),
             size,
+            colour: RGBA::default(),
+            borders: None,
             widgets,
             overflow,
             x_align: None,
@@ -63,6 +109,21 @@ impl Layout {
         }
     }
 
+    /// Creates a layout with borders, fixed at a specific `position` point.
+    pub fn fixed_bordered(position: Point, size: Size, borders: [Border; 4], widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align) -> Self {
+        Self {
+            position: Some(position),
+            size,
+            colour: RGBA::default(),
+            borders: Some(borders),
+            widgets,
+            overflow,
+            x_align: None,
+            y_align: None,
+            wx_align,
+            wy_align,
+        }
+    }
     
     /// Returns all the widgets of type `T` from the `widgets` contained in the 
     /// layout.
@@ -94,9 +155,7 @@ impl Layout {
         for boxed in &self.widgets {
             match boxed.as_any().downcast_ref::<T>() {
                 Some(widget) => widgets.push(widget),
-                None => {
-                    println!("shit: {:?}", boxed);
-                } // not a widget of type `T`.
+                None => {} // not a widget of type `T`.
             }
         }
         

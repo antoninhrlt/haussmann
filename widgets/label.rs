@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::theme::TextTheme;
+use crate::{theme::TextTheme, ToAny};
 use super::{Widget, DebugWidget};
 
 /// Label widget, which is not a "surfaced" widget. The text has to be rendered, 

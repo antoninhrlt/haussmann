@@ -2,8 +2,6 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use std::fmt::Debug;
-
 use crate::{
     graphics::{
         Size, 
@@ -11,7 +9,7 @@ use crate::{
         colours::RGBA
     }, 
     Radius, 
-    Border
+    Border, ToAny
 };
 
 mod button;
@@ -26,7 +24,7 @@ pub use layout::Layout;
 /// 
 /// A widget contains one or more shapes. Its size is the larger size being a 
 /// zone containing all the shapes.
-pub trait Widget: DebugWidget {
+pub trait Widget: DebugWidget + ToAny {
 
 }
 

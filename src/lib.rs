@@ -23,19 +23,19 @@ pub use theme::Theme;
 
 pub use widgets::{ Widget, DebugWidget };
 
-pub trait ToAny: 'static {
+pub trait ToAny {
     fn as_any(&self) -> &dyn std::any::Any;
-}
-
-impl<X: 'static> ToAny for X {
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
 }
 
 #[macro_export]
 macro_rules! dynamic_widget {
     ($t:ty) => {
+        impl ToAny for $t {
+            fn as_any(&self) -> &dyn std::any::Any {
+                self
+            }
+        }
+        
         impl From<$t> for Box<dyn Widget> {
             fn from(value: $t) -> Self {
                 Box::new(value)

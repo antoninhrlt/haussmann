@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{graphics::{Shape, shapes, colours::RGBA, Size}, Border, Radius, DebugWidget};
+use crate::{graphics::{Shape, shapes, colours::RGBA, Size}, Border, Radius, DebugWidget, ToAny};
 use super::{Widget, SurfacedWidget};
 
 /// Button widget, without text.

@@ -89,11 +89,11 @@ impl Layout {
         let mut widgets = vec![];
 
         for boxed in &self.widgets {
-            let any: &dyn std::any::Any = boxed.as_any();
-
-            match any.downcast_ref::<T>() {
-                Some(widget) => widgets.push(widget.clone()),
-                None => {} // not a widget of type `T`.
+            match boxed.as_any().downcast_ref::<T>() {
+                Some(widget) => widgets.push(widget),
+                None => {
+                    println!("shit: {:?}", boxed);
+                } // not a widget of type `T`.
             }
         }
         

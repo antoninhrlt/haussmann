@@ -4,7 +4,7 @@
 
 use crate::{graphics::colours::RGBA, font::FontWeight, FontFamily, TextAlign};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct TextTheme {
     /// The height of the text.
     pub font_size: f32,

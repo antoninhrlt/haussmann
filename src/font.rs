@@ -14,7 +14,7 @@ pub struct FontFamily {
 }
 
 /// TTF Font with a `name`.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct TTFFont {
     /// The font's name identifier.
     pub name: String,
@@ -23,7 +23,7 @@ pub struct TTFFont {
 }
 
 /// Font weights
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum FontWeight {
     Black = 900,
     ExtraBold = 800,

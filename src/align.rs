@@ -4,7 +4,7 @@
 
 pub type TextAlign = Align;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Align {
     Center,
     Left,

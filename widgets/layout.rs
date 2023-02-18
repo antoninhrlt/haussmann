@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{ Overflow, Align, graphics::{Size, Point}, ToAny };
+use crate::{ Overflow, Align, graphics::{Size, Point} };
 use super::Widget;
 
 /// Layout to contain several widgets.
@@ -71,19 +71,22 @@ impl Layout {
     /// ```rust
     /// use haussmann::widgets;
     /// use haussmann::{ Overflow, Align };
-    /// use haussmann::widgets::{ Widget, SurfacedWidget, Button, FixedLayout };
+    /// use haussmann::widgets::{ Widget, Button, Label, Layout };
     /// use haussmann::graphics::colours::RGBA;
     /// 
-    /// let button1 = Button::new([30, 10], RGBA::new(0, 255, 255, 255));
-    /// let button2 = Button::new([30, 10], RGBA::new(255, 0, 255, 255));
+    /// let button1 = Button::simple([30, 10], RGBA::new(0, 255, 255, 255));
+    /// let button2 = Button::simple([30, 10], RGBA::new(255, 0, 255, 255));
+    /// let label1 = Label::simple("label1");
     ///
-    /// let layout = FixedLayout::new(
+    /// let layout = Layout::fixed(
     ///     [0, 0], [100, 100], 
-    ///     widgets![button1, button2],
+    ///     widgets![button1, label1, button2],
     ///     Overflow::Hide,
     ///     Align::Center, Align::Center
     /// );
-    /// let buttons = layout.widgets::<Button>();
+    /// let labels = layout.widgets::<Label>();
+    /// 
+    /// assert_eq!(labels, vec![&Label::simple("label1")]);
     /// ```
     pub fn widgets<T: 'static>(&self) -> Vec<&T> {
         let mut widgets = vec![];

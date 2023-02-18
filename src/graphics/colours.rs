@@ -11,6 +11,12 @@ pub struct RGBA {
     pub a: u32,
 }
 
+impl Default for RGBA {
+    fn default() -> Self {
+        RGBA { r: 0, g: 0, b: 0, a: 0 }
+    }
+}
+
 impl RGBA {
     /// Creates a new `RGBA` object.
     /// 

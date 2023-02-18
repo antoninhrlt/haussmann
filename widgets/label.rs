@@ -9,7 +9,7 @@ use super::{Widget, DebugWidget};
 /// following its text theme.
 /// 
 /// Check https://github.com/mooman219/fontdue to render text with font.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Label {
     pub text: String,
     /// Independent text theme for this label.
@@ -20,11 +20,30 @@ pub struct Label {
 
 crate::dynamic_widget!(Label);
 
+impl Default for Label {
+    fn default() -> Self {
+        Self {
+            text: String::new(),
+            theme: None,
+        }
+    }
+}
+
 impl Label {
-    pub fn new(text: &str) -> Self {
+    /// Creates a label with a specific `theme`.
+    pub fn new(text: &str, theme: TextTheme) -> Self {
         Self {
             text: text.to_string(),
-            theme: None,
+            theme: Some(theme),
+        }
+    }
+
+    /// Creates a label without specific `theme`, the global theme for texts 
+    /// is used.
+    pub fn simple(text: &str) -> Self {
+        Self {
+            text: text.to_string(),
+            ..Self::default()
         }
     }
 }

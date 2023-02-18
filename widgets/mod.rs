@@ -11,21 +11,23 @@ use crate::{
 };
 
 pub mod buttons;
+mod image;
 mod label;
 pub mod layout;
 
 pub use buttons::Button;
+pub use image::Image;
 pub use label::Label;
 pub use layout::Layout;
 
 /// The simplest functionalities and property getters of any widget.
 /// 
-/// A widget contains one or more shapes. Its size is the larger size being a 
-/// zone containing all the shapes.
-/// 
-/// It's heavily recommanded to create another constructor called `all()` with 
-/// all the options possible. Then, each constructor shall call `all()` with 
-/// their values, and `None` values for the unwanted options.
+/// Every structure implementing the `Widget` trait must implement the following 
+/// functions :
+/// - `new`: Constructor with all the values.
+/// - `simple`: Constructor for the simplest widget possible.
+/// - Other constructors like `rounded` if a `radius` can be added or `bordered`
+/// if `borders` can be added.
 pub trait Widget: DebugWidget + ToAny {
     /// Returns the drawable shapes of the widget.
     /// 

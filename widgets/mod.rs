@@ -6,17 +6,15 @@ use crate::{
     graphics::{
         Size, 
         Shape, 
-        colours::RGBA
     }, 
-    Radius, 
-    Border, ToAny
+    ToAny
 };
 
-mod button;
+pub mod buttons;
 mod label;
 pub mod layout;
 
-pub use button::Button;
+pub use buttons::Button;
 pub use label::Label;
 pub use layout::Layout;
 

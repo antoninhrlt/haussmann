@@ -11,7 +11,7 @@ use sdl2::rect::Rect;
 use std::time::Duration;
 
 use haussmann::{widgets, Align, Widget, Overflow};
-use haussmann::widgets::{CreateWidget, Button, Label, Layout};
+use haussmann::widgets::{Button, Label, Layout};
 
 #[test]
 fn with_sdl2() {
@@ -30,7 +30,7 @@ fn with_sdl2() {
 
     let label = Label::new("Hello!");
 
-    let button = Button::new(
+    let button = Button::simple(
         [100, 50], 
         RGBA::new(255, 0, 0, 255),
     );

@@ -41,11 +41,23 @@ pub struct Shape {
 }
 
 impl Shape {
+    /// Moves all the points from the given top-left position. 
+    pub(crate) fn move_at(&mut self, position: Point) {
+        for point in &mut self.points {
+            *point = [position[0] + point[0], position[1] + point[1]];
+        }
+    }
+
     /// Returns the shape's points.
     pub fn points(&self) -> &Vec<Point> {
         &self.points
     }
     
+    /// Returns the first point of the shape being its position.
+    pub fn position(&self) -> &Point {
+        &self.points[0]
+    }
+
     /// Returns the shape's borders if they exist, otherwise returns `None`. 
     pub fn borders(&self) -> Option<&Vec<Border>> {
         if self.borders.is_empty() {

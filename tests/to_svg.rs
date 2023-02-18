@@ -5,7 +5,7 @@
 use svg::node::element::Path;
 use svg::node::element::path::Data;
 
-use haussmann::{widgets::{Button, SurfacedWidget}, graphics::{shapes, colours::RGBA, Shape}, Radius};
+use haussmann::{widgets::{Button, CreateWidget}, graphics::{shapes, colours::RGBA, Shape}, Radius, Widget};
 
 #[test]
 fn shape_to_svg() {

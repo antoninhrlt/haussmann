@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use haussmann::graphics;
+use haussmann::graphics::{self, Shape};
 use haussmann::graphics::colours::RGBA;
 use sdl2::pixels::Color;
 use sdl2::event::Event;
@@ -11,7 +11,7 @@ use sdl2::rect::Rect;
 use std::time::Duration;
 
 use haussmann::{widgets, Align, Widget, Overflow};
-use haussmann::widgets::{SurfacedWidget, Button, Label, Layout};
+use haussmann::widgets::{CreateWidget, Button, Label, Layout};
 
 #[test]
 fn with_sdl2() {
@@ -32,7 +32,7 @@ fn with_sdl2() {
 
     let button = Button::new(
         [100, 50], 
-        RGBA::new(255, 0, 0, 255)
+        RGBA::new(255, 0, 0, 255),
     );
 
     let layout = Layout::fixed(
@@ -71,7 +71,8 @@ fn with_sdl2() {
             )
         ).unwrap();
 
-        let button = layout.widgets::<Button>()[0].shapes()[0].clone();
+        let button: &Button = layout.widgets::<Button>()[0];
+        let button: Shape = button.shapes()[0].clone();
 
         let button_colour = button.fill_colour().unwrap();
         canvas.set_draw_color(

@@ -1,7 +1,12 @@
 [package]
 name = "haussmann"
+description = "Integrate highly customisable widgets and themes for any Rust application or GUI library"
 authors = ["Antonin Hérault <antonherault@gmail.com>"]
-version = "0.1.0"
+repository = "https://github.com/antoninhrlt/haussmann"
+readme = "README.md"
+keywords = ["widgets", "gui", "ux", "toolkit", "theme"]
+license = "MIT"
+version = "0.0.1"
 edition = "2021"
 
 [dependencies]

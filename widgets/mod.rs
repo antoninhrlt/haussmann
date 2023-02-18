@@ -44,17 +44,6 @@ pub trait Widget: DebugWidget + ToAny {
     fn size(&self) -> Size;
 }
 
-pub trait CreateWidget: Widget {
-    /// Creates a widget without corner radius nor borders.
-    fn new(size: Size, colour: RGBA) -> Self;
-
-    /// Creates a widget with a corner radius.
-    fn rounded(size: Size, colour: RGBA, radius: Radius) -> Self;
-
-    /// Creates a widget with borders.
-    fn bordered(size: Size, colour: RGBA, borders: [Border; 4]) -> Self;
-}
-
 /// Implements the `Debug` trait for dynamic `Widget` objects.
 impl std::fmt::Debug for dyn Widget {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -70,6 +59,14 @@ pub trait DebugWidget {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
 }
 
+/// Implements what it is needed to make this widget a clean `dyn Widget` to be 
+/// inserted in layouts etc...
+/// 
+/// > The `t` argument is the type of the widget. It can be a `Button`, 
+/// a `Label`, ...
+/// 
+/// To use this trait, the `ToAny`, `Widget`, `DebugWidget` traits must be 
+/// imported in the usage context.
 #[macro_export]
 macro_rules! dynamic_widget {
     ($t:ty) => {
@@ -93,11 +90,21 @@ macro_rules! dynamic_widget {
     };
 }
 
+/// Creates a vector of dynamic widgets from a series of widgets, no matter 
+/// their type as long as they implement the `Widget` trait.
+/// 
+/// To use this trait, the `Widget` trait must be imported in the usage context.
 #[macro_export]
 macro_rules! widgets {
     ($first:expr $(, $widget:expr) *) => {
+        // Code block returning a vector of boxes of dynamic widget.
         {
-            let widgets: Vec<Box<dyn Widget>> = vec![$first.into(), $($widget.into()),*];
+            // The type annotation here is very important. It transforms the 
+            // widget boxes into boxes of dynamic widget.
+            let widgets: Vec<Box<dyn Widget>> = vec![
+                $first.into(), 
+                $($widget.into()),*
+            ];
             widgets
         }
     };

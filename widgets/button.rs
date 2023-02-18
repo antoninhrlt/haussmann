@@ -3,7 +3,7 @@
 // Copyright (c) 2023 Antonin Hérault
 
 use crate::{graphics::{Shape, shapes, colours::RGBA, Size}, Border, Radius, ToAny};
-use super::{Widget, CreateWidget, DebugWidget, Label};
+use super::{Widget, DebugWidget, Label};
 
 /// Button widget, without text.
 #[derive(Debug, Clone)]
@@ -16,34 +16,55 @@ pub struct Button {
 
 crate::dynamic_widget!(Button);
 
-impl Button {
-    /// Creates the most complex button possible. 
-    /// 
-    /// However, `borders` can be `None`.
-    fn all(size: Size, colour: RGBA, radius: Option<Radius>, borders: Option<[Border; 4]>) -> Self {
+impl Default for Button {
+    fn default() -> Self {
         Self {
-            size,
-            colour,
-            radius: radius.unwrap_or(Radius::new(0.0)),
-            borders,
+            size: [0, 0],
+            colour: RGBA::new(0, 0, 0, 0),
+            radius: Radius::new(0.0),
+            borders: None,
         }
     }
 }
 
-impl CreateWidget for Button {
-    /// Creates the simplest button possible.
-    fn new(size: Size, colour: RGBA) -> Self {
-        Self::all(size, colour, None, None)
-    }
-    
-    /// Creates a button with a radius.
-    fn rounded(size: Size, colour: RGBA, radius: Radius) -> Self {
-        Self::all(size, colour, Some(radius), None)
+impl Button {
+    /// Creates a button with a `radius` and `borders`.
+    pub fn new(size: Size, colour: RGBA, radius: Radius, borders: [Border; 4]) -> Self {
+        Self {
+            size,
+            colour,
+            radius,
+            borders: Some(borders),
+        }
     }
 
-    /// Creates a button with borders.
-    fn bordered(size: Size, colour: RGBA, borders: [Border; 4]) -> Self {
-        Self::all(size, colour, None, Some(borders))
+    /// Creates the simplest button possible, without radius nor borders.
+    pub fn simple(size: Size, colour: RGBA) -> Self {
+        Self {
+            size,
+            colour,
+            ..Self::default()
+        }
+    }
+
+    /// Creates a button with a `radius` but no `borders`.
+    pub fn rounded(size: Size, colour: RGBA, radius: Radius) -> Self {
+        Self {
+            size,
+            colour,
+            radius,
+            ..Self::default()
+        }
+    }
+
+    /// Creates a button with `borders` but no `radius`.
+    pub fn bordered(size: Size, colour: RGBA, borders: [Border; 4]) -> Self {
+        Self {
+            size,
+            colour,
+            borders: Some(borders),
+            ..Self::default()
+        }
     }
 }
 

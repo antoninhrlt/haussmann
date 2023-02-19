@@ -2,8 +2,8 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use haussmann::{Integrator, graphics};
-use haussmann::graphics::{Shape, calculate_size};
+use haussmann::{Integrator, graphics, Direction};
+use haussmann::graphics::{Shape, calculate_size, Size};
 use haussmann::graphics::colours::RGBA;
 use sdl2::pixels::Color;
 use sdl2::event::Event;
@@ -53,9 +53,8 @@ impl DrawableZone {
 }
 
 impl Integrator for DrawableZone {
-    fn shape(&mut self, shape: &Shape) {
-        let (width, height) = calculate_size(shape);
-        println!("{}x{}", width, height);
+    fn shape(&mut self, shape: &Shape) { 
+        let size: Size = calculate_size(shape);
 
         // If the shape is not filled with a colour, use the window's colour.
         self.change_colour(
@@ -68,8 +67,8 @@ impl Integrator for DrawableZone {
                     Rect::new(
                         shape.position()[0] as i32, 
                         shape.position()[1] as i32, 
-                        width as u32,
-                        height as u32,
+                        size[0] as u32,
+                        size[1] as u32,
                     )
                 ).unwrap();
             },
@@ -77,12 +76,12 @@ impl Integrator for DrawableZone {
         }
     }
 
-    fn image(&mut self, image: &Image, in_layout: Option<&Layout>) {
-
+    fn image(&mut self, image: &Image) {
+        println!("renders image : {:?}", image);
     }
 
-    fn label(&mut self, label: &Label, in_layout: Option<&Layout>) {
-
+    fn label(&mut self, label: &Label) {
+        println!("renders label : {:?}", label);
     }
 }
 
@@ -101,17 +100,28 @@ fn with_sdl2() {
     let label = Label::simple("Hello!");
 
     let button = Button::simple(
-        [100, 50], 
+        [100, 60], 
         RGBA::new(255, 0, 0, 255),
+    );
+
+    let button2 = Button::simple(
+        [80, 50], 
+        RGBA::new(0, 255, 0, 255),
+    );
+
+    let button3 = Button::simple(
+        [40, 40], 
+        RGBA::new(0, 0, 255, 255),
     );
 
     let layout = Layout::fixed(
         [50, 50],
         [300, 500],
-        widgets![button, label], 
+        widgets![label, button, button2, button3],
         Overflow::Hide, 
         Align::Center, 
-        Align::Center
+        Align::Center,
+        Direction::Column,
     );
 
     let mut event_pump = sdl_context.event_pump().unwrap();
@@ -130,11 +140,8 @@ fn with_sdl2() {
             }
         }
         
-        // Does not draw the widgets contained in the layout!
+        // Draws the layout and its widgets.
         canvas.layout(&layout);
-
-        let button: &Button = layout.widgets::<Button>()[0];
-        canvas.button(&button, Some(&layout));
 
         canvas.present();
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));

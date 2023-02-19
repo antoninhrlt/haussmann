@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{ Overflow, Align, graphics::{Size, Point, shapes::{self, Shape}, colours::RGBA, self}, Border, ToAny, Direction, direction };
+use crate::{ Overflow, Align, graphics::{Size, Point, shapes::{self, Shape}, colours::RGBA, self, Aligner}, Border, ToAny, Direction, direction };
 use super::{ Widget, DebugWidget };
 
 /// Layout to contain several widgets.
@@ -60,21 +60,19 @@ impl Widget for Layout {
             shapes.push(layout_shape);
         }
 
-        let mut i = 0;
+        let mut aligner = Aligner::new(&self);
 
         // Pushes all the shapes of the widgets contained in the layout.
         for widget in &self.widgets {
-            for shape in widget.shapes() {
+            for shape in &widget.shapes() {
                 // Creates a copy to be able to move the shape.
                 let mut copy = shape.clone();
 
                 if is_fixed {
-                    let position = graphics::place_in_fixed_layout(self, &shape, i);
-                    copy.move_by(position);
+                    copy.move_by(aligner.align(shape));
                 }
 
                 shapes.push(copy);
-                i += 1;
             }
         }
 

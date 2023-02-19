@@ -9,6 +9,7 @@ pub mod graphics;
 
 mod align;
 mod border;
+mod direction;
 mod font;
 mod integrator;
 mod overflow;
@@ -17,6 +18,7 @@ mod theme;
 
 pub use align::{ Align, TextAlign };
 pub use border::Border;
+pub use direction::Direction;
 pub use font::*;
 pub use integrator::Integrator;
 pub use overflow::Overflow;

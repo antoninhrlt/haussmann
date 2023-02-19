@@ -20,7 +20,7 @@ pub use builder::Builder;
 /// 
 /// Thanks to `ShapeBuilder` it's surely a safe structure, there cannot be any 
 /// illogical problem.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Shape {
     /// The points of the shape.
     /// 
@@ -41,8 +41,8 @@ pub struct Shape {
 }
 
 impl Shape {
-    /// Moves all the points from the given top-left position. 
-    pub(crate) fn move_at(&mut self, position: Point) {
+    /// Moves all the points by `position`.
+    pub(crate) fn move_by(&mut self, position: Point) {
         for point in &mut self.points {
             *point = [position[0] + point[0], position[1] + point[1]];
         }

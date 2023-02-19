@@ -2,49 +2,57 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{widgets::{Button, buttons::{TextButton, ImageButton}, Image, Label, Layout}, graphics::{Shape, self}, Widget};
+use crate::{widgets::{Button, buttons::{TextButton, ImageButton}, Image, Label, Layout}, graphics::Shape, Widget};
 
 /// Trait to implement on a drawable surface to draw the widgets.
 /// 
-/// Some functions are not provided, it's because it's about widgets which 
-/// cannot be renderer the normal way. They must be implemented.
+/// Some functions are not provided, it is because it's about widgets which 
+/// cannot be rendered the normal way.
 pub trait Integrator {
+    /// Renders a shape.
     fn shape(&mut self, shape: &Shape);
 
-    fn button(&mut self, button: &Button, in_layout: Option<&Layout>) {
-        let button = &mut button.shapes()[0];
-        
-        // Change position if contained in a layout.
-        match in_layout {
-            Some(layout) => {
-                if !layout.is_fixed() {
-                    return;
-                }
+    /// Renders a button.
+    fn button(&mut self, button: &Button) {
+        self.shape(&button.shapes()[0]);
+    }
+    
+    /// Renders a button and renders its text over it.
+    fn text_button(&mut self, text_button: &TextButton) {
+        self.button(&Button::from(text_button));
+        self.label(&text_button.label);
+    }
 
-                let position = graphics::place_in_fixed_layout(layout, button);
-                button.move_at([position.0, position.1]);
-            }
-            None => {}
+    /// Renders a button and renders its image over it.
+    fn image_button(&mut self, image_button: &ImageButton) {
+        self.button(&Button::from(image_button));
+        self.image(&image_button.image);
+    }
+    
+    /// Renders an image.
+    fn image(&mut self, image: &Image);
+
+    /// Renders a text.
+    fn label(&mut self, label: &Label);
+    
+    /// Renders a layout and its widgets, even the images and labels.
+    /// 
+    /// Of course, images and labels are rendered thanks to `image` and `label` 
+    /// functions.
+    fn layout(&mut self, layout: &Layout) {
+        // Draws all layout's widgets having shapes.
+        for shape in &layout.shapes() {
+            self.shape(shape);
         }
 
-        self.shape(&button);
-    }
-    
-    fn text_button(&mut self, text_button: &TextButton, in_layout: Option<&Layout>) {
-        self.button(&Button::from(text_button), in_layout);
-        self.label(&text_button.label, in_layout);
-    }
+        // Renders all the images
+        for image in layout.widgets::<Image>() {
+            self.image(image);
+        }
 
-    fn image_button(&mut self, image_button: &ImageButton, in_layout: Option<&Layout>) {
-        self.button(&Button::from(image_button), in_layout);
-        self.image(&image_button.image, in_layout);
-    }
-    
-    fn image(&mut self, image: &Image, in_layout: Option<&Layout>);
-    fn label(&mut self, label: &Label, in_layout: Option<&Layout>);
-    
-    /// Does not draw the widgets contained in the layout !
-    fn layout(&mut self, layout: &Layout) {
-        self.shape(&layout.shapes()[0]);
+        // Renders all the labels
+        for label in layout.widgets::<Label>() {
+            self.label(label);
+        }
     }
 }

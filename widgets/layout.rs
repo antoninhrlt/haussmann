@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{ Overflow, Align, graphics::{Size, Point, shapes, colours::RGBA}, Border, ToAny };
+use crate::{ Overflow, Align, graphics::{Size, Point, shapes::{self, Shape}, colours::RGBA, self}, Border, ToAny, Direction, direction };
 use super::{ Widget, DebugWidget };
 
 /// Layout to contain several widgets.
@@ -15,7 +15,7 @@ pub struct Layout {
     position: Option<Point>,
     /// The size of the layout is the a zone containing all the widgets, indeed
     /// no widget can be out of this zone.
-    pub size: Size,
+    size: Size,
     /// The colour of the layout.
     pub colour: RGBA,
     /// The borders of the layout.
@@ -36,22 +36,49 @@ pub struct Layout {
     pub wx_align: Align,
     /// Widgets alignment on the Y axis inside the layout.
     pub wy_align: Align,
+    /// The direction of the widgets arrangement.
+    pub direction: Direction,
 }
 
 crate::dynamic_widget!(Layout);
 
 impl Widget for Layout {
-    fn shapes(&self) -> Vec<crate::graphics::Shape> {
-        let mut shape = shapes::Builder::new()
+    /// Returns the layout's shape plus the shapes of its widgets.
+    fn shapes(&self) -> Vec<Shape> {
+        let mut shapes = vec![];
+        
+        let mut layout_shape = shapes::Builder::new()
             .rectangle(self.size, self.borders)
             .fill(self.colour)
             .finish();
 
-        if self.is_fixed() {
-            shape.move_at(self.position.unwrap());
+        let is_fixed: bool = self.is_fixed();
+
+        // Moves the layout and push its shape. 
+        if is_fixed {
+            layout_shape.move_by(self.position.unwrap());
+            shapes.push(layout_shape);
         }
-        
-        vec![shape]
+
+        let mut i = 0;
+
+        // Pushes all the shapes of the widgets contained in the layout.
+        for widget in &self.widgets {
+            for shape in widget.shapes() {
+                // Creates a copy to be able to move the shape.
+                let mut copy = shape.clone();
+
+                if is_fixed {
+                    let position = graphics::place_in_fixed_layout(self, &shape, i);
+                    copy.move_by(position);
+                }
+
+                shapes.push(copy);
+                i += 1;
+            }
+        }
+
+        shapes
     }
 
     fn size(&self) -> Size {
@@ -61,7 +88,7 @@ impl Widget for Layout {
 
 impl Layout {
     /// Creates a normal layout, without position defined. It is not "fixed".
-    pub fn new(widgets: Vec<Box<dyn Widget>>, overflow: Overflow, x_align: Align, y_align: Align, wx_align: Align, wy_align: Align) -> Self {
+    pub fn new(widgets: Vec<Box<dyn Widget>>, overflow: Overflow, x_align: Align, y_align: Align, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
         Self {
             position: None,
             size: [0, 0],
@@ -73,12 +100,13 @@ impl Layout {
             y_align: Some(y_align),
             wx_align,
             wy_align,
+            direction
         }
     }
     
     /// Creates a normal layout with borders, without position defined. It is 
     /// not "fixed".
-    pub fn bordered(size: Size, borders: [Border; 4], widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align) -> Self {
+    pub fn bordered(size: Size, borders: [Border; 4], widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
         Self {
             position: None,
             size,
@@ -90,11 +118,12 @@ impl Layout {
             y_align: None,
             wx_align,
             wy_align,
+            direction
         }
     }
 
     /// Creates a layout fixed at a specific `position` point.
-    pub fn fixed(position: Point, size: Size, widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align) -> Self {
+    pub fn fixed(position: Point, size: Size, widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
         Self {
             position: Some(position),
             size,
@@ -106,11 +135,12 @@ impl Layout {
             y_align: None,
             wx_align,
             wy_align,
+            direction
         }
     }
 
     /// Creates a layout with borders, fixed at a specific `position` point.
-    pub fn fixed_bordered(position: Point, size: Size, borders: [Border; 4], widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align) -> Self {
+    pub fn fixed_bordered(position: Point, size: Size, borders: [Border; 4], widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
         Self {
             position: Some(position),
             size,
@@ -122,6 +152,7 @@ impl Layout {
             y_align: None,
             wx_align,
             wy_align,
+            direction
         }
     }
     

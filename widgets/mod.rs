@@ -29,11 +29,12 @@ pub use layout::Layout;
 /// - Other constructors like `rounded` if a `radius` can be added or `bordered`
 /// if `borders` can be added.
 pub trait Widget: DebugWidget + ToAny {
-    /// Returns the drawable shapes of the widget.
+    /// Returns the drawable shapes of the widget. Most widgets return a vector
+    /// with only one shape in.
     /// 
     /// If the returned vector is empty, it means there is no shape to draw. It 
-    /// can be because it's not a surfaced widget like a `Label`. The widget has 
-    /// to be renderer another way. However, the widget must have a size.
+    /// can be because it's not a surfaced widget, like a `Label`. The widget 
+    /// has to be renderer another way. However, the widget must have a size.
     fn shapes(&self) -> Vec<Shape> {
         vec![]
     }
@@ -96,6 +97,10 @@ macro_rules! dynamic_widget {
 /// To use this trait, the `Widget` trait must be imported in the usage context.
 #[macro_export]
 macro_rules! widgets {
+    ($first:expr $(, $widget:expr) *,) => {
+        widgets![$first, $($widget),*]
+    };
+
     ($first:expr $(, $widget:expr) *) => {
         // Code block returning a vector of boxes of dynamic widget.
         {

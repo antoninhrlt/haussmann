@@ -2,9 +2,10 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use haussmann::{Integrator, graphics, Direction};
-use haussmann::graphics::{Shape, calculate_size, Size};
+use haussmann::{Integrator, Direction};
+use haussmann::graphics::{Shape, calculate_size, Size, colours, Aligner};
 use haussmann::graphics::colours::RGBA;
+use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -13,6 +14,7 @@ use std::time::Duration;
 
 use haussmann::{widgets, Align, Widget, Overflow};
 use haussmann::widgets::{Button, Label, Layout, Image};
+use haussmann::controllers::tap;
 
 struct DrawableZone {
     pub canvas: sdl2::render::Canvas<sdl2::video::Window>,
@@ -29,6 +31,8 @@ impl DrawableZone {
     }
 
     fn change_colour(&mut self, colour: RGBA) {
+        self.canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
+
         self.canvas.set_draw_color(
             Color::RGBA(
                 colour.r as u8, 
@@ -56,9 +60,9 @@ impl Integrator for DrawableZone {
     fn shape(&mut self, shape: &Shape) { 
         let size: Size = calculate_size(shape);
 
-        // If the shape is not filled with a colour, use the window's colour.
+        // If the shape is not filled with a colour, use a transparent colour.
         self.change_colour(
-            shape.fill_colour().unwrap_or(Self::window_colour())
+            shape.fill_colour().unwrap_or(colours::TRANSPARENT)
         );
 
         match shape.points().len() {
@@ -77,11 +81,11 @@ impl Integrator for DrawableZone {
     }
 
     fn image(&mut self, image: &Image) {
-        println!("renders image : {:?}", image);
+        //println!("renders image : {:?}", image);
     }
 
     fn label(&mut self, label: &Label) {
-        println!("renders label : {:?}", label);
+        //println!("renders label : {:?}", label);
     }
 }
 
@@ -99,9 +103,14 @@ fn with_sdl2() {
 
     let label = Label::simple("Hello!");
 
-    let button = Button::simple(
-        [100, 60], 
-        RGBA::new(255, 0, 0, 255),
+    let button = tap::Detector::new(
+        Button::simple(
+            [100, 60], 
+            RGBA::new(255, 0, 0, 255),
+        ),
+        || {
+            println!("button1 was tapped!");
+        }
     );
 
     let button2 = Button::simple(
@@ -114,10 +123,21 @@ fn with_sdl2() {
         RGBA::new(0, 0, 255, 255),
     );
 
-    let layout = Layout::fixed(
+    let child_layout = Layout::coloured(
+        [100, 100],
+        widgets![button3],
+        RGBA::new(0, 0, 0, 100),
+        Overflow::Hide,
+        Align::Center,
+        Align::Center,
+        Direction::Column,
+    );
+
+    let mut layout = Layout::fixed_coloured(
         [50, 50],
         [300, 500],
-        widgets![label, button, button2, button3],
+        RGBA::new(0, 0, 0, 100),
+        widgets![label, button, child_layout, button2],
         Overflow::Hide, 
         Align::Center, 
         Align::Center,
@@ -129,6 +149,9 @@ fn with_sdl2() {
     'running: loop {
         canvas.change_colour(DrawableZone::window_colour());
         canvas.clear();
+
+        // Draws the layout and its widgets.
+        canvas.layout(&mut layout);
         
         for event in event_pump.poll_iter() {
             match event {
@@ -136,12 +159,37 @@ fn with_sdl2() {
                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                     break 'running
                 },
+                Event::MouseButtonDown {
+                    mouse_btn, 
+                    x, 
+                    y, 
+                    .. 
+                } => {
+                    if mouse_btn != MouseButton::Left {
+                        return;
+                    }
+
+                    let mut aligner = Aligner::new(&layout);
+
+                    for detector in layout.widgets::<tap::Detector>() {
+                        let mut widget: Shape = detector.shapes()[0].clone();
+                        aligner.align_shape(&mut widget);
+                        let position = widget.points()[0];
+                        let size = detector.tap_zone();
+                        let (x, y) = (x as isize, y as isize);
+
+                        if 
+                            (x >= position[0] && x <= position[0] + size[0] as isize) 
+                            && (y >= position[1] && y <= position[1] + size[1] as isize)
+                        {
+                            let callback: fn() = detector.on_tap;
+                            callback();
+                        }
+                    }
+                }
                 _ => {}
             }
         }
-        
-        // Draws the layout and its widgets.
-        canvas.layout(&layout);
 
         canvas.present();
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));

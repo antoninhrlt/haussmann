@@ -2,6 +2,11 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+pub const TRANSPARENT: RGBA = RGBA { r: 0, g: 0, b: 0, a: 0 };
+pub const RED: RGBA = RGBA { r: 255, g: 0, b: 0, a: 255 };
+pub const GREEN: RGBA = RGBA { r: 0, g: 255, b: 0, a: 255 };
+pub const BLUE: RGBA = RGBA { r: 0, g: 0, b: 255, a: 255 };
+
 /// Colour with red, green and blue values + an alpha channel.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct RGBA {

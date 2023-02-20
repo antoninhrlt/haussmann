@@ -9,8 +9,6 @@ mod aligner;
 pub use shapes::Shape;
 pub use aligner::Aligner;
 
-use crate::{widgets::Layout, Widget, Align, direction, Direction};
-
 /// Vector of type `T` with 2 values.
 pub type Vec2<T> = [T; 2];
 

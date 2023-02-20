@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{ Overflow, Align, graphics::{Size, Point, shapes::{self, Shape}, colours::RGBA, self, Aligner}, Border, ToAny, Direction, direction };
+use crate::{ Overflow, Align, graphics::{Size, Point, shapes::{self, Shape}, colours::RGBA, Aligner}, Border, ToAny, Direction };
 use super::{ Widget, DebugWidget };
 
 /// Layout to contain several widgets.
@@ -24,14 +24,6 @@ pub struct Layout {
     pub widgets: Vec<Box<dyn Widget>>,
     /// Rules about widget overflowing.
     pub overflow: Overflow,
-    /// Layout alignment on the X axis.
-    /// 
-    /// `None` for fixed layouts.
-    pub x_align: Option<Align>,
-    /// Layout alignment on the Y axis.
-    /// 
-    /// `None` for fixed layouts.
-    pub y_align: Option<Align>, 
     /// Widgets alignment on the X axis inside the layout.
     pub wx_align: Align,
     /// Widgets alignment on the Y axis inside the layout.
@@ -54,26 +46,34 @@ impl Widget for Layout {
 
         let is_fixed: bool = self.is_fixed();
 
-        // Moves the layout and push its shape. 
         if is_fixed {
+            // Moves the layout's shape to the layout's position. 
             layout_shape.move_by(self.position.unwrap());
-            shapes.push(layout_shape);
         }
 
-        let mut aligner = Aligner::new(&self);
+        // Pushes the layout's shape.
+        shapes.push(layout_shape);
+
+        let mut aligner = Aligner::new(self);
 
         // Pushes all the shapes of the widgets contained in the layout.
         for widget in &self.widgets {
-            for shape in &widget.shapes() {
-                // Creates a copy to be able to move the shape.
-                let mut copy = shape.clone();
+            // If it has more than one shape, it is a layout.
+            // Layouts inside layout must be rendered independently.
 
-                if is_fixed {
-                    copy.move_by(aligner.align(shape));
-                }
-
-                shapes.push(copy);
+            // No shape.
+            if widget.shapes().len() == 0 {
+                continue;
             }
+
+            // Creates a copy to be able to move the shape.
+            let mut shape = widget.shapes()[0].clone();
+
+            if is_fixed {
+                shape.move_by(aligner.align(&shape));
+            }
+
+            shapes.push(shape);
         }
 
         shapes
@@ -86,16 +86,28 @@ impl Widget for Layout {
 
 impl Layout {
     /// Creates a normal layout, without position defined. It is not "fixed".
-    pub fn new(widgets: Vec<Box<dyn Widget>>, overflow: Overflow, x_align: Align, y_align: Align, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
+    pub fn new(size: Size, widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
         Self {
             position: None,
-            size: [0, 0],
+            size,
             colour: RGBA::default(),
             borders: None,
             widgets,
             overflow,
-            x_align: Some(x_align),
-            y_align: Some(y_align),
+            wx_align,
+            wy_align,
+            direction
+        }
+    }
+
+    pub fn coloured(size: Size, widgets: Vec<Box<dyn Widget>>, colour: RGBA, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
+        Self {
+            position: None,
+            size,
+            colour,
+            borders: None,
+            widgets,
+            overflow,
             wx_align,
             wy_align,
             direction
@@ -112,8 +124,6 @@ impl Layout {
             borders: Some(borders),
             widgets,
             overflow,
-            x_align: None,
-            y_align: None,
             wx_align,
             wy_align,
             direction
@@ -129,8 +139,20 @@ impl Layout {
             borders: None,
             widgets,
             overflow,
-            x_align: None,
-            y_align: None,
+            wx_align,
+            wy_align,
+            direction
+        }
+    }
+
+    pub fn fixed_coloured(position: Point, size: Size, colour: RGBA, widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
+        Self {
+            position: Some(position),
+            size,
+            colour,
+            borders: None,
+            widgets,
+            overflow,
             wx_align,
             wy_align,
             direction
@@ -146,14 +168,12 @@ impl Layout {
             borders: Some(borders),
             widgets,
             overflow,
-            x_align: None,
-            y_align: None,
             wx_align,
             wy_align,
             direction
         }
     }
-    
+
     /// Returns all the widgets of type `T` from the `widgets` contained in the 
     /// layout.
     /// 
@@ -198,6 +218,6 @@ impl Layout {
 
     /// Returns the `position` when it is not `None`. Otherwise, panics.
     pub fn position(&self) -> Point {
-        self.position.expect("unable to get the position of a not-fixed layout")
+        self.position.expect("unable to get the position of a non-fixed layout")
     }
 }

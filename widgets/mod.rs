@@ -30,7 +30,8 @@ pub use layout::Layout;
 /// if `borders` can be added.
 pub trait Widget: DebugWidget + ToAny {
     /// Returns the drawable shapes of the widget. Most widgets return a vector
-    /// with only one shape in.
+    /// with only one shape in, the only widgets returning more than one shape
+    /// are layouts.
     /// 
     /// If the returned vector is empty, it means there is no shape to draw. It 
     /// can be because it's not a surfaced widget, like a `Label`. The widget 

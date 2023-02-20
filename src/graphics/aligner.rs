@@ -34,12 +34,17 @@ impl<'a> Aligner<'a> {
     /// Called by `Aligner::new()`.
     pub fn update(&mut self) {
         for widget in &self.layout.widgets {
-            for shape in &widget.shapes() {
-                let shape_size: Size = super::calculate_size(shape);
-                
-                self.widths.push(shape_size[0]);
-                self.heights.push(shape_size[1]);
+            // No shape.
+            if widget.shapes().len() == 0 {
+                continue;
             }
+
+            let shape = &widget.shapes()[0];
+
+            let shape_size: Size = super::calculate_size(shape);
+            
+            self.widths.push(shape_size[0]);
+            self.heights.push(shape_size[1]);
         }
     }
 

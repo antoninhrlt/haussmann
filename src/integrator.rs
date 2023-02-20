@@ -8,6 +8,9 @@ use crate::{widgets::{Button, buttons::{TextButton, ImageButton}, Image, Label, 
 /// 
 /// Some functions are not provided, it is because it's about widgets which 
 /// cannot be rendered the normal way.
+/// 
+/// The functions are defined with a mutable `self`, it is to permit the user
+/// modifying anything on their drawable surface alongside rendering widgets.
 pub trait Integrator {
     /// Renders a shape.
     fn shape(&mut self, shape: &Shape);

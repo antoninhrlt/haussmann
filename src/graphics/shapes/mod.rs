@@ -42,7 +42,7 @@ pub struct Shape {
 
 impl Shape {
     /// Moves all the points by `position`.
-    pub(crate) fn move_by(&mut self, position: Point) {
+    pub fn move_by(&mut self, position: Point) {
         for point in &mut self.points {
             *point = [position[0] + point[0], position[1] + point[1]];
         }

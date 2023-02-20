@@ -37,43 +37,42 @@ crate::dynamic_widget!(Layout);
 impl Widget for Layout {
     /// Returns the layout's shape plus the shapes of its widgets.
     fn shapes(&self) -> Vec<Shape> {
-        let mut shapes = vec![];
-        
+        // Creates a shape for the layout.
         let mut layout_shape = shapes::Builder::new()
             .rectangle(self.size, self.borders)
             .fill(self.colour)
             .finish();
 
+        // Whether this layout is fixed or not.
         let is_fixed: bool = self.is_fixed();
 
         if is_fixed {
-            // Moves the layout's shape to the layout's position. 
+            // Moves the layout's shape to the layout's actual position. 
             layout_shape.move_by(self.position.unwrap());
         }
 
+        let mut shapes = vec![];
         // Pushes the layout's shape.
         shapes.push(layout_shape);
 
-        let mut aligner = Aligner::new(self);
-
-        // Pushes all the shapes of the widgets contained in the layout.
+        // Pushes the widgets' shape.
         for widget in &self.widgets {
-            // If it has more than one shape, it is a layout.
-            // Layouts inside layout must be rendered independently.
+            let widget_shapes = &widget.shapes();
 
-            // No shape.
-            if widget.shapes().len() == 0 {
+            // Widget is not shaped.
+            if widget_shapes.len() == 0 {
                 continue;
             }
 
-            // Creates a copy to be able to move the shape.
-            let mut shape = widget.shapes()[0].clone();
+            // todo: sub-layouts
+            shapes.push(widget_shapes[0].clone());
+        }
 
-            if is_fixed {
-                shape.move_by(aligner.align(&shape));
-            }
-
-            shapes.push(shape);
+        if is_fixed {
+            // Align the `shapes` in the layout.
+            // Directly modify the elements of the `shapes` vector.
+            let mut aligner = Aligner::new(self);
+            aligner.align_shapes(&mut shapes);
         }
 
         shapes
@@ -209,7 +208,7 @@ impl Layout {
         }
         
         widgets
-    } 
+    }
 
     /// Returns whether the layout is "fixed" or not. 
     pub fn is_fixed(&self) -> bool {

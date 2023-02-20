@@ -2,6 +2,9 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+#[path = "../controllers/mod.rs"]
+pub mod controllers;
+
 #[path = "../widgets/mod.rs"]
 pub mod widgets;
 

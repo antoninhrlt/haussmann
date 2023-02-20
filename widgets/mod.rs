@@ -98,6 +98,10 @@ macro_rules! dynamic_widget {
 /// To use this trait, the `Widget` trait must be imported in the usage context.
 #[macro_export]
 macro_rules! widgets {
+    () => {
+        vec![]
+    };
+
     ($first:expr $(, $widget:expr) *,) => {
         widgets![$first, $($widget),*]
     };

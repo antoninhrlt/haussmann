@@ -10,40 +10,28 @@ use crate::{
     ToAny
 };
 
-pub mod buttons;
+mod button;
+mod container;
 mod image;
 mod label;
 pub mod layout;
 
-pub use buttons::Button;
+pub use button::Button;
+pub use container::Container;
 pub use image::Image;
 pub use label::Label;
 pub use layout::Layout;
 
 /// The simplest functionalities and property getters of any widget.
-/// 
-/// Every structure implementing the `Widget` trait must implement the following 
-/// functions :
-/// - `new`: Constructor with all the values.
-/// - `simple`: Constructor for the simplest widget possible.
-/// - Other constructors like `rounded` if a `radius` can be added or `bordered`
-/// if `borders` can be added.
 pub trait Widget: DebugWidget + ToAny {
-    /// Returns the drawable shapes of the widget. Most widgets return a vector
-    /// with only one shape in, the only widgets returning more than one shape
-    /// are layouts.
+    /// Returns the widget as a shape of `size`. If it's a widget containing 
+    /// other widgets, it does not return its children but only itself as a 
+    /// shape.
     /// 
-    /// If the returned vector is empty, it means there is no shape to draw. It 
-    /// can be because it's not a surfaced widget, like a `Label`. The widget 
-    /// has to be renderer another way. However, the widget must have a size.
-    fn shapes(&self) -> Vec<Shape> {
-        vec![]
-    }
-
-    /// Returns the larger size possible of the widget, from its shapes.
-    /// 
-    /// Nothing of the widget can be out of this zone.
-    fn size(&self) -> Size;
+    /// ## Note
+    /// When the widget is actually a `Container`, the `size` parameter is its 
+    /// own size.
+    fn shape(&self, size: Size) -> Shape;
 }
 
 /// Implements the `Debug` trait for dynamic `Widget` objects.
@@ -98,10 +86,6 @@ macro_rules! dynamic_widget {
 /// To use this trait, the `Widget` trait must be imported in the usage context.
 #[macro_export]
 macro_rules! widgets {
-    () => {
-        vec![]
-    };
-
     ($first:expr $(, $widget:expr) *,) => {
         widgets![$first, $($widget),*]
     };

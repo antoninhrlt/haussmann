@@ -7,7 +7,7 @@ use crate::{Widget, graphics::{Size, Shape}, ToAny, DebugWidget};
 #[derive(Debug)]
 pub struct Detector {
     /// Widget where the tap detection will be done.
-    widget: Box<dyn Widget>,
+    pub widget: Box<dyn Widget>,
     /// Function called when `widget` is tapped.
     pub on_tap: fn(),
 }
@@ -15,12 +15,10 @@ pub struct Detector {
 crate::dynamic_widget!(Detector);
 
 impl Widget for Detector {
-    fn shapes(&self) -> Vec<Shape> {
-        self.widget.shapes()
-    }
-
-    fn size(&self) -> Size {
-        self.widget.size()
+    /// Calls `Widget::shape()` on `self.widget` and returns the returned value 
+    /// of this function.
+    fn shape(&self, size: Size) -> Shape {
+        self.widget.shape(size)
     }
 }
 
@@ -30,11 +28,5 @@ impl Detector {
             widget: Box::new(widget),
             on_tap,
         }
-    }
-
-    /// Returns the zone (which is the `widget`'s size) covered by the tap 
-    /// detector.
-    pub fn tap_zone(&self) -> Size {
-        self.widget.size()
     }
 }

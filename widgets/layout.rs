@@ -3,7 +3,7 @@
 // Copyright (c) 2023 Antonin Hérault
 
 use crate::{ Overflow, Align, graphics::{Size, Point, shapes::{self, Shape}, colours::RGBA, Aligner}, Border, ToAny, Direction };
-use super::{ Widget, DebugWidget };
+use super::{ Widget, DebugWidget, Container };
 
 /// Layout to contain several widgets.
 /// 
@@ -11,11 +11,6 @@ use super::{ Widget, DebugWidget };
 /// `None` fields but `position` is a `Some(x)`.
 #[derive(Debug)]
 pub struct Layout {
-    /// Only used for fixed layouts.`None` for a normal layout.
-    position: Option<Point>,
-    /// The size of the layout is the a zone containing all the widgets, indeed
-    /// no widget can be out of this zone.
-    size: Size,
     /// The colour of the layout.
     pub colour: RGBA,
     /// The borders of the layout.
@@ -32,63 +27,37 @@ pub struct Layout {
     pub direction: Direction,
 }
 
+impl Default for Layout {
+    fn default() -> Self {
+        Self {
+            colour: RGBA::default(),
+            borders: None,
+            widgets: vec![],
+            overflow: Overflow::Ignore,
+            wx_align: Align::Center,
+            wy_align: Align::Center,
+            direction: Direction::Column,
+        }
+    }
+}
+
 crate::dynamic_widget!(Layout);
 
 impl Widget for Layout {
-    /// Returns the layout's shape plus the shapes of its widgets.
-    fn shapes(&self) -> Vec<Shape> {
-        // Creates a shape for the layout.
-        let mut layout_shape = shapes::Builder::new()
-            .rectangle(self.size, self.borders)
+    /// Returns the shape of the layout itself of `size` filled with colour 
+    /// `self.colour`, with borders if defined.
+    fn shape(&self, size: Size) -> Shape {
+        shapes::Builder::new()
+            .rectangle(size, self.borders)
             .fill(self.colour)
-            .finish();
-
-        // Whether this layout is fixed or not.
-        let is_fixed: bool = self.is_fixed();
-
-        if is_fixed {
-            // Moves the layout's shape to the layout's actual position. 
-            layout_shape.move_by(self.position.unwrap());
-        }
-
-        let mut shapes = vec![];
-        // Pushes the layout's shape.
-        shapes.push(layout_shape);
-
-        // Pushes the widgets' shape.
-        for widget in &self.widgets {
-            let widget_shapes = &widget.shapes();
-
-            // Widget is not shaped.
-            if widget_shapes.len() == 0 {
-                continue;
-            }
-
-            // todo: sub-layouts
-            shapes.push(widget_shapes[0].clone());
-        }
-
-        if is_fixed {
-            // Align the `shapes` in the layout.
-            // Directly modify the elements of the `shapes` vector.
-            let mut aligner = Aligner::new(self);
-            aligner.align_shapes(&mut shapes);
-        }
-
-        shapes
-    }
-
-    fn size(&self) -> Size {
-        self.size
+            .finish()
     }
 }
 
 impl Layout {
     /// Creates a normal layout, without position defined. It is not "fixed".
-    pub fn new(size: Size, widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
+    pub fn simple(widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
         Self {
-            position: None,
-            size,
             colour: RGBA::default(),
             borders: None,
             widgets,
@@ -99,10 +68,8 @@ impl Layout {
         }
     }
 
-    pub fn coloured(size: Size, widgets: Vec<Box<dyn Widget>>, colour: RGBA, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
+    pub fn coloured(widgets: Vec<Box<dyn Widget>>, colour: RGBA, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
         Self {
-            position: None,
-            size,
             colour,
             borders: None,
             widgets,
@@ -115,54 +82,8 @@ impl Layout {
     
     /// Creates a normal layout with borders, without position defined. It is 
     /// not "fixed".
-    pub fn bordered(size: Size, borders: [Border; 4], widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
+    pub fn bordered(borders: [Border; 4], widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
         Self {
-            position: None,
-            size,
-            colour: RGBA::default(),
-            borders: Some(borders),
-            widgets,
-            overflow,
-            wx_align,
-            wy_align,
-            direction
-        }
-    }
-
-    /// Creates a layout fixed at a specific `position` point.
-    pub fn fixed(position: Point, size: Size, widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
-        Self {
-            position: Some(position),
-            size,
-            colour: RGBA::default(),
-            borders: None,
-            widgets,
-            overflow,
-            wx_align,
-            wy_align,
-            direction
-        }
-    }
-
-    pub fn fixed_coloured(position: Point, size: Size, colour: RGBA, widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
-        Self {
-            position: Some(position),
-            size,
-            colour,
-            borders: None,
-            widgets,
-            overflow,
-            wx_align,
-            wy_align,
-            direction
-        }
-    }
-
-    /// Creates a layout with borders, fixed at a specific `position` point.
-    pub fn fixed_bordered(position: Point, size: Size, borders: [Border; 4], widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
-        Self {
-            position: Some(position),
-            size,
             colour: RGBA::default(),
             borders: Some(borders),
             widgets,
@@ -210,13 +131,17 @@ impl Layout {
         widgets
     }
 
-    /// Returns whether the layout is "fixed" or not. 
-    pub fn is_fixed(&self) -> bool {
-        self.position != None
-    }
+    /// Returns all the widgets which are not of type `T`.
+    pub fn not_widget<T: 'static>(&self) -> Vec<&Box<dyn Widget>> {
+        let mut widgets = vec![];
 
-    /// Returns the `position` when it is not `None`. Otherwise, panics.
-    pub fn position(&self) -> Point {
-        self.position.expect("unable to get the position of a non-fixed layout")
+        for boxed in &self.widgets {
+            match boxed.as_any().downcast_ref::<T>() {
+                Some(_) => {}, // type `T`, ignore it.
+                None => widgets.push(boxed)
+            }
+        }
+        
+        widgets
     }
 }

@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{theme::TextTheme, ToAny, graphics::Size};
+use crate::{theme::TextTheme, ToAny, graphics::{Size, Shape}};
 use super::{Widget, DebugWidget};
 
 /// Label widget, which is not a "surfaced" widget. The text has to be rendered, 
@@ -49,7 +49,7 @@ impl Label {
 }
 
 impl Widget for Label {
-    fn size(&self) -> Size {
-        todo!("calculate the size of a text label")   
+    fn shape(&self, size: Size) -> Shape {
+        panic!("cannot return shape")
     }
 }

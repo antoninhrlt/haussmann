@@ -13,7 +13,7 @@ fn shape_builder() {
     let colour = RGBA::new(255, 0, 0, 255);
 
     let triangle = shapes::Builder::<3>::new()
-        .create::<fn()>([a, b, c], None)
+        .create([a, b, c], None)
         .fill(colour)
         .finish();
 

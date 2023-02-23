@@ -2,8 +2,8 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use haussmann::{Drawer, Direction};
-use haussmann::graphics::{Shape, calculate_size, Size, colours, Aligner};
+use haussmann::{Drawer, Direction, Theme, TextTheme, FontWeight, TextAlign};
+use haussmann::graphics::{Shape, calculate_size, Size, colours, Aligner, Point};
 use haussmann::graphics::colours::RGBA;
 use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
@@ -84,16 +84,12 @@ impl Drawer for Canvas {
         }
     }
 
-    fn image(&mut self, _image: &Image) {
+    fn image(&mut self, position: Point, _image: &Image) {
         todo!()
     }
 
-    fn label(&mut self, _label: &Label) {
-        todo!()
-    }
-
-    fn set_layout(&mut self, layout: Layout) {
-        self.layout = layout;
+    fn label(&mut self, position: Point, label: &Label) {
+        // todo
     }
 
     fn layout(&self) -> &Layout {
@@ -116,6 +112,7 @@ fn with_sdl2() {
         window_size.1 as u32
     )
         .position_centered()
+        .resizable()
         .build()
         .unwrap();
 
@@ -127,6 +124,7 @@ fn with_sdl2() {
         widgets![
             tap::Detector::new(
                 Button::simple(
+                    Label::simple("Button 1"),
                     RGBA::new(255, 0, 0, 255),
                 ),
                 || {
@@ -135,17 +133,22 @@ fn with_sdl2() {
             ), 
             Layout::coloured(
                 widgets![
-                    Button::simple(
-                        RGBA::new(0, 0, 255, 255),
+                    Container::simple(
+                        [200, 100],
+                        Button::simple(
+                            Label::simple("Button 3"),
+                            RGBA::new(0, 0, 255, 255),
+                        )
                     )
                 ],
                 RGBA::new(0, 0, 0, 50),
                 Overflow::Hide,
-                Align::Left,
-                Align::Bottom,
+                Align::Center,
+                Align::Center,
                 Direction::Column,
             ), 
             Button::simple(
+                Label::simple("Button 2"),
                 RGBA::new(0, 255, 0, 255),
             )
         ],
@@ -155,14 +158,14 @@ fn with_sdl2() {
         Direction::Row,
     );
 
-    canvas.set_layout(layout);
+    canvas.layout = layout;
 
     let mut event_pump = sdl_context.event_pump().unwrap();
 
     'running: loop {
         canvas.clear();
 
-        canvas.draw([25, 25], [window_size.0 as usize - 50, window_size.1 as usize - 50]);
+        canvas.draw([0, 0], [window_size.0 as usize, window_size.1 as usize]);
 
         for event in event_pump.poll_iter() {
             match event {

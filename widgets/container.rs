@@ -22,12 +22,8 @@ crate::dynamic_widget!(Container);
 impl Widget for Container {
     /// Returns a rectangle of size `self.size` filled with colour 
     /// `self.colour`, with borders if defined.
-    fn shape(&self, size: Size) -> Shape {
-        assert_eq!(size, self.size, 
-            "size parameter = {:?} must be equal to self.size = {:?}", 
-            size, 
-            self.size
-        );
+    fn shape(&self, size: Option<Size>) -> Shape {
+        assert_eq!(size, None);
 
         shapes::Builder::new()
             .rectangle(self.size, self.borders)
@@ -37,6 +33,15 @@ impl Widget for Container {
 }
 
 impl Container {
+    pub fn new<T: Widget + 'static>(size: Size, colour: RGBA, borders: [Border; 4], widget: T) -> Self {
+        Self {
+            size,
+            colour,
+            borders: Some(borders),
+            widget: Box::new(widget),
+        }
+    }
+
     pub fn simple<T: Widget + 'static>(size: Size, widget: T) -> Self {
         Self {
             size,
@@ -55,10 +60,10 @@ impl Container {
         }
     }
     
-    pub fn bordered<T: Widget + 'static>(size: Size, colour: RGBA, borders: [Border; 4], widget: T) -> Self {
+    pub fn bordered<T: Widget + 'static>(size: Size, borders: [Border; 4], widget: T) -> Self {
         Self {
             size,
-            colour,
+            colour: RGBA::default(),
             borders: Some(borders),
             widget: Box::new(widget),
         }

@@ -46,9 +46,9 @@ crate::dynamic_widget!(Layout);
 impl Widget for Layout {
     /// Returns the shape of the layout itself of `size` filled with colour 
     /// `self.colour`, with borders if defined.
-    fn shape(&self, size: Size) -> Shape {
+    fn shape(&self, size: Option<Size>) -> Shape {
         shapes::Builder::new()
-            .rectangle(size, self.borders)
+            .rectangle(size.unwrap(), self.borders)
             .fill(self.colour)
             .finish()
     }

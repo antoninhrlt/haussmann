@@ -13,7 +13,7 @@ pub struct Image {
 crate::dynamic_widget!(Image);
 
 impl Widget for Image {
-    fn shape(&self, size: Size) -> Shape {
+    fn shape(&self, size: Option<Size>) -> Shape {
         panic!("cannot return shape")
     }
 }

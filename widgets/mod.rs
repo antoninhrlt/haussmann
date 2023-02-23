@@ -28,10 +28,8 @@ pub trait Widget: DebugWidget + ToAny {
     /// other widgets, it does not return its children but only itself as a 
     /// shape.
     /// 
-    /// ## Note
-    /// When the widget is actually a `Container`, the `size` parameter is its 
-    /// own size.
-    fn shape(&self, size: Size) -> Shape;
+    /// If the size is `None`, the widget has to define its own size.
+    fn shape(&self, size: Option<Size>) -> Shape;
 }
 
 /// Implements the `Debug` trait for dynamic `Widget` objects.
@@ -63,6 +61,31 @@ macro_rules! dynamic_widget {
         impl ToAny for $t {
             fn as_any(&self) -> &dyn std::any::Any {
                 self
+            }
+        }
+        
+        impl From<$t> for Box<dyn Widget> {
+            fn from(value: $t) -> Self {
+                Box::new(value)
+            }
+        }
+
+        impl DebugWidget for $t {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                write!(f, "{:?}", self)
+            }
+        }
+    };
+}
+
+/// Same as `dynamic_widget!` but for controllers. The `ToAny` implementation 
+/// returns `self.widget` as `Any` instead of the controller itself.s
+#[macro_export]
+macro_rules! dynamic_controller {
+    ($t:ty) => {
+        impl ToAny for $t {
+            fn as_any(&self) -> &dyn std::any::Any {
+                self.widget.as_any()
             }
         }
         

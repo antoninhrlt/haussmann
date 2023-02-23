@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{theme::TextTheme, ToAny, graphics::{Size, Shape}};
+use crate::{theme::TextTheme, ToAny, graphics::{Size, Shape, shapes}};
 use super::{Widget, DebugWidget};
 
 /// Label widget, which is not a "surfaced" widget. The text has to be rendered, 
@@ -12,19 +12,22 @@ use super::{Widget, DebugWidget};
 #[derive(Debug, Clone, PartialEq)]
 pub struct Label {
     pub text: String,
-    /// Independent text theme for this label.
-    /// 
-    /// If the theme is `None`, the global theme for texts is used.
-    pub theme: Option<TextTheme>,
+    pub theme: TextTheme,
 }
 
 crate::dynamic_widget!(Label);
+
+impl Widget for Label {
+    fn shape(&self, size: Option<Size>) -> Shape {
+        panic!("cannot return shape for label");
+    }
+}
 
 impl Default for Label {
     fn default() -> Self {
         Self {
             text: String::new(),
-            theme: None,
+            theme: TextTheme::default(),
         }
     }
 }
@@ -34,7 +37,7 @@ impl Label {
     pub fn new(text: &str, theme: TextTheme) -> Self {
         Self {
             text: text.to_string(),
-            theme: Some(theme),
+            theme,
         }
     }
 
@@ -45,11 +48,5 @@ impl Label {
             text: text.to_string(),
             ..Self::default()
         }
-    }
-}
-
-impl Widget for Label {
-    fn shape(&self, size: Size) -> Shape {
-        panic!("cannot return shape")
     }
 }

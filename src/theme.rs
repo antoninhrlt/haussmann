@@ -2,18 +2,29 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{graphics::colours::RGBA, font::FontWeight, FontFamily, TextAlign};
+use crate::{graphics::colours::RGBA, font::FontWeight, FontFamily, TextAlign, Align};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TextTheme {
     /// The height of the text.
-    pub font_size: f32,
+    pub font_size: u32,
     /// The weight of the letters.
     pub font_weight: FontWeight,
     /// The colour of the text.
     pub colour: RGBA,
     /// Text alignment.
     pub align: TextAlign,
+}
+
+impl Default for TextTheme {
+    fn default() -> Self {
+        Self {
+            font_size: 16,
+            font_weight: FontWeight::default(),
+            colour: RGBA::default(),
+            align: Align::Left,
+        }
+    }
 }
 
 /// Global search to be used as a fallback theme when a widget has a theme set 
@@ -47,10 +58,10 @@ impl Default for Theme {
             highlight_colour: RGBA::new(255, 0, 0, 255),
             focus_colour: RGBA::new(0, 0, 0, 100),
             font: None,
-            title: TextTheme { font_size: 24.0, font_weight: FontWeight::Bold, colour: RGBA::new(0, 0, 0, 255), align: TextAlign::Center },
-            subtitle: TextTheme { font_size: 18.0, font_weight: FontWeight::SemiBold, colour: RGBA::new(0, 0, 0, 255), align: TextAlign::Center },
-            text1: TextTheme { font_size: 12.0, font_weight: FontWeight::Medium, colour: RGBA::new(0, 0, 0, 255), align: TextAlign::Left },
-            text2: TextTheme { font_size: 12.0, font_weight: FontWeight::Medium, colour: RGBA::new(0, 0, 0, 255), align: TextAlign::Left },
+            title: TextTheme { font_size: 24, font_weight: FontWeight::Bold, colour: RGBA::new(0, 0, 0, 255), align: TextAlign::Center },
+            subtitle: TextTheme { font_size: 18, font_weight: FontWeight::SemiBold, colour: RGBA::new(0, 0, 0, 255), align: TextAlign::Center },
+            text1: TextTheme { font_size: 12, font_weight: FontWeight::Medium, colour: RGBA::new(0, 0, 0, 255), align: TextAlign::Left },
+            text2: TextTheme { font_size: 12, font_weight: FontWeight::Medium, colour: RGBA::new(0, 0, 0, 255), align: TextAlign::Left },
         }
     }
 }
@@ -66,10 +77,10 @@ impl Theme {
             highlight_colour: RGBA::from_hex(0xE6B450),
             focus_colour: RGBA::from_hex(0x47526640),
             font: None,
-            title: TextTheme { font_size: 24.0, font_weight: FontWeight::Bold, colour: font_colour, align: TextAlign::Center },
-            subtitle: TextTheme { font_size: 18.0, font_weight: FontWeight::SemiBold, colour: font_colour, align: TextAlign::Center },
-            text1: TextTheme { font_size: 12.0, font_weight: FontWeight::Medium, colour: font_colour, align: TextAlign::Left },
-            text2: TextTheme { font_size: 12.0, font_weight: FontWeight::Medium, colour: RGBA::from_hex(0x39BAE6), align: TextAlign::Left },
+            title: TextTheme { font_size: 24, font_weight: FontWeight::Bold, colour: font_colour, align: TextAlign::Center },
+            subtitle: TextTheme { font_size: 18, font_weight: FontWeight::SemiBold, colour: font_colour, align: TextAlign::Center },
+            text1: TextTheme { font_size: 12, font_weight: FontWeight::Medium, colour: font_colour, align: TextAlign::Left },
+            text2: TextTheme { font_size: 12, font_weight: FontWeight::Medium, colour: RGBA::from_hex(0x39BAE6), align: TextAlign::Left },
         }
     }
 }

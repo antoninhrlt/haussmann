@@ -26,7 +26,7 @@ pub use font::*;
 pub use drawer::Drawer;
 pub use overflow::Overflow;
 pub use radius::Radius;
-pub use theme::Theme;
+pub use theme::{TextTheme, Theme};
 
 pub use widgets::{ Widget, DebugWidget };
 

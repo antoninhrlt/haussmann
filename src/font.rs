@@ -35,3 +35,9 @@ pub enum FontWeight {
     ExtraLight = 200,
     Thin = 100,
 }
+
+impl Default for FontWeight {
+    fn default() -> Self {
+        FontWeight::Regular
+    }
+}

@@ -32,18 +32,10 @@ pub trait Widget: DebugWidget + ToAny {
     fn shape(&self, size: Option<Size>) -> Shape;
 }
 
-/// Implements the `Debug` trait for dynamic `Widget` objects.
-impl std::fmt::Debug for dyn Widget {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        // Calls `DebugWidget::fmt`.
-        self.fmt(f)
-    }
-}
-
 /// Automatically implemented by the macro `dynamic_widget`.
 /// 
 /// Prints an object which implements the `Widget` trait.
-pub trait DebugWidget {
+pub trait DebugWidget: std::fmt::Debug {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
 }
 
@@ -61,31 +53,6 @@ macro_rules! dynamic_widget {
         impl ToAny for $t {
             fn as_any(&self) -> &dyn std::any::Any {
                 self
-            }
-        }
-        
-        impl From<$t> for Box<dyn Widget> {
-            fn from(value: $t) -> Self {
-                Box::new(value)
-            }
-        }
-
-        impl DebugWidget for $t {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                write!(f, "{:?}", self)
-            }
-        }
-    };
-}
-
-/// Same as `dynamic_widget!` but for controllers. The `ToAny` implementation 
-/// returns `self.widget` as `Any` instead of the controller itself.s
-#[macro_export]
-macro_rules! dynamic_controller {
-    ($t:ty) => {
-        impl ToAny for $t {
-            fn as_any(&self) -> &dyn std::any::Any {
-                self.widget.as_any()
             }
         }
         

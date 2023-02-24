@@ -4,6 +4,7 @@
 
 use crate::{graphics::colours::RGBA, font::FontWeight, FontFamily, TextAlign, Align};
 
+/// Theme for a text with a font.
 #[derive(Debug, Clone, PartialEq)]
 pub struct TextTheme {
     /// The height of the text.
@@ -32,9 +33,13 @@ impl Default for TextTheme {
 /// Themes for different widgets or objects.
 #[derive(Debug, Clone)]
 pub struct Theme {
+    /// The main colour.
     pub primary_colour: RGBA,
+    /// The secondary main colour.
     pub secondary_colour: RGBA,
+    /// Colour used for highlighting.
     pub highlight_colour: RGBA,
+    /// Colour used on focusing.
     pub focus_colour: RGBA,
     /// Font family for all the texts.
     pub font: Option<FontFamily>,

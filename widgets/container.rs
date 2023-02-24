@@ -2,9 +2,10 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{graphics::{Size, Point, Shape, shapes, colours::{RGBA, self}}, Widget, DebugWidget, ToAny, Border};
+use crate::{graphics::{Size, Shape, shapes, colours::{RGBA, self}}, Widget, DebugWidget, ToAny, Border};
 
-/// Fixed zone containing a widget which is not able to go beyond it.
+/// Fixed zone containing a widget which is not able to go beyond it and which 
+/// will be of size `self.size`.
 #[derive(Debug)]
 pub struct Container {
     /// The size of the zone.
@@ -33,6 +34,7 @@ impl Widget for Container {
 }
 
 impl Container {
+    /// Creates a new containers.
     pub fn new<T: Widget + 'static>(size: Size, colour: RGBA, borders: [Border; 4], widget: T) -> Self {
         Self {
             size,
@@ -42,6 +44,7 @@ impl Container {
         }
     }
 
+    /// Creates the simple container possible.
     pub fn simple<T: Widget + 'static>(size: Size, widget: T) -> Self {
         Self {
             size,
@@ -51,6 +54,7 @@ impl Container {
         }
     }
 
+    /// Creates a container with a defined colour.
     pub fn coloured<T: Widget + 'static>(size: Size, colour: RGBA, widget: T) -> Self {
         Self {
             size,
@@ -60,6 +64,7 @@ impl Container {
         }
     }
     
+    /// Creates a container with borders.
     pub fn bordered<T: Widget + 'static>(size: Size, borders: [Border; 4], widget: T) -> Self {
         Self {
             size,

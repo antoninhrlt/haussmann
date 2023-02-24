@@ -2,13 +2,11 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{ Overflow, Align, graphics::{Size, Point, shapes::{self, Shape}, colours::RGBA, Aligner}, Border, ToAny, Direction };
-use super::{ Widget, DebugWidget, Container };
+use crate::{ Overflow, Align, graphics::{Size, shapes::{self, Shape}, colours::RGBA}, Border, ToAny, Direction };
+use super::{ Widget, DebugWidget };
 
-/// Layout to contain several widgets.
-/// 
-/// It can be fixed at a certain point, in this case `x_align`, `y_align` are 
-/// `None` fields but `position` is a `Some(x)`.
+/// Layout to contain several widgets and define alignment rules for these 
+/// widgets.
 #[derive(Debug)]
 pub struct Layout {
     /// The colour of the layout.
@@ -55,7 +53,20 @@ impl Widget for Layout {
 }
 
 impl Layout {
-    /// Creates a normal layout, without position defined. It is not "fixed".
+    /// Creates a new layout.
+    pub fn new(colour: RGBA, borders: [Border; 4], widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
+        Self {
+            colour,
+            borders: Some(borders),
+            widgets,
+            overflow,
+            wx_align,
+            wy_align,
+            direction,
+        }
+    }
+
+    /// Creates the simplest layout possible.
     pub fn simple(widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
         Self {
             colour: RGBA::default(),
@@ -68,6 +79,7 @@ impl Layout {
         }
     }
 
+    /// Creates a new layout with a colour.
     pub fn coloured(widgets: Vec<Box<dyn Widget>>, colour: RGBA, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
         Self {
             colour,
@@ -80,8 +92,7 @@ impl Layout {
         }
     }
     
-    /// Creates a normal layout with borders, without position defined. It is 
-    /// not "fixed".
+    /// Creates a layout with borders.
     pub fn bordered(borders: [Border; 4], widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
         Self {
             colour: RGBA::default(),

@@ -4,16 +4,18 @@
 
 use crate::{Widget, DebugWidget, ToAny, graphics::{Shape, Size}};
 
+/// Image widget.
 #[derive(Debug, Clone)]
 pub struct Image {
-    ratio: (f32, f32),
+    /// Aspect ratio of the image.
+    pub ratio: (f32, f32),
     // todo
 }
 
 crate::dynamic_widget!(Image);
 
 impl Widget for Image {
-    fn shape(&self, size: Option<Size>) -> Shape {
+    fn shape(&self, _size: Option<Size>) -> Shape {
         panic!("cannot return shape")
     }
 }
@@ -28,6 +30,7 @@ impl Default for Image {
 }
 
 impl Image {
+    /// Creates a new image.
     pub fn new(ratio: (f32, f32)) -> Self {
         Self {
             ratio,

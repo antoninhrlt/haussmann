@@ -2,6 +2,8 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+//! Widgets are items to be placed on a drawable surface and managed by layouts.
+
 use crate::{
     graphics::{
         Size, 
@@ -14,13 +16,15 @@ mod button;
 mod container;
 mod image;
 mod label;
-pub mod layout;
+mod layout;
+mod toolbar;
 
 pub use button::Button;
 pub use container::Container;
 pub use image::Image;
 pub use label::Label;
 pub use layout::Layout;
+pub use toolbar::ToolBar;
 
 /// The simplest functionalities and property getters of any widget.
 pub trait Widget: DebugWidget + ToAny {
@@ -32,21 +36,22 @@ pub trait Widget: DebugWidget + ToAny {
     fn shape(&self, size: Option<Size>) -> Shape;
 }
 
-/// Automatically implemented by the macro `dynamic_widget`.
-/// 
-/// Prints an object which implements the `Widget` trait.
+/// Automatically implemented by the macro [`dynamic_widget`](crate::dynamic_widget).
 pub trait DebugWidget: std::fmt::Debug {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result;
+    /// Should not be overridden
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
-/// Implements what it is needed to make this widget a clean `dyn Widget` to be 
+/// Implements what it is needed to make a widget a clean `dyn Widget` to be 
 /// inserted in layouts etc...
 /// 
-/// > The `t` argument is the type of the widget. It can be a `Button`, 
-/// a `Label`, ...
+/// The `t` argument is the type of the widget. It can be a [`Button`], a 
+/// [`Label`], ...
 /// 
-/// To use this trait, the `ToAny`, `Widget`, `DebugWidget` traits must be 
-/// imported in the usage context.
+/// To use this trait, the [`ToAny`], [`Widget`] and [`DebugWidget`] traits must 
+/// be imported in the usage context.
 #[macro_export]
 macro_rules! dynamic_widget {
     ($t:ty) => {
@@ -62,18 +67,15 @@ macro_rules! dynamic_widget {
             }
         }
 
-        impl DebugWidget for $t {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                write!(f, "{:?}", self)
-            }
-        }
+        impl DebugWidget for $t {}
     };
 }
 
 /// Creates a vector of dynamic widgets from a series of widgets, no matter 
-/// their type as long as they implement the `Widget` trait.
+/// their type as long as they implement the [`Widget`] trait.
 /// 
-/// To use this trait, the `Widget` trait must be imported in the usage context.
+/// To use this trait, the [`Widget`] trait must be imported in the usage 
+/// context.
 #[macro_export]
 macro_rules! widgets {
     ($first:expr $(, $widget:expr) *,) => {

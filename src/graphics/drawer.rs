@@ -19,8 +19,12 @@ pub trait Drawer {
     /// Draws a label on the drawable surface implementing this trait.
     fn label(&mut self, position: Point, label: &Label);
 
+    /// Returns the layout governing the align rules for widgets in the drawable 
+    /// surface implementing this trait.
     fn layout(&self) -> &Layout;
 
+    /// Returns placed and aligned shapes of the layout's widgets. Recursive 
+    /// function when encounters a [`Layout`] widget in the layout.
     fn shapes_from_layout(&self, layout: &Layout, position: Point, size: Size) -> Vec<Shape> {
         let not_containers = layout.not_widget::<Container>();
         let containers = layout.widgets::<Container>();
@@ -114,9 +118,8 @@ pub trait Drawer {
         shapes
     }
 
-    /// Draws the widgets contained in the layout (retrieved with 
-    /// `self.layout()`) following the layout's rules, in a zone of `size` at 
-    /// `position`.
+    /// Draws the widgets contained in the layout following the layout's rules, 
+    /// in a sized zone, at a certain position.
     fn draw(&mut self, position: Point, size: Size) {
         let layout = self.layout();
         let shapes = self.shapes_from_layout(layout, position, size);

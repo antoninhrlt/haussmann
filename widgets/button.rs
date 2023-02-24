@@ -2,14 +2,19 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{graphics::{Shape, shapes, colours::RGBA, Size, self}, Border, Radius, ToAny};
+use crate::{graphics::{Shape, shapes, colours::RGBA, Size}, Border, Radius, ToAny};
 use super::{Widget, DebugWidget, Label};
 
+/// Button widget with a label inside.
 #[derive(Debug, Clone)]
 pub struct Button {
+    /// The label in the center of the button.
     pub label: Label,
+    /// The colour of the button.
     pub colour: RGBA,
+    /// The radius of the button.
     pub radius: Radius,
+    /// The borders of the button.
     pub borders: Option<[Border; 4]>,
 }
 
@@ -36,6 +41,7 @@ impl Default for Button {
 }
 
 impl Button {
+    /// Creates a new button.
     pub fn new(label: Label, colour: RGBA, radius: Radius, borders: [Border; 4]) -> Self {
         Self {
             label,

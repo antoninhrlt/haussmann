@@ -2,6 +2,9 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+//! Tools to draw, to align in layouts, to shape and to colour 
+//! [`Widget`s](crate::Widget).
+
 pub mod shapes;
 pub mod colours;
 mod aligner;

@@ -2,23 +2,23 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+//! Shapes into what the widgets are converted and tools to create shapes.
+
 use crate::{Border, Radius};
 use super::Point;
 use super::colours::RGBA;
 
 mod builder;
-pub mod rectangle;
 
-/// `Builder` is accessible from `crate::graphics::shapes::Builder`.
 pub use builder::Builder;
 
-/// The parent of any sort of shape. To create a `Shape` object, see 
-/// `ShapeBuilder`.
+/// [`Widget`s](crate::Widget) are transformed into shapes to draw them on a 
+/// surface. To create a shape, use [`shapes::Builder`](Builder).
 /// 
 /// There is the same number of `points` than `borders`. The shape cannot be set 
-/// as `filled` without fill colour.
+/// as `filled` without a fill colour.
 /// 
-/// Thanks to `ShapeBuilder` it's surely a safe structure, there cannot be any 
+/// Thanks to shapes builder, it's surely a safe structure, there cannot be any 
 /// illogical problem.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Shape {

@@ -2,17 +2,40 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-pub const TRANSPARENT: RGBA = RGBA { r: 0, g: 0, b: 0, a: 0 };
-pub const RED: RGBA = RGBA { r: 255, g: 0, b: 0, a: 255 };
-pub const GREEN: RGBA = RGBA { r: 0, g: 255, b: 0, a: 255 };
+//! Structures to store and convert hexadecimal to RGBA colour values, and 
+//! colour constants.
+
+/// Blue colour constant (alpha = 255).
 pub const BLUE: RGBA = RGBA { r: 0, g: 0, b: 255, a: 255 };
+/// Green colour constant (alpha = 255).
+pub const GREEN: RGBA = RGBA { r: 0, g: 255, b: 0, a: 255 };
+/// Red colour constant (alpha = 255).
+pub const RED: RGBA = RGBA { r: 255, g: 0, b: 0, a: 255 };
+/// Transparent colour constant (alpha = 0).
+pub const TRANSPARENT: RGBA = RGBA { r: 0, g: 0, b: 0, a: 0 };
 
 /// Colour with red, green and blue values + an alpha channel.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct RGBA {
+    /// Red part of the colour corresponding to the first two bytes of an 
+    /// hexadecimal colour value. 
+    /// 
+    /// Must be in range from 0 to 255.
     pub r: u32,
+    /// Green part of the colour corresponding to the third and fourth bytes of 
+    /// an hexadecimal colour value. 
+    /// 
+    /// Must be in range from 0 to 255.
     pub g: u32,
+    /// Blue part of the colour corresponding to the fifth and sixth bytes of an 
+    /// hexadecimal colour value. 
+    /// 
+    /// Must be in range from 0 to 255.
     pub b: u32,
+    /// Alpha part of the colour corresponding to the seventh and eighth bytes 
+    /// of an hexadecimal colour value. 
+    /// 
+    /// Must be in range from 0 to 255.
     pub a: u32,
 }
 

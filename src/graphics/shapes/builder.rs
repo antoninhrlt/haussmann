@@ -4,22 +4,23 @@
 
 use super::Shape;
 use super::Point;
+use crate::graphics::Size;
 use crate::{Border, Radius};
 use crate::graphics::colours::RGBA;
 
-/// Creates a `Shape` with `N` points and `N` borders.
+/// Creates a shape with `N` points and `N` borders.
 /// 
 /// ## Why a shape builder 
-/// The purpose of this builder is to create a safe `Shape` object. Indeed, if 
+/// The purpose of this builder is to create a safe [`Shape`] object. Indeed, if 
 /// the shape were proposing build functions itself, the user could define a 
 /// structure with a different number of points than the borders or create a 
 /// filled shape without a fill colour.
 /// 
-/// > But, why not just using the const template argument `N` with `Shape` ?
-/// 
-/// The `Shape` structure wants to be a sort of parent for all the type of 
-/// shapes. Adding a `N` const template argument would not permit to have 
-/// different sort of shapes in a same widget. 
+/// The question : "why not just using the const template argument `N` with 
+/// [`Shape`]?" could be asked. And the answer would be: The [`Shape`] structure 
+/// wants to be a sort of parent for all the type of shapes. Adding a `N` const 
+/// template argument would not permit to have different sort of shapes in a 
+/// same widget. 
 pub struct Builder<const N: usize> {
     shape: Option<Shape>,
 }
@@ -67,5 +68,19 @@ impl<const N: usize> Builder<N> {
     /// Returns the shape finished.
     pub fn finish(&mut self) -> Shape {
         self.shape.clone().unwrap()
+    }
+}
+
+/// Basically an implementation to create a rectangle (`N` = 4) with 
+/// [`Builder`].
+impl Builder<4> {
+    /// Creates a builder for 4-points shapes actually being rectangles.
+    pub fn rectangle(&mut self, size: Size, borders: Option<[Border; 4]>) -> &mut Self {
+        self.create([
+            [0, 0],
+            [size[0] as isize, 0],
+            [size[0] as isize, size[1] as isize], 
+            [0, size[1] as isize],
+        ], borders)
     }
 }

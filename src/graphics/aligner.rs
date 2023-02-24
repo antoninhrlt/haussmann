@@ -2,10 +2,11 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{widgets::{Layout, Container}, Align, Direction, Widget};
+use crate::{widgets::{Layout}, Align, Direction};
 
 use super::{Shape, Size};
 
+/// Aligns shapes following the rules of a [`Layout`] widget.
 #[derive(Debug)]
 pub struct Aligner {
     /// All the widths of the shapes.
@@ -17,6 +18,8 @@ pub struct Aligner {
 }
 
 impl Aligner {
+    /// Creates a new aligner calculating the size of all the shapes grouped 
+    /// to avoid calculating it them at each [`Self::align_shapes`] call.
     pub fn new(shapes: &Vec<Shape>) -> Self {
         let mut widths = vec![];
         let mut heights = vec![];
@@ -37,14 +40,16 @@ impl Aligner {
         }
     }
  
-    /// Changes the position of the `shapes` to be aligned in the layout.
+    /// Changes the position of `shapes` to be aligned in the layout following 
+    /// its rules.
     pub fn align_shapes(&mut self, layout: &Layout, layout_shape: &Shape, shapes: &mut Vec<Shape>) {
         for mut shape in shapes {
             self.align_shape(layout, layout_shape, &mut shape);
         }
     }
 
-    /// Changes the position of a `shape` to be aligned in the layout.
+    /// Changes the position of a `shape` to be aligned in the layout following 
+    /// its rules.
     pub fn align_shape(&mut self, layout: &Layout, layout_shape: &Shape, shape: &mut Shape) {
         // Calculate the size of the `shape`.
         let shape_size: Size = super::calculate_size(shape);

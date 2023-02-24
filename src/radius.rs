@@ -4,6 +4,7 @@
 
 use std::f32::consts;
 
+/// Radius definition for a shape.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Radius(f32);
 
@@ -14,11 +15,12 @@ impl Default for Radius {
 }
 
 impl Radius {
+    /// Creates a new radius from degrees.
     pub fn new(degrees: f32) -> Self {
         Self(degrees)
     }
 
-    /// Converts the `value` given in radians to degrees.
+    /// Converts the value given in radians to degrees.
     pub fn from_radians(value: f32) -> Self {
         Self(value * consts::PI / 180.0)
     }

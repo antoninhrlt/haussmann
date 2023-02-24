@@ -2,23 +2,25 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{theme::TextTheme, ToAny, graphics::{Size, Shape, shapes}};
+use crate::{theme::TextTheme, ToAny, graphics::{Size, Shape}};
 use super::{Widget, DebugWidget};
 
 /// Label widget, which is not a "surfaced" widget. The text has to be rendered, 
 /// following its text theme.
 /// 
-/// Check https://github.com/mooman219/fontdue to render text with font.
+/// Check <https://github.com/mooman219/fontdue> to render text with font.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Label {
+    /// The text string of the label.
     pub text: String,
+    /// The theme for the text.
     pub theme: TextTheme,
 }
 
 crate::dynamic_widget!(Label);
 
 impl Widget for Label {
-    fn shape(&self, size: Option<Size>) -> Shape {
+    fn shape(&self, _size: Option<Size>) -> Shape {
         panic!("cannot return shape for label");
     }
 }

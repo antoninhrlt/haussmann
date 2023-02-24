@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{widgets::{Image, Label, Layout, Container, Button}, graphics::{Shape, Size, Point, Aligner}, Widget, Direction};
+use crate::{widgets::{Image, Label, Layout, Container}, graphics::{Shape, Size, Point, Aligner}, Widget, Direction};
 
 /// Trait to implement on a drawable surface in order to draw shapes and widgets
 /// which cannot be transformed into simple `Shape`s.
@@ -108,7 +108,7 @@ pub trait Drawer {
 
         shapes.extend(more_shapes);
 
-        // Draws each shape.
+        // Prepares each shape to be drawn.
         shapes.push(layout_shape);
 
         shapes
@@ -120,9 +120,10 @@ pub trait Drawer {
     fn draw(&mut self, position: Point, size: Size) {
         let layout = self.layout();
         let shapes = self.shapes_from_layout(layout, position, size);
-                
-        for shape in shapes {
-            self.shape(&shape);
+
+        // Draws each shape.
+        for shape in &shapes {
+            self.shape(shape);
         }
     }
 }

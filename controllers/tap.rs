@@ -4,12 +4,13 @@
 
 use crate::{Widget, graphics::{Size, Shape}, ToAny, DebugWidget};
 
+/// Wrapper for a widget to detect taps on it.
 #[derive(Debug)]
 pub struct Detector {
     /// Widget where the tap detection will be done.
     pub widget: Box<dyn Widget>,
     /// Function called when `widget` is tapped.
-    pub on_tap: fn(),
+    pub on_tap: fn(&'static mut Box<dyn Widget>),
 }
 
 crate::dynamic_widget!(Detector);
@@ -17,16 +18,21 @@ crate::dynamic_widget!(Detector);
 impl Widget for Detector {
     /// Calls `Widget::shape()` on `self.widget` and returns the returned value 
     /// of this function.
-    fn shape(&self, size: Size) -> Shape {
+    fn shape(&self, size: Option<Size>) -> Shape {
         self.widget.shape(size)
     }
 }
 
 impl Detector {
-    pub fn new<T: Widget + 'static>(widget: T, on_tap: fn()) -> Self {
+    pub fn new<T: Widget + 'static>(widget: T, on_tap: fn(&'static mut Box<dyn Widget>)) -> Self {
         Self {
             widget: Box::new(widget),
             on_tap,
         }
+    }
+
+    pub fn on_tap(&'static mut self) {
+        let call = self.on_tap;
+        call(&mut self.widget);
     }
 }

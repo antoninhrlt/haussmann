@@ -5,14 +5,14 @@
 use std::collections::HashMap;
 
 /// Font family with a name for the whole family.
-/// 
+///
 /// Each font from `fonts` is the font associated to each font's weight.
 #[derive(Debug, Clone)]
 pub struct FontFamily {
     /// The name of the font family.
     pub name: String,
     /// Font for each available [`FontWeight`].
-    pub fonts: HashMap<FontWeight, TTFFont>
+    pub fonts: HashMap<FontWeight, TTFFont>,
 }
 
 /// Named local TTF font.

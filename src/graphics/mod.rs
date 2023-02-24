@@ -2,17 +2,17 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-//! Tools to draw, to align in layouts, to shape and to colour 
+//! Tools to draw, to align in layouts, to shape and to colour
 //! [`Widget`s](crate::Widget).
 
-pub mod shapes;
-pub mod colours;
 mod aligner;
+pub mod colours;
 mod drawer;
+pub mod shapes;
 
-pub use shapes::Shape;
 pub use aligner::Aligner;
 pub use drawer::Drawer;
+pub use shapes::Shape;
 
 /// Vector of type `T` with 2 values.
 pub type Vec2<T> = [T; 2];
@@ -35,7 +35,7 @@ pub fn calculate_size(shape: &Shape) -> Size {
     x_values.sort();
 
     let greatest_x = x_values[0];
-    let smallest_x = x_values[x_values.len() -1];
+    let smallest_x = x_values[x_values.len() - 1];
 
     let width = smallest_x - greatest_x;
 
@@ -49,7 +49,7 @@ pub fn calculate_size(shape: &Shape) -> Size {
     y_values.sort();
 
     let greatest_y = y_values[0];
-    let smallest_y = y_values[y_values.len() -1];
+    let smallest_y = y_values[y_values.len() - 1];
 
     let height = smallest_y - greatest_y;
 

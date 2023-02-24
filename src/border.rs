@@ -5,8 +5,8 @@
 use crate::graphics::colours::RGBA;
 
 /// Rectangle border of width a width and a colour.
-/// 
-/// Borders are more commonly use in arrays like `[Border; 4]` to define a 
+///
+/// Borders are more commonly use in arrays like `[Border; 4]` to define a
 /// border on each side of a shape.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Border {
@@ -19,9 +19,6 @@ pub struct Border {
 impl Border {
     /// Creates a new sized and coloured border.
     pub fn new(width: i32, colour: RGBA) -> Self {
-        Self {
-            width,
-            colour,
-        }
+        Self { width, colour }
     }
 }

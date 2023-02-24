@@ -2,7 +2,10 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{Widget, DebugWidget, ToAny, graphics::{Shape, Size}};
+use crate::{
+    graphics::{Shape, Size},
+    DebugWidget, ToAny, Widget,
+};
 
 /// Image widget.
 #[derive(Debug, Clone)]

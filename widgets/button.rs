@@ -2,8 +2,11 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{graphics::{Shape, shapes, colours::RGBA, Size}, Border, Radius, ToAny};
-use super::{Widget, DebugWidget, Label};
+use super::{DebugWidget, Label, Widget};
+use crate::{
+    graphics::{colours::RGBA, shapes, Shape, Size},
+    Border, Radius, ToAny,
+};
 
 /// Button widget with a label inside.
 #[derive(Debug, Clone)]

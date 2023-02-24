@@ -4,36 +4,36 @@
 
 //! Shapes into what the widgets are converted and tools to create shapes.
 
-use crate::{Border, Radius};
-use super::Point;
 use super::colours::RGBA;
+use super::Point;
+use crate::{Border, Radius};
 
 mod builder;
 
 pub use builder::Builder;
 
-/// [`Widget`s](crate::Widget) are transformed into shapes to draw them on a 
+/// [`Widget`s](crate::Widget) are transformed into shapes to draw them on a
 /// surface. To create a shape, use [`shapes::Builder`](Builder).
-/// 
-/// There is the same number of `points` than `borders`. The shape cannot be set 
+///
+/// There is the same number of `points` than `borders`. The shape cannot be set
 /// as `filled` without a fill colour.
-/// 
-/// Thanks to shapes builder, it's surely a safe structure, there cannot be any 
+///
+/// Thanks to shapes builder, it's surely a safe structure, there cannot be any
 /// illogical problem.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Shape {
     /// The points of the shape.
-    /// 
+    ///
     /// The first point is the top left point. It is also relative to the layout
     /// where the shape is, it is not a fixed point.
     points: Vec<Point>,
-    /// Borders for each side of the shape. An empty `borders` vector is used to 
+    /// Borders for each side of the shape. An empty `borders` vector is used to
     /// define no borders.
     borders: Vec<Border>,
     /// The first value is whether the shape is filled, and the second value is
     /// the fill colour if the shape is filled.
-    /// 
-    /// If the shape is designed to be filled, the second value must be not 
+    ///
+    /// If the shape is designed to be filled, the second value must be not
     /// `None`.
     filled: (bool, Option<RGBA>),
     /// The radius of the shape, in degrees.
@@ -52,13 +52,13 @@ impl Shape {
     pub fn points(&self) -> &Vec<Point> {
         &self.points
     }
-    
+
     /// Returns the first point of the shape being its position.
     pub fn position(&self) -> &Point {
         &self.points[0]
     }
 
-    /// Returns the shape's borders if they exist, otherwise returns `None`. 
+    /// Returns the shape's borders if they exist, otherwise returns `None`.
     pub fn borders(&self) -> Option<&Vec<Border>> {
         if self.borders.is_empty() {
             None
@@ -73,11 +73,11 @@ impl Shape {
     }
 
     /// Returns the fill colour when exists, otherwise returns `None`. But, also
-    /// returns `None` if the shape is specified to not be filled, no matter if 
+    /// returns `None` if the shape is specified to not be filled, no matter if
     /// the fill colour exists or not.
     pub fn fill_colour(&self) -> Option<RGBA> {
         if !self.is_filled() {
-            // The shape is not filled, there is no fill colour or we don't care 
+            // The shape is not filled, there is no fill colour or we don't care
             // about it.
             None
         } else {

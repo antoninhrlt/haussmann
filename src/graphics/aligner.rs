@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{widgets::{Layout}, Align, Direction};
+use crate::{widgets::Layout, Align, Direction};
 
 use super::{Shape, Size};
 
@@ -18,29 +18,29 @@ pub struct Aligner {
 }
 
 impl Aligner {
-    /// Creates a new aligner calculating the size of all the shapes grouped 
+    /// Creates a new aligner calculating the size of all the shapes grouped
     /// to avoid calculating it them at each [`Self::align_shapes`] call.
     pub fn new(shapes: &Vec<Shape>) -> Self {
         let mut widths = vec![];
         let mut heights = vec![];
 
         for shape in &shapes.clone() {
-            // This calculation creates a rectangle zone containing the whole 
+            // This calculation creates a rectangle zone containing the whole
             // shape no matter its actual form.
             let shape_size: Size = super::calculate_size(shape);
-            
+
             widths.push(shape_size[0]);
             heights.push(shape_size[1]);
         }
-        
+
         Self {
             index: 0,
             widths,
-            heights
+            heights,
         }
     }
- 
-    /// Changes the position of `shapes` to be aligned in the layout following 
+
+    /// Changes the position of `shapes` to be aligned in the layout following
     /// its rules.
     pub fn align_shapes(&mut self, layout: &Layout, layout_shape: &Shape, shapes: &mut Vec<Shape>) {
         for mut shape in shapes {
@@ -48,7 +48,7 @@ impl Aligner {
         }
     }
 
-    /// Changes the position of a `shape` to be aligned in the layout following 
+    /// Changes the position of a `shape` to be aligned in the layout following
     /// its rules.
     pub fn align_shape(&mut self, layout: &Layout, layout_shape: &Shape, shape: &mut Shape) {
         // Calculate the size of the `shape`.
@@ -60,7 +60,7 @@ impl Aligner {
         let offset_width = self.widths[..self.index].iter().sum::<usize>() as isize;
         // Total of heights of the shapes already placed.
         let offset_height = self.heights[..self.index].iter().sum::<usize>() as isize;
-        
+
         // Total of widths of the shapes which are not already placed.
         let setoff_width = self.widths[self.index..].iter().sum::<usize>() as isize;
         // Total of heights of the shapes which are already placed.

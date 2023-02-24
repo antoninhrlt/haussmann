@@ -17,5 +17,5 @@ pub enum Align {
     /// Aligns item at the top of its parent.
     Top,
     /// Aligns item in the bottom of its parent.
-    Bottom
+    Bottom,
 }

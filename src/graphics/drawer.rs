@@ -2,28 +2,32 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{widgets::{Image, Label, Layout, Container}, graphics::{Shape, Size, Point, Aligner}, Widget, Direction};
+use crate::{
+    graphics::{Aligner, Point, Shape, Size},
+    widgets::{Container, Image, Label, Layout},
+    Direction, Widget,
+};
 
 /// Trait to implement on a drawable surface in order to draw shapes and widgets
 /// which cannot be transformed into simple `Shape`s.
-/// 
+///
 /// The functions are defined with a mutable `self`, it is to permit the user
 /// modifying anything on their drawable surface alongside rendering widgets.
 pub trait Drawer {
     /// Draws a shape on the drawable surface implementing this trait.
     fn shape(&mut self, shape: &Shape);
-    
+
     /// Draws an image on the drawable surface implementing this trait.
     fn image(&mut self, position: Point, image: &Image);
 
     /// Draws a label on the drawable surface implementing this trait.
     fn label(&mut self, position: Point, label: &Label);
 
-    /// Returns the layout governing the align rules for widgets in the drawable 
+    /// Returns the layout governing the align rules for widgets in the drawable
     /// surface implementing this trait.
     fn layout(&self) -> &Layout;
 
-    /// Returns placed and aligned shapes of the layout's widgets. Recursive 
+    /// Returns placed and aligned shapes of the layout's widgets. Recursive
     /// function when encounters a [`Layout`] widget in the layout.
     fn shapes_from_layout(&self, layout: &Layout, position: Point, size: Size) -> Vec<Shape> {
         let not_containers = layout.not_widget::<Container>();
@@ -35,7 +39,7 @@ pub trait Drawer {
         // Total of widths and heights of the widgets.
         let (mut widget_widths, mut widget_heights) = (0, 0);
 
-        // Adds the sizes of the layouts to the total of widths and heights of 
+        // Adds the sizes of the layouts to the total of widths and heights of
         // the widgets, since containers have defined size.
         for container in &containers {
             widget_widths += container.size[0];
@@ -47,14 +51,8 @@ pub trait Drawer {
             [0, 0]
         } else {
             match layout.direction {
-                Direction::Column => [
-                    (size[0] - widget_widths) / n_widgets,
-                    size[1]
-                ],
-                Direction::Row => [
-                    size[0],
-                    (size[1] - widget_heights) / n_widgets, 
-                ],
+                Direction::Column => [(size[0] - widget_widths) / n_widgets, size[1]],
+                Direction::Row => [size[0], (size[1] - widget_heights) / n_widgets],
             }
         };
 
@@ -70,7 +68,7 @@ pub trait Drawer {
 
             shapes.push(shape);
         }
-        
+
         let mut layout_shape = layout.shape(Some(size));
         layout_shape.move_by(position);
 
@@ -81,7 +79,7 @@ pub trait Drawer {
 
         for (i, shape) in shapes.iter_mut().enumerate() {
             aligner.align_shape(layout, &layout_shape, shape);
-            
+
             let widget_as_any = layout.widgets[i].as_any();
 
             match widget_as_any.downcast_ref::<Layout>() {
@@ -89,13 +87,11 @@ pub trait Drawer {
                     // It's the shape of a layout.
                     let sub_layout_position: Point = shape.points()[0];
 
-                    more_shapes.extend(
-                        self.shapes_from_layout(
-                            sub_layout,
-                            sub_layout_position, 
-                            size_of_not_container
-                        )
-                    );
+                    more_shapes.extend(self.shapes_from_layout(
+                        sub_layout,
+                        sub_layout_position,
+                        size_of_not_container,
+                    ));
                 }
                 None => {}
             }
@@ -118,7 +114,7 @@ pub trait Drawer {
         shapes
     }
 
-    /// Draws the widgets contained in the layout following the layout's rules, 
+    /// Draws the widgets contained in the layout following the layout's rules,
     /// in a sized zone, at a certain position.
     fn draw(&mut self, position: Point, size: Size) {
         let layout = self.layout();

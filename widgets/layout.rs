@@ -2,10 +2,17 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{ Overflow, Align, graphics::{Size, shapes::{self, Shape}, colours::RGBA}, Border, ToAny, Direction };
-use super::{ Widget, DebugWidget };
+use super::{DebugWidget, Widget};
+use crate::{
+    graphics::{
+        colours::RGBA,
+        shapes::{self, Shape},
+        Size,
+    },
+    Align, Border, Direction, Overflow, ToAny,
+};
 
-/// Layout to contain several widgets and define alignment rules for these 
+/// Layout to contain several widgets and define alignment rules for these
 /// widgets.
 #[derive(Debug)]
 pub struct Layout {
@@ -42,7 +49,7 @@ impl Default for Layout {
 crate::dynamic_widget!(Layout);
 
 impl Widget for Layout {
-    /// Returns the shape of the layout itself of `size` filled with colour 
+    /// Returns the shape of the layout itself of `size` filled with colour
     /// `self.colour`, with borders if defined.
     fn shape(&self, size: Option<Size>) -> Shape {
         shapes::Builder::new()
@@ -54,7 +61,15 @@ impl Widget for Layout {
 
 impl Layout {
     /// Creates a new layout.
-    pub fn new(colour: RGBA, borders: [Border; 4], widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
+    pub fn new(
+        colour: RGBA,
+        borders: [Border; 4],
+        widgets: Vec<Box<dyn Widget>>,
+        overflow: Overflow,
+        wx_align: Align,
+        wy_align: Align,
+        direction: Direction,
+    ) -> Self {
         Self {
             colour,
             borders: Some(borders),
@@ -67,7 +82,13 @@ impl Layout {
     }
 
     /// Creates the simplest layout possible.
-    pub fn simple(widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
+    pub fn simple(
+        widgets: Vec<Box<dyn Widget>>,
+        overflow: Overflow,
+        wx_align: Align,
+        wy_align: Align,
+        direction: Direction,
+    ) -> Self {
         Self {
             colour: RGBA::default(),
             borders: None,
@@ -75,12 +96,19 @@ impl Layout {
             overflow,
             wx_align,
             wy_align,
-            direction
+            direction,
         }
     }
 
     /// Creates a new layout with a colour.
-    pub fn coloured(widgets: Vec<Box<dyn Widget>>, colour: RGBA, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
+    pub fn coloured(
+        widgets: Vec<Box<dyn Widget>>,
+        colour: RGBA,
+        overflow: Overflow,
+        wx_align: Align,
+        wy_align: Align,
+        direction: Direction,
+    ) -> Self {
         Self {
             colour,
             borders: None,
@@ -88,12 +116,19 @@ impl Layout {
             overflow,
             wx_align,
             wy_align,
-            direction
+            direction,
         }
     }
-    
+
     /// Creates a layout with borders.
-    pub fn bordered(borders: [Border; 4], widgets: Vec<Box<dyn Widget>>, overflow: Overflow, wx_align: Align, wy_align: Align, direction: Direction) -> Self {
+    pub fn bordered(
+        borders: [Border; 4],
+        widgets: Vec<Box<dyn Widget>>,
+        overflow: Overflow,
+        wx_align: Align,
+        wy_align: Align,
+        direction: Direction,
+    ) -> Self {
         Self {
             colour: RGBA::default(),
             borders: Some(borders),
@@ -101,32 +136,32 @@ impl Layout {
             overflow,
             wx_align,
             wy_align,
-            direction
+            direction,
         }
     }
 
-    /// Returns all the widgets of type `T` from the `widgets` contained in the 
+    /// Returns all the widgets of type `T` from the `widgets` contained in the
     /// layout.
-    /// 
+    ///
     /// ## Example
     /// ```rust
     /// use haussmann::widgets;
     /// use haussmann::{ Overflow, Align };
     /// use haussmann::widgets::{ Widget, Button, Label, Layout };
     /// use haussmann::graphics::colours::RGBA;
-    /// 
+    ///
     /// let button1 = Button::simple([30, 10], RGBA::new(0, 255, 255, 255));
     /// let button2 = Button::simple([30, 10], RGBA::new(255, 0, 255, 255));
     /// let label1 = Label::simple("label1");
     ///
     /// let layout = Layout::fixed(
-    ///     [0, 0], [100, 100], 
+    ///     [0, 0], [100, 100],
     ///     widgets![button1, label1, button2],
     ///     Overflow::Hide,
     ///     Align::Center, Align::Center
     /// );
     /// let labels = layout.widgets::<Label>();
-    /// 
+    ///
     /// assert_eq!(labels, vec![&Label::simple("label1")]);
     /// ```
     pub fn widgets<T: 'static>(&self) -> Vec<&T> {
@@ -138,7 +173,7 @@ impl Layout {
                 None => {} // not a widget of type `T`.
             }
         }
-        
+
         widgets
     }
 
@@ -148,11 +183,11 @@ impl Layout {
 
         for boxed in &self.widgets {
             match boxed.as_any().downcast_ref::<T>() {
-                Some(_) => {}, // type `T`, ignore it.
-                None => widgets.push(boxed)
+                Some(_) => {} // type `T`, ignore it.
+                None => widgets.push(boxed),
             }
         }
-        
+
         widgets
     }
 }

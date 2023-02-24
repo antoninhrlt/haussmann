@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{graphics::colours::RGBA, font::FontWeight, FontFamily, TextAlign, Align};
+use crate::{font::FontWeight, graphics::colours::RGBA, Align, FontFamily, TextAlign};
 
 /// Theme for a text with a font.
 #[derive(Debug, Clone, PartialEq)]
@@ -28,8 +28,8 @@ impl Default for TextTheme {
     }
 }
 
-/// Global search to be used as a fallback theme when a widget has a theme set 
-/// as `None`. 
+/// Global search to be used as a fallback theme when a widget has a theme set
+/// as `None`.
 /// Themes for different widgets or objects.
 #[derive(Debug, Clone)]
 pub struct Theme {
@@ -54,7 +54,7 @@ pub struct Theme {
 }
 
 impl Default for Theme {
-    /// The default theme for any application using this crate. It's an 
+    /// The default theme for any application using this crate. It's an
     /// high-contrast theme, with colourful accent colours, not very pretty.
     fn default() -> Self {
         Self {
@@ -63,10 +63,30 @@ impl Default for Theme {
             highlight_colour: RGBA::new(255, 0, 0, 255),
             focus_colour: RGBA::new(0, 0, 0, 100),
             font: None,
-            title: TextTheme { font_size: 24, font_weight: FontWeight::Bold, colour: RGBA::new(0, 0, 0, 255), align: TextAlign::Center },
-            subtitle: TextTheme { font_size: 18, font_weight: FontWeight::SemiBold, colour: RGBA::new(0, 0, 0, 255), align: TextAlign::Center },
-            text1: TextTheme { font_size: 12, font_weight: FontWeight::Medium, colour: RGBA::new(0, 0, 0, 255), align: TextAlign::Left },
-            text2: TextTheme { font_size: 12, font_weight: FontWeight::Medium, colour: RGBA::new(0, 0, 0, 255), align: TextAlign::Left },
+            title: TextTheme {
+                font_size: 24,
+                font_weight: FontWeight::Bold,
+                colour: RGBA::new(0, 0, 0, 255),
+                align: TextAlign::Center,
+            },
+            subtitle: TextTheme {
+                font_size: 18,
+                font_weight: FontWeight::SemiBold,
+                colour: RGBA::new(0, 0, 0, 255),
+                align: TextAlign::Center,
+            },
+            text1: TextTheme {
+                font_size: 12,
+                font_weight: FontWeight::Medium,
+                colour: RGBA::new(0, 0, 0, 255),
+                align: TextAlign::Left,
+            },
+            text2: TextTheme {
+                font_size: 12,
+                font_weight: FontWeight::Medium,
+                colour: RGBA::new(0, 0, 0, 255),
+                align: TextAlign::Left,
+            },
         }
     }
 }
@@ -82,10 +102,30 @@ impl Theme {
             highlight_colour: RGBA::from_hex(0xE6B450),
             focus_colour: RGBA::from_hex(0x47526640),
             font: None,
-            title: TextTheme { font_size: 24, font_weight: FontWeight::Bold, colour: font_colour, align: TextAlign::Center },
-            subtitle: TextTheme { font_size: 18, font_weight: FontWeight::SemiBold, colour: font_colour, align: TextAlign::Center },
-            text1: TextTheme { font_size: 12, font_weight: FontWeight::Medium, colour: font_colour, align: TextAlign::Left },
-            text2: TextTheme { font_size: 12, font_weight: FontWeight::Medium, colour: RGBA::from_hex(0x39BAE6), align: TextAlign::Left },
+            title: TextTheme {
+                font_size: 24,
+                font_weight: FontWeight::Bold,
+                colour: font_colour,
+                align: TextAlign::Center,
+            },
+            subtitle: TextTheme {
+                font_size: 18,
+                font_weight: FontWeight::SemiBold,
+                colour: font_colour,
+                align: TextAlign::Center,
+            },
+            text1: TextTheme {
+                font_size: 12,
+                font_weight: FontWeight::Medium,
+                colour: font_colour,
+                align: TextAlign::Left,
+            },
+            text2: TextTheme {
+                font_size: 12,
+                font_weight: FontWeight::Medium,
+                colour: RGBA::from_hex(0x39BAE6),
+                align: TextAlign::Left,
+            },
         }
     }
 }

@@ -4,7 +4,10 @@
 
 //! Everything related to tapping widgets.
 
-use crate::{Widget, graphics::{Size, Shape}, ToAny, DebugWidget};
+use crate::{
+    graphics::{Shape, Size},
+    DebugWidget, ToAny, Widget,
+};
 
 /// Controller wrapping a widget to detect when it is tapped.
 #[derive(Debug)]
@@ -18,7 +21,7 @@ pub struct Detector {
 crate::dynamic_widget!(Detector);
 
 impl Widget for Detector {
-    /// Calls `Widget::shape()` on `self.widget` and returns the returned value 
+    /// Calls `Widget::shape()` on `self.widget` and returns the returned value
     /// of this function.
     fn shape(&self, size: Option<Size>) -> Shape {
         self.widget.shape(size)
@@ -26,8 +29,11 @@ impl Widget for Detector {
 }
 
 impl Detector {
-    /// Creates a new detector for a widget calling `on_tap` when it is tapped. 
-    pub fn new<T: Widget + 'static>(widget: T, on_tap: fn(widget: &'static mut Box<dyn Widget>)) -> Self {
+    /// Creates a new detector for a widget calling `on_tap` when it is tapped.
+    pub fn new<T: Widget + 'static>(
+        widget: T,
+        on_tap: fn(widget: &'static mut Box<dyn Widget>),
+    ) -> Self {
         Self {
             widget: Box::new(widget),
             on_tap,

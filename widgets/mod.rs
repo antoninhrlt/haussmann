@@ -5,11 +5,8 @@
 //! Widgets are items to be placed on a drawable surface and managed by layouts.
 
 use crate::{
-    graphics::{
-        Size, 
-        Shape, 
-    }, 
-    ToAny
+    graphics::{Shape, Size},
+    ToAny,
 };
 
 mod button;
@@ -28,10 +25,10 @@ pub use toolbar::ToolBar;
 
 /// The simplest functionalities and property getters of any widget.
 pub trait Widget: DebugWidget + ToAny {
-    /// Returns the widget as a shape of `size`. If it's a widget containing 
-    /// other widgets, it does not return its children but only itself as a 
+    /// Returns the widget as a shape of `size`. If it's a widget containing
+    /// other widgets, it does not return its children but only itself as a
     /// shape.
-    /// 
+    ///
     /// If the size is `None`, the widget has to define its own size.
     fn shape(&self, size: Option<Size>) -> Shape;
 }
@@ -44,13 +41,13 @@ pub trait DebugWidget: std::fmt::Debug {
     }
 }
 
-/// Implements what it is needed to make a widget a clean `dyn Widget` to be 
+/// Implements what it is needed to make a widget a clean `dyn Widget` to be
 /// inserted in layouts etc...
-/// 
-/// The `t` argument is the type of the widget. It can be a [`Button`], a 
+///
+/// The `t` argument is the type of the widget. It can be a [`Button`], a
 /// [`Label`], ...
-/// 
-/// To use this trait, the [`ToAny`], [`Widget`] and [`DebugWidget`] traits must 
+///
+/// To use this trait, the [`ToAny`], [`Widget`] and [`DebugWidget`] traits must
 /// be imported in the usage context.
 #[macro_export]
 macro_rules! dynamic_widget {
@@ -60,7 +57,7 @@ macro_rules! dynamic_widget {
                 self
             }
         }
-        
+
         impl From<$t> for Box<dyn Widget> {
             fn from(value: $t) -> Self {
                 Box::new(value)
@@ -71,10 +68,10 @@ macro_rules! dynamic_widget {
     };
 }
 
-/// Creates a vector of dynamic widgets from a series of widgets, no matter 
+/// Creates a vector of dynamic widgets from a series of widgets, no matter
 /// their type as long as they implement the [`Widget`] trait.
-/// 
-/// To use this trait, the [`Widget`] trait must be imported in the usage 
+///
+/// To use this trait, the [`Widget`] trait must be imported in the usage
 /// context.
 #[macro_export]
 macro_rules! widgets {
@@ -85,10 +82,10 @@ macro_rules! widgets {
     ($first:expr $(, $widget:expr) *) => {
         // Code block returning a vector of boxes of dynamic widget.
         {
-            // The type annotation here is very important. It transforms the 
+            // The type annotation here is very important. It transforms the
             // widget boxes into boxes of dynamic widget.
             let widgets: Vec<Box<dyn Widget>> = vec![
-                $first.into(), 
+                $first.into(),
                 $($widget.into()),*
             ];
             widgets

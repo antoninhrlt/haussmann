@@ -5,9 +5,11 @@
 pub mod shapes;
 pub mod colours;
 mod aligner;
+mod drawer;
 
 pub use shapes::Shape;
 pub use aligner::Aligner;
+pub use drawer::Drawer;
 
 /// Vector of type `T` with 2 values.
 pub type Vec2<T> = [T; 2];

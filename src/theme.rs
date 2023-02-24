@@ -67,7 +67,7 @@ impl Default for Theme {
 }
 
 impl Theme {
-    /// The ayu theme from https://raw.githubusercontent.com/ayu-theme/ayu-colors/master/colors.svg
+    /// The ayu theme from <https://raw.githubusercontent.com/ayu-theme/ayu-colors/master/colors.svg>
     pub fn ayu() -> Self {
         let font_colour = RGBA::from_hex(0xBFBDB6);
 

@@ -2,8 +2,8 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use haussmann::{Drawer, Direction, Theme, TextTheme, FontWeight, TextAlign};
-use haussmann::graphics::{Shape, calculate_size, Size, colours, Aligner, Point};
+use haussmann::Direction;
+use haussmann::graphics::{Drawer, Shape, calculate_size, Size, colours, Point};
 use haussmann::graphics::colours::RGBA;
 use sdl2::mouse::MouseButton;
 use sdl2::pixels::Color;
@@ -127,7 +127,9 @@ fn with_sdl2() {
                     Label::simple("Button 1"),
                     RGBA::new(255, 0, 0, 255),
                 ),
-                || {
+                |button| {
+                    let button = (button as &mut dyn std::any::Any).downcast_mut::<Button>().unwrap();
+                    button.colour = RGBA::new(0, 255, 255, 255);
                     println!("button1 was tapped!");
                 }
             ), 
@@ -166,7 +168,7 @@ fn with_sdl2() {
         canvas.clear();
 
         canvas.draw([0, 0], [window_size.0 as usize, window_size.1 as usize]);
-
+        
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit {..} |
@@ -183,8 +185,6 @@ fn with_sdl2() {
                     if mouse_btn != MouseButton::Left {
                         return;
                     }
-
-                    todo!("on click on clickable widgets")
                 }
                 _ => {}
             }

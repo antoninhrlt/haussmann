@@ -11,16 +11,16 @@ use crate::{
 
 /// Controller wrapping a widget to detect when it is tapped.
 #[derive(Debug)]
-pub struct Detector {
+pub struct Detector<'a, T: Widget> {
     /// Widget where the tap detection will be done.
-    pub widget: Box<dyn Widget>,
+    pub widget: Box<T>,
     /// Function called when the widget is tapped.
-    pub on_tap: fn(widget: &'static mut Box<dyn Widget>),
+    pub on_tap: fn(widget: &'a mut T),
 }
 
-crate::dynamic_widget!(Detector);
+crate::dynamic_controller!(Detector<'a, T>);
 
-impl Widget for Detector {
+impl<'a, T: Widget + 'static> Widget for Detector<'a, T> {
     /// Calls `Widget::shape()` on `self.widget` and returns the returned value
     /// of this function.
     fn shape(&self, size: Option<Size>) -> Shape {
@@ -28,11 +28,11 @@ impl Widget for Detector {
     }
 }
 
-impl Detector {
+impl<'a, T: Widget> Detector<'a, T> {
     /// Creates a new detector for a widget calling `on_tap` when it is tapped.
-    pub fn new<T: Widget + 'static>(
+    pub fn new(
         widget: T,
-        on_tap: fn(widget: &'static mut Box<dyn Widget>),
+        on_tap: fn(widget: &'a mut T),
     ) -> Self {
         Self {
             widget: Box::new(widget),

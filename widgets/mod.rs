@@ -68,6 +68,33 @@ macro_rules! dynamic_widget {
     };
 }
 
+/// Same as [`dynamic_widget`](crate::dynamic_widget) but for controller 
+/// widgets since controllers have a generic parameters as following : 
+/// `<'a, T: Widget + 'static>`.
+/// 
+/// Also, the [`ToAny`] trait implementation returns the widget as 
+/// [`std::any::Any`] and not the controller itself.
+#[macro_export]
+macro_rules! dynamic_controller {
+    ($t:ty) => {
+        impl<'a, T: Widget + 'static> ToAny for $t {
+            fn as_any(&self) -> &dyn std::any::Any {
+                self.widget.as_any()
+            }
+        }
+        
+        impl<'a, T: Widget + 'static> From<$t> for Box<dyn Widget> {
+            fn from(value: $t) -> Self {
+                Box::new(value)
+            }
+        }
+        
+        impl<'a, T: Widget> DebugWidget for $t {}        
+    };
+}
+
+
+
 /// Creates a vector of dynamic widgets from a series of widgets, no matter
 /// their type as long as they implement the [`Widget`] trait.
 ///
@@ -75,6 +102,10 @@ macro_rules! dynamic_widget {
 /// context.
 #[macro_export]
 macro_rules! widgets {
+    () => {
+        vec![]
+    };
+
     ($first:expr $(, $widget:expr) *,) => {
         widgets![$first, $($widget),*]
     };

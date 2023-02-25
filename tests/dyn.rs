@@ -35,11 +35,10 @@ macro_rules! widgets {
     };
 }
 
-fn foo<T>(widgets: Vec<T>) 
+fn foo<T>(widgets: Vec<T>)
 where
     T: From<Box<dyn Widget>>,
 {
-
 }
 
 #[test]

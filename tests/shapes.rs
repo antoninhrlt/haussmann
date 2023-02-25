@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use haussmann::graphics::{ shapes, colours::RGBA, };
+use haussmann::graphics::{colours::RGBA, shapes};
 
 #[test]
 fn shape_builder() {

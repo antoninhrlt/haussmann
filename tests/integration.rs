@@ -2,19 +2,19 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use haussmann::Direction;
-use haussmann::graphics::{Drawer, Shape, calculate_size, Size, colours, Point};
 use haussmann::graphics::colours::RGBA;
-use sdl2::mouse::MouseButton;
-use sdl2::pixels::Color;
+use haussmann::graphics::{calculate_size, colours, Drawer, Point, Shape, Size};
+use haussmann::Direction;
 use sdl2::event::{Event, WindowEvent};
 use sdl2::keyboard::Keycode;
+use sdl2::mouse::MouseButton;
+use sdl2::pixels::Color;
 use sdl2::rect::Rect;
 use std::time::Duration;
 
-use haussmann::{widgets, Align, Widget, Overflow};
-use haussmann::widgets::{Button, Label, Layout, Image, Container};
 use haussmann::controllers::tap;
+use haussmann::widgets::{Button, Container, Image, Label, Layout, ToolBar};
+use haussmann::{widgets, Align, Overflow, Widget};
 
 struct Canvas {
     canvas: sdl2::render::Canvas<sdl2::video::Window>,
@@ -25,10 +25,7 @@ impl Canvas {
     /// Creates a canvas from a SDL2 window.
     fn from(window: sdl2::video::Window) -> Self {
         Self {
-            canvas: window.into_canvas()
-                .present_vsync()
-                .build()
-                .unwrap(),
+            canvas: window.into_canvas().present_vsync().build().unwrap(),
             layout: Layout::default(),
         }
     }
@@ -37,14 +34,12 @@ impl Canvas {
     fn change_colour(&mut self, colour: RGBA) {
         self.canvas.set_blend_mode(sdl2::render::BlendMode::Blend);
 
-        self.canvas.set_draw_color(
-            Color::RGBA(
-                colour.r as u8, 
-                colour.g as u8, 
-                colour.b as u8, 
-                colour.a as u8,
-            )
-        );
+        self.canvas.set_draw_color(Color::RGBA(
+            colour.r as u8,
+            colour.g as u8,
+            colour.b as u8,
+            colour.a as u8,
+        ));
     }
 
     /// Clears the canvas to white.
@@ -61,26 +56,24 @@ impl Canvas {
 
 impl Drawer for Canvas {
     /// Draws a `shape` on the canvas.
-    fn shape(&mut self, shape: &Shape) { 
+    fn shape(&mut self, shape: &Shape) {
         let size: Size = calculate_size(shape);
 
         // If the shape is not filled with a colour, use a transparent colour.
-        self.change_colour(
-            shape.fill_colour().unwrap_or(colours::TRANSPARENT)
-        );
+        self.change_colour(shape.fill_colour().unwrap_or(colours::TRANSPARENT));
 
         match shape.points().len() {
             4 => {
-                self.canvas.fill_rect(
-                    Rect::new(
-                        shape.position()[0] as i32, 
-                        shape.position()[1] as i32, 
+                self.canvas
+                    .fill_rect(Rect::new(
+                        shape.position()[0] as i32,
+                        shape.position()[1] as i32,
                         size[0] as u32,
                         size[1] as u32,
-                    )
-                ).unwrap();
-            },
-            _ => todo!()
+                    ))
+                    .unwrap();
+            }
+            _ => todo!(),
         }
     }
 
@@ -101,16 +94,17 @@ impl Drawer for Canvas {
 fn with_sdl2() {
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
-    
+
     // The current size of the window.
     // Updated in the events loop.
     let mut window_size: (i32, i32) = (400, 600);
 
-    let window = video_subsystem.window(
-        "Haussmann on SDL2", 
-        window_size.0 as u32, 
-        window_size.1 as u32
-    )
+    let window = video_subsystem
+        .window(
+            "Haussmann on SDL2",
+            window_size.0 as u32,
+            window_size.1 as u32,
+        )
         .position_centered()
         .resizable()
         .build()
@@ -124,23 +118,29 @@ fn with_sdl2() {
         widgets![
             tap::Detector::new(
                 Button::simple(
-                    Label::simple("Button 1"),
+                    Label::simple("Button 1"), 
                     RGBA::new(255, 0, 0, 255),
                 ),
                 |button| {
-                    let button = (button as &mut dyn std::any::Any).downcast_mut::<Button>().unwrap();
+                    let button = (button as &mut dyn std::any::Any)
+                        .downcast_mut::<Button>()
+                        .unwrap();
                     button.colour = RGBA::new(0, 255, 255, 255);
                     println!("button1 was tapped!");
                 }
-            ), 
+            ),
             Layout::coloured(
                 widgets![
                     Container::simple(
                         [200, 100],
                         Button::simple(
-                            Label::simple("Button 3"),
+                            Label::simple("Button 3"), 
                             RGBA::new(0, 0, 255, 255),
                         )
+                    ),
+                    Button::simple(
+                        Label::simple("Button 4"), 
+                        RGBA::new(255, 255, 0, 255),
                     )
                 ],
                 RGBA::new(0, 0, 0, 50),
@@ -148,9 +148,9 @@ fn with_sdl2() {
                 Align::Center,
                 Align::Center,
                 Direction::Column,
-            ), 
+            ),
             Button::simple(
-                Label::simple("Button 2"),
+                Label::simple("Button 2"), 
                 RGBA::new(0, 255, 0, 255),
             )
         ],
@@ -160,28 +160,32 @@ fn with_sdl2() {
         Direction::Row,
     );
 
-    canvas.layout = layout;
-
+    
     let mut event_pump = sdl_context.event_pump().unwrap();
+    
+    canvas.layout = layout;
 
     'running: loop {
         canvas.clear();
-
-        canvas.draw([0, 0], [window_size.0 as usize, window_size.1 as usize]);
         
+        canvas.draw([0, 0], [window_size.0 as usize, window_size.1 as usize]);
+
         for event in event_pump.poll_iter() {
             match event {
-                Event::Quit {..} |
-                Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                    break 'running
-                }
+                Event::Quit { .. }
+                | Event::KeyDown {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => break 'running,
                 Event::Window { win_event, .. } => match win_event {
                     WindowEvent::Resized(width, height) => {
                         window_size = (width, height);
                     }
                     _ => {}
-                }
-                Event::MouseButtonDown {mouse_btn, x, y, .. } => {
+                },
+                Event::MouseButtonDown {
+                    mouse_btn, x, y, ..
+                } => {
                     if mouse_btn != MouseButton::Left {
                         return;
                     }
@@ -193,4 +197,4 @@ fn with_sdl2() {
         canvas.present();
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
-} 
+}

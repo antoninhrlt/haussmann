@@ -20,12 +20,6 @@ impl From<Button> for Box<dyn Widget> {
     }
 }
 
-macro_rules! widgets1 {
-    ($first:expr $(, $widget:expr) *) => {
-        vec![Box::new($first), $(Box::new($widget)), *]
-    };
-}
-
 macro_rules! widgets {
     ($first:expr $(, $widget:expr) *) => {
         {
@@ -35,7 +29,7 @@ macro_rules! widgets {
     };
 }
 
-fn foo<T>(widgets: Vec<T>)
+fn foo<T>(_widgets: Vec<T>)
 where
     T: From<Box<dyn Widget>>,
 {

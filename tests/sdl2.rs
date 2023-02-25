@@ -13,12 +13,11 @@ use sdl2::rect::Rect;
 use std::time::Duration;
 
 use haussmann::controllers::tap;
-use haussmann::widgets::{Button, Container, Image, Label, Layout, ToolBar};
+use haussmann::widgets::{Button, Container, Image, Label, Layout};
 use haussmann::{widgets, Align, Overflow, Widget};
 
 struct Canvas {
     canvas: sdl2::render::Canvas<sdl2::video::Window>,
-    layout: Layout,
 }
 
 impl Canvas {
@@ -26,7 +25,6 @@ impl Canvas {
     fn from(window: sdl2::video::Window) -> Self {
         Self {
             canvas: window.into_canvas().present_vsync().build().unwrap(),
-            layout: Layout::default(),
         }
     }
 
@@ -77,16 +75,60 @@ impl Drawer for Canvas {
         }
     }
 
-    fn image(&mut self, position: Point, _image: &Image) {
+    fn image(&mut self, _position: Point, _image: &Image) {
         todo!()
     }
 
-    fn label(&mut self, position: Point, label: &Label) {
+    fn label(&mut self, _position: Point, _label: &Label) {
         // todo
     }
 
-    fn layout(&self) -> &Layout {
-        &self.layout
+    fn layout(&self) -> Layout {
+        Layout::simple(
+            widgets![
+                tap::Detector::new(
+                    Button::simple(
+                        Label::simple("Button 1"), 
+                        RGBA::new(255, 0, 0, 255),
+                    ),
+                    |button| {
+                        let button = (button as &mut dyn std::any::Any)
+                            .downcast_mut::<Button>()
+                            .unwrap();
+                        button.colour = RGBA::new(0, 255, 255, 255);
+                        println!("button1 was tapped!");
+                    }
+                ),
+                Layout::coloured(
+                    widgets![
+                        Container::simple(
+                            [200, 100],
+                            Button::simple(
+                                Label::simple("Button 3"), 
+                                RGBA::new(0, 0, 255, 255),
+                            )
+                        ),
+                        Button::simple(
+                            Label::simple("Button 4"), 
+                            RGBA::new(255, 255, 0, 255),
+                        )
+                    ],
+                    RGBA::new(0, 0, 0, 50),
+                    Overflow::Hide,
+                    Align::Center,
+                    Align::Center,
+                    Direction::Column,
+                ),
+                Button::simple(
+                    Label::simple("Button 2"), 
+                    RGBA::new(0, 255, 0, 255),
+                )
+            ],
+            Overflow::Ignore,
+            Align::Center,
+            Align::Center,
+            Direction::Row,
+        )
     }
 }
 
@@ -113,58 +155,8 @@ fn with_sdl2() {
     // Where to draw the widgets.
     let mut canvas = Canvas::from(window);
 
-    // The layout organizing the widgets on the window.
-    let layout = Layout::simple(
-        widgets![
-            tap::Detector::new(
-                Button::simple(
-                    Label::simple("Button 1"), 
-                    RGBA::new(255, 0, 0, 255),
-                ),
-                |button| {
-                    let button = (button as &mut dyn std::any::Any)
-                        .downcast_mut::<Button>()
-                        .unwrap();
-                    button.colour = RGBA::new(0, 255, 255, 255);
-                    println!("button1 was tapped!");
-                }
-            ),
-            Layout::coloured(
-                widgets![
-                    Container::simple(
-                        [200, 100],
-                        Button::simple(
-                            Label::simple("Button 3"), 
-                            RGBA::new(0, 0, 255, 255),
-                        )
-                    ),
-                    Button::simple(
-                        Label::simple("Button 4"), 
-                        RGBA::new(255, 255, 0, 255),
-                    )
-                ],
-                RGBA::new(0, 0, 0, 50),
-                Overflow::Hide,
-                Align::Center,
-                Align::Center,
-                Direction::Column,
-            ),
-            Button::simple(
-                Label::simple("Button 2"), 
-                RGBA::new(0, 255, 0, 255),
-            )
-        ],
-        Overflow::Ignore,
-        Align::Center,
-        Align::Center,
-        Direction::Row,
-    );
-
-    
     let mut event_pump = sdl_context.event_pump().unwrap();
     
-    canvas.layout = layout;
-
     'running: loop {
         canvas.clear();
         
@@ -184,7 +176,7 @@ fn with_sdl2() {
                     _ => {}
                 },
                 Event::MouseButtonDown {
-                    mouse_btn, x, y, ..
+                    mouse_btn, ..
                 } => {
                     if mouse_btn != MouseButton::Left {
                         return;

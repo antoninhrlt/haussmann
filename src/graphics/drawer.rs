@@ -5,8 +5,10 @@
 use crate::{
     graphics::{Aligner, Point, Shape, Size},
     widgets::{Container, Image, Label, Layout},
-    Direction, Widget,
+    Direction, Widget, controllers::tap,
 };
+
+use super::calculate_size;
 
 /// Trait to implement on a drawable surface in order to draw shapes and widgets
 /// which cannot be transformed into simple `Shape`s.
@@ -27,101 +29,197 @@ pub trait Drawer {
     /// surface implementing this trait.
     fn layout(&self) -> &Layout;
 
-    /// Returns placed and aligned shapes of the layout's widgets. Recursive
-    /// function when encounters a [`Layout`] widget in the layout.
-    fn shapes_from_layout(&self, layout: &Layout, position: Point, size: Size) -> Vec<Shape> {
+    /// Returns the size of all the containers grouped together.
+    fn size_all_containers(containers: &Vec<&Container>) -> Size {
+        // No container
+        if containers.len() == 0 {
+            return [0, 0];
+        }
+
+        let mut total_size = [0, 0];
+
+        // Browses the sizes rather than the whole containers.
+        let sizes = containers.iter().map(|container| container.size);
+
+        for container_size in sizes {
+            total_size[0] += container_size[0];
+            total_size[1] += container_size[1];
+        }
+
+        total_size
+    }
+
+    /// Returns the size for each widget which is not a container. All the 
+    /// non-container widgets have the same size.
+    /// 
+    /// The size parameter is the size of the surface containing the widgets.
+    fn size_each_not_container(
+        widgets: &Vec<&Box<dyn Widget>>, 
+        size: &Size, 
+        direction: &Direction, 
+        size_all_containers: &Size
+    ) -> Size {
+        // Avoid divide by zero.
+        assert!(widgets.len() != 0);
+
+        match direction {
+            Direction::Column => [
+                // Shares the width with the other widgets.
+                if size_all_containers[0] > size[0] {
+                    // Avoids 'subtract with overflow'
+                    0
+                } else {
+                    (size[0] - size_all_containers[0]) / widgets.len() 
+                },
+                // Takes the whole height.
+                size[1]
+            ],
+            Direction::Row => [
+                // Takes the whole width.
+                size[0], 
+                // Shares the height with the other widgets.
+                if size_all_containers[1] > size[1] {
+                    // Avoids 'subtract with overflow'
+                    0
+                } else {
+                    (size[1] - size_all_containers[1]) / widgets.len()
+                }
+            ],
+        }
+    }
+
+    /// The size and the position parameters are the size and the position of 
+    /// the surface containing the widgets.
+    /// 
+    /// Does not build the layout's shape.
+    fn build_shapes(layout: &Layout, size: Size) -> Vec<Shape> {
+        // There is nothing to shape.
+        if layout.widgets.len() == 0 {
+            return vec![]
+        }
+
+        // All the widgets which are not containers.
         let not_containers = layout.not_widget::<Container>();
+        
+        // All the container widgets.
         let containers = layout.widgets::<Container>();
 
-        // How many not-container widgets.
-        let n_widgets = not_containers.len();
-
-        // Total of widths and heights of the widgets.
-        let (mut widget_widths, mut widget_heights) = (0, 0);
-
-        // Adds the sizes of the layouts to the total of widths and heights of
-        // the widgets, since containers have defined size.
-        for container in &containers {
-            widget_widths += container.size[0];
-            widget_heights += container.size[1];
+        // There are only containers, no other widgets.
+        if not_containers.len() == 0 {
+            // Return the shape of these containers.
+            return containers
+                .iter()
+                .map(|container| container.shape(None))
+                .collect::<Vec<Shape>>();
         }
 
-        // The size of each widget which is not a container.
-        let size_of_not_container: Size = if n_widgets == 0 {
-            [0, 0]
-        } else {
-            match layout.direction {
-                Direction::Column => [(size[0] - widget_widths) / n_widgets, size[1]],
-                Direction::Row => [size[0], (size[1] - widget_heights) / n_widgets],
-            }
-        };
+        let size_all_containers: Size = Self::size_all_containers(&containers);
+        
+        let size_each_not_container: Size = Self::size_each_not_container(
+            &not_containers, 
+            &size, 
+            &layout.direction, 
+            &size_all_containers
+        );
 
-        // Gets a vector of the widgets' shape.
-        let mut shapes: Vec<Shape> = vec![];
-
-        for widget in &layout.widgets {
-            // Builds the widget's shape.
-            let shape = match widget.as_any().downcast_ref::<Container>() {
+        // Builds the shape for all the widgets.
+        // While calling `Widget::shape`, a `None` value is given for the 
+        // containers because they have their own size.
+        layout.widgets
+            .iter()
+            .map(|widget| match widget.as_any().downcast_ref::<Container>() {
                 Some(container) => container.shape(None),
-                None => widget.shape(Some(size_of_not_container)),
-            };
+                None => widget.shape(Some(size_each_not_container)),
+            })
+            .collect()
+    }
 
-            shapes.push(shape);
-        }
-
+    /// Builds the shape for the layout being the layout of a drawable surface 
+    /// with a certain size and position.
+    fn build_layout_shape(layout: &Layout, position: Point, size: Size) -> Shape {
+        // Creates a layout of the drawable surface's size.
         let mut layout_shape = layout.shape(Some(size));
+        // Place the layout's shape at `position`.
         layout_shape.move_by(position);
+        // Returns the shape.
+        layout_shape
+    }
 
+    /// Draws the widgets of a layout. Recursive function when encounters a 
+    /// sub-layout. 
+    fn build_layout_shapes(&self, layout: &Layout, position: Point, size: Size) -> Vec<Shape> {
+        // Builds the layout' shape.
+        let layout_shape: Shape = Self::build_layout_shape(layout, position, size);
+        
+        // Builds the shapes of the layout's widgets.
+        let mut widgets_shapes: Vec<Shape> = Self::build_shapes(layout, size);
+        
         // Aligns the shapes following the layout's rules.
-        let mut aligner = Aligner::new(&shapes);
+        let mut aligner = Aligner::new(&widgets_shapes);
 
-        let mut more_shapes = vec![];
-
-        for (i, shape) in shapes.iter_mut().enumerate() {
+        // Shapes which are going to be pushed at the end.
+        let mut more_shapes: Vec<Shape> = vec![];
+        
+        // The manipulated shape is the shape of the current manipulated widget.
+        for (i, shape) in widgets_shapes.iter_mut().enumerate() {
+            // Aligns the shape in the layout.
             aligner.align_shape(layout, &layout_shape, shape);
-
+ 
             let widget_as_any = layout.widgets[i].as_any();
-
+            
+            // Recursive call to draw the shapes of a sub-layout.
             match widget_as_any.downcast_ref::<Layout>() {
                 Some(sub_layout) => {
-                    // It's the shape of a layout.
-                    let sub_layout_position: Point = shape.points()[0];
-
-                    more_shapes.extend(self.shapes_from_layout(
-                        sub_layout,
-                        sub_layout_position,
-                        size_of_not_container,
-                    ));
+                    // Pushes the sub-layout's shape and its widgets' shapes in 
+                    // `more_shapes` to be drawn after the other widgets.
+                    more_shapes.extend(
+                        self.build_layout_shapes(
+                            sub_layout, 
+                            shape.points()[0], 
+                            calculate_size(&shape)
+                        )
+                    );
                 }
                 None => {}
             }
-
+            
+            // Since containers contain a widget and are not wrappers like the 
+            // controllers, we must also shape their contained widget.
             match widget_as_any.downcast_ref::<Container>() {
                 Some(container) => {
-                    let mut container_widget_shape = container.widget.shape(Some(container.size));
+                    // Gets the shape of the container's widget.
+                    // The container's widget has the same size as the 
+                    // container.
+                    let mut container_widget_shape = container
+                        .widget
+                        .shape(Some(container.size));
+
+                    // The container's widget has the same position as the 
+                    // container.
                     container_widget_shape.move_by(shape.points()[0]);
+                    
+                    // Pushes it into `more_shapes` to draw it after the other 
+                    // shapes
                     more_shapes.push(container_widget_shape);
                 }
                 None => {}
             }
         }
+ 
+        more_shapes.push(layout_shape);
+        widgets_shapes.extend(more_shapes);
 
-        shapes.extend(more_shapes);
-
-        // Prepares each shape to be drawn.
-        shapes.push(layout_shape);
-
-        shapes
+        widgets_shapes
     }
 
     /// Draws the widgets contained in the layout following the layout's rules,
     /// in a sized zone, at a certain position.
     fn draw(&mut self, position: Point, size: Size) {
         let layout = self.layout();
-        let shapes = self.shapes_from_layout(layout, position, size);
-
-        // Draws each shape.
-        for shape in &shapes {
+        
+        let all_shapes = self.build_layout_shapes(layout, position, size);
+        
+        for shape in &all_shapes {
             self.shape(shape);
         }
     }

@@ -27,7 +27,7 @@ pub trait Drawer {
 
     /// Returns the layout governing the align rules for widgets in the drawable
     /// surface implementing this trait.
-    fn layout(&self) -> &Layout;
+    fn layout(&self) -> Layout;
 
     /// Returns the size of all the containers grouped together.
     fn size_all_containers(containers: &Vec<&Container>) -> Size {
@@ -217,7 +217,7 @@ pub trait Drawer {
     fn draw(&mut self, position: Point, size: Size) {
         let layout = self.layout();
         
-        let all_shapes = self.build_layout_shapes(layout, position, size);
+        let all_shapes = self.build_layout_shapes(&layout, position, size);
         
         for shape in &all_shapes {
             self.shape(shape);

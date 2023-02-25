@@ -14,6 +14,7 @@ mod container;
 mod image;
 mod label;
 mod layout;
+mod surface;
 mod toolbar;
 
 pub use button::Button;
@@ -21,6 +22,7 @@ pub use container::Container;
 pub use image::Image;
 pub use label::Label;
 pub use layout::Layout;
+pub use surface::Surface;
 pub use toolbar::ToolBar;
 
 /// The simplest functionalities and property getters of any widget.

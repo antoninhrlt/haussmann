@@ -28,9 +28,8 @@ impl Default for TextTheme {
     }
 }
 
-/// Global search to be used as a fallback theme when a widget has a theme set
-/// as `None`.
-/// Themes for different widgets or objects.
+/// Global theme to be used as a fallback theme when a widget does not have its 
+/// own theme. 
 #[derive(Debug, Clone)]
 pub struct Theme {
     /// The main colour.

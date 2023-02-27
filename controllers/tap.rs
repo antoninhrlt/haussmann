@@ -9,12 +9,17 @@ use crate::{Widget, widgets, ToAny, DebugWidget, graphics::{Point, Size, Shape}}
 use super::ControllerFn;
 
 /// Controller detecting taps on a widget.
-#[derive(Debug)]
 pub struct Detector<T: Widget + 'static> {
     /// The wrapped widget.
     pub widget: Box<T>,
     /// Function to call when the widget is tapped.
     tap: ControllerFn<T>,
+}
+
+impl<T: Widget + 'static> std::fmt::Debug for Detector<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "tap::Detector")
+    }
 }
 
 widgets::dynamic_controller!(Detector<T>);
@@ -35,7 +40,7 @@ impl<T: Widget> Detector<T> {
     }
 
     /// Function to call when the wrapped widget was tapped.
-    pub fn on_tap(&'static mut self) {
+    pub fn on_tap(&mut self) {
         let tap = self.tap;
         tap(&mut self.widget);
     }

@@ -7,13 +7,12 @@
 
 pub mod tap;
 
-use crate::{Widget, widgets, ToAny, DebugWidget};
+use crate::{Widget, widgets, ToAny, DebugWidget, graphics::{Point, Size, Shape}};
 
 /// Function to call when something happen on a widget.
-type ControllerFn<T> = fn(widget: &'static mut T);
+type ControllerFn<T> = fn(widget: &mut T);
 
 /// Wraps a widget to call functions when some events happen on it.
-#[derive(Debug)]
 pub struct Controller<T: Widget + 'static> {
     /// The controlled widget.
     pub widget: Box<T>,
@@ -25,8 +24,14 @@ pub struct Controller<T: Widget + 'static> {
     unfocus: Option<ControllerFn<T>>,
 }
 
+impl<T: Widget + 'static> std::fmt::Debug for Controller<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Controller")
+    }
+}
+
 impl<T: Widget + 'static> Widget for Controller<T> {
-    fn shape(&self, position: Option<crate::graphics::Point>, size: Option<crate::graphics::Size>) -> crate::graphics::Shape {
+    fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {
         self.widget.shape(position, size)
     }
 }
@@ -52,7 +57,7 @@ impl<T: Widget + 'static> Controller<T> {
 macro_rules! on {
     ($field:ident, $x:expr, $function:ident) => {
         #[allow(missing_docs)]
-        pub fn $function(&'static mut self) -> Result<(), String> {
+        pub fn $function(&mut self) -> Result<(), String> {
             match self.$field {
                 Some(function) => Ok(function(&mut self.widget)), 
                 None => Err(format!("undefined function when widget is {}", $x)),

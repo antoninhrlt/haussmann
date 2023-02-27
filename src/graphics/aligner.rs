@@ -27,7 +27,7 @@ impl Aligner {
         for shape in &shapes.clone() {
             // This calculation creates a rectangle zone containing the whole
             // shape no matter its actual form.
-            let shape_size: Size = super::calculate_size(shape);
+            let shape_size: Size = shape.size();
 
             widths.push(shape_size[0]);
             heights.push(shape_size[1]);
@@ -52,9 +52,9 @@ impl Aligner {
     /// its rules.
     pub fn align_shape(&mut self, layout: &Layout, layout_shape: &Shape, shape: &mut Shape) {
         // Calculate the size of the `shape`.
-        let shape_size: Size = super::calculate_size(shape);
+        let shape_size: Size = shape.size();
         // Gets the size of the layout.
-        let parent_size: Size = super::calculate_size(layout_shape);
+        let parent_size: Size = layout_shape.size();
 
         // Total of widths of the shapes already placed.
         let offset_width = self.widths[..self.index].iter().sum::<usize>() as isize;

@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{dynamic_widget, Widget, ToAny, DebugWidget, graphics::{colours::RGBA, Size, Shape, shapes}, Border};
+use crate::{dynamic_widget, Widget, ToAny, DebugWidget, graphics::{colours::RGBA, Size, Shape, shapes, Point}, Border};
 
 #[derive(Debug)]
 pub struct Surface {
@@ -13,11 +13,12 @@ pub struct Surface {
 dynamic_widget!(Surface);
 
 impl Widget for Surface {
-    fn shape(&self, size: Option<Size>) -> Shape {
-        assert!(size != None);
+    fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {
+        assert_ne!(position, None);
+        assert_ne!(size, None);
 
         shapes::Builder::new()
-            .rectangle(size.unwrap(), self.borders)
+            .rectangle_at(position.unwrap(), size.unwrap(), self.borders)
             .fill(self.colour)
             .finish()
     }

@@ -7,7 +7,7 @@ use crate::{
     graphics::{
         colours::RGBA,
         shapes::{self, Shape},
-        Size,
+        Size, Point,
     },
     Align, Border, Direction, Overflow, ToAny,
 };
@@ -49,11 +49,12 @@ impl Default for Layout {
 crate::dynamic_widget!(Layout);
 
 impl Widget for Layout {
-    /// Returns the shape of the layout itself of `size` filled with colour
-    /// `self.colour`, with borders if defined.
-    fn shape(&self, size: Option<Size>) -> Shape {
+    fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {
+        assert_ne!(position, None);
+        assert_ne!(size, None);
+
         shapes::Builder::new()
-            .rectangle(size.unwrap(), self.borders)
+            .rectangle_at(position.unwrap(), size.unwrap(), self.borders)
             .fill(self.colour)
             .finish()
     }

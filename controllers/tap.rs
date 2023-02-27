@@ -5,7 +5,7 @@
 //! Everything related to tapping widgets.
 
 use crate::{
-    graphics::{Shape, Size},
+    graphics::{Shape, Size, Point},
     DebugWidget, ToAny, Widget,
 };
 
@@ -23,8 +23,8 @@ crate::dynamic_controller!(Detector<'a, T>);
 impl<'a, T: Widget + 'static> Widget for Detector<'a, T> {
     /// Calls `Widget::shape()` on `self.widget` and returns the returned value
     /// of this function.
-    fn shape(&self, size: Option<Size>) -> Shape {
-        self.widget.shape(size)
+    fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {
+        self.widget.shape(position, size)
     }
 }
 

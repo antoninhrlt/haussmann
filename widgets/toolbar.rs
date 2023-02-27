@@ -3,7 +3,7 @@
 // Copyright (c) 2023 Antonin Hérault
 
 use crate::{
-    graphics::{colours::RGBA, shapes, Shape, Size},
+    graphics::{colours::RGBA, shapes, Shape, Size, Point},
     Align, DebugWidget, ToAny, Widget,
 };
 
@@ -33,9 +33,12 @@ pub struct ToolBar {
 crate::dynamic_widget!(ToolBar);
 
 impl Widget for ToolBar {
-    fn shape(&self, size: Option<Size>) -> Shape {
+    fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {
+        assert_eq!(position, None);
         assert!(size != None);
 
+        // No need to define the position because it's located by default at 
+        // [0, 0] as wanted.
         shapes::Builder::new()
             .rectangle(size.unwrap(), None)
             .fill(self.colour)

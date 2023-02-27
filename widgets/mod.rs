@@ -5,7 +5,7 @@
 //! Widgets are items to be placed on a drawable surface and managed by layouts.
 
 use crate::{
-    graphics::{Shape, Size},
+    graphics::{Shape, Size, Point},
     ToAny,
 };
 
@@ -27,12 +27,12 @@ pub use toolbar::ToolBar;
 
 /// The simplest functionalities and property getters of any widget.
 pub trait Widget: DebugWidget + ToAny {
-    /// Returns the widget as a shape of `size`. If it's a widget containing
-    /// other widgets, it does not return its children but only itself as a
-    /// shape.
-    ///
-    /// If the size is `None`, the widget has to define its own size.
-    fn shape(&self, size: Option<Size>) -> Shape;
+    /// Creates a shape from the widget's properties. This shape can have a 
+    /// defined position and size. 
+    /// 
+    /// If the `position` parameter or `size` parameter is set as `None`, it 
+    /// would be because the widget has a static position or size. 
+    fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape;
 }
 
 /// Automatically implemented by the macro [`dynamic_widget`](crate::dynamic_widget).

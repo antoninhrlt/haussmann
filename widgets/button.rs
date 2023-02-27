@@ -4,7 +4,7 @@
 
 use super::{DebugWidget, Label, Widget};
 use crate::{
-    graphics::{colours::RGBA, shapes, Shape, Size},
+    graphics::{colours::RGBA, shapes, Shape, Size, Point},
     Border, Radius, ToAny,
 };
 
@@ -24,9 +24,12 @@ pub struct Button {
 crate::dynamic_widget!(Button);
 
 impl Widget for Button {
-    fn shape(&self, size: Option<Size>) -> Shape {
+    fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {
+        assert_ne!(position, None);
+        assert_ne!(size, None);
+        
         shapes::Builder::new()
-            .rectangle(size.unwrap(), self.borders)
+            .rectangle_at(position.unwrap(), size.unwrap(), self.borders)
             .fill(self.colour)
             .finish()
     }

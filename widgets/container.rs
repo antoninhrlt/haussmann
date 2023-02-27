@@ -5,7 +5,7 @@
 use crate::{
     graphics::{
         colours::{self, RGBA},
-        shapes, Shape, Size,
+        shapes, Shape, Size, Point,
     },
     Border, DebugWidget, ToAny, Widget,
 };
@@ -29,11 +29,12 @@ crate::dynamic_widget!(Container);
 impl Widget for Container {
     /// Returns a rectangle of size `self.size` filled with colour
     /// `self.colour`, with borders if defined.
-    fn shape(&self, size: Option<Size>) -> Shape {
+    fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {
+        assert_ne!(position, None);
         assert_eq!(size, None);
 
         shapes::Builder::new()
-            .rectangle(self.size, self.borders)
+            .rectangle_at(position.unwrap(), self.size, self.borders)
             .fill(self.colour)
             .finish()
     }

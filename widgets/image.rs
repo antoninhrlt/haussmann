@@ -3,7 +3,7 @@
 // Copyright (c) 2023 Antonin Hérault
 
 use crate::{
-    graphics::{Shape, Size},
+    graphics::{Shape, Size, Point},
     DebugWidget, ToAny, Widget,
 };
 
@@ -18,7 +18,7 @@ pub struct Image {
 crate::dynamic_widget!(Image);
 
 impl Widget for Image {
-    fn shape(&self, _size: Option<Size>) -> Shape {
+    fn shape(&self, _position: Option<Point>, _size: Option<Size>) -> Shape {
         panic!("cannot return shape")
     }
 }

@@ -29,7 +29,7 @@ use sdl2::{
     rect::Rect,
 };
 
-use std::{time::Duration, any::Any};
+use std::time::Duration;
 
 #[test]
 fn with_sdl2() {
@@ -93,6 +93,8 @@ fn with_sdl2() {
         Align::Center,
         Direction::Row,
     );
+
+    let mut i = 0;
 
     // Where to draw the widgets.
     let mut canvas = window
@@ -165,8 +167,8 @@ fn with_sdl2() {
                     
                     let (x, y) = (x as isize, y as isize);
 
-                    let s: Size = shapes[0].size();
-                    let p: Point = shapes[0].position();
+                    let s: Size = shapes[1].size();
+                    let p: Point = shapes[1].position();
 
                     let tap_detector = layout.widgets[0]
                         .as_any_mut()
@@ -177,7 +179,9 @@ fn with_sdl2() {
                         x >= p[0] && x <= p[0] + s[0] as isize 
                         && y >= p[1] && y <= p[1] + s[1] as isize 
                     {
-                        tap_detector.widget.colour = RGBA::new(25, 100, 100, 255);
+                        tap_detector.widget.colour = RGBA::new(100, i, 100, 255);
+                        //tap_detector.on_tap();
+                        i += 50;
                     }
                 }
                 _ => {}

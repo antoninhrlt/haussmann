@@ -7,7 +7,7 @@ use crate::{
         colours::{self, RGBA},
         shapes, Shape, Size, Point,
     },
-    Border, DebugWidget, ToAny, Widget,
+    Border, DebugWidget, ToAny, Widget, widgets,
 };
 
 /// Fixed zone containing a widget which is not able to go beyond it and which
@@ -24,7 +24,7 @@ pub struct Container {
     pub widget: Box<dyn Widget>,
 }
 
-crate::dynamic_widget!(Container);
+widgets::dynamic_widget!(Container);
 
 impl Widget for Container {
     /// Returns a rectangle of size `self.size` filled with colour

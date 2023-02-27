@@ -9,7 +9,7 @@ use crate::{
         shapes::{self, Shape},
         Size, Point,
     },
-    Align, Border, Direction, Overflow, ToAny,
+    Align, Border, Direction, Overflow, ToAny, widgets,
 };
 
 /// Layout to contain several widgets and define alignment rules for these
@@ -46,7 +46,7 @@ impl Default for Layout {
     }
 }
 
-crate::dynamic_widget!(Layout);
+widgets::dynamic_widget!(Layout);
 
 impl Widget for Layout {
     fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {

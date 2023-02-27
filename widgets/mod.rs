@@ -33,10 +33,6 @@ pub trait Widget: DebugWidget + ToAny {
     /// If the `position` parameter or `size` parameter is set as `None`, it 
     /// would be because the widget has a static position or size. 
     fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape;
-
-    fn ok(&mut self) {
-        print!("ok");
-    }
 }
 
 /// Automatically implemented by the macro [`dynamic_widget`](crate::dynamic_widget).
@@ -55,7 +51,6 @@ pub trait DebugWidget: std::fmt::Debug {
 ///
 /// To use this trait, the [`ToAny`], [`Widget`] and [`DebugWidget`] traits must
 /// be imported in the usage context.
-#[macro_export]
 macro_rules! dynamic_widget {
     ($t:ty) => {
         impl ToAny for $t {
@@ -78,13 +73,13 @@ macro_rules! dynamic_widget {
     };
 }
 
-/// Same as [`dynamic_widget`](crate::dynamic_widget) but for controller 
-/// widgets since controllers have a generic parameters as following : 
-/// `<'a, T: Widget + 'static>`.
+pub(crate) use dynamic_widget;
+
+/// Same as [`dynamic_widget`] but for controller widgets since controllers 
+/// have a generic parameters as following : `<T: Widget + 'static>`.
 /// 
 /// Also, the [`ToAny`] trait implementation returns the widget as 
 /// [`std::any::Any`] and not the controller itself.
-#[macro_export]
 macro_rules! dynamic_controller {
     ($t:ty) => {
         impl<T: Widget + 'static> ToAny for $t {
@@ -97,17 +92,17 @@ macro_rules! dynamic_controller {
             }
         }
         
-        impl<'a, T: Widget + 'static> From<$t> for Box<dyn Widget> {
+        impl<T: Widget + 'static> From<$t> for Box<dyn Widget> {
             fn from(value: $t) -> Self {
                 Box::new(value)
             }
         }
         
-        impl<'a, T: Widget> DebugWidget for $t {}        
+        impl<T: Widget> DebugWidget for $t {}        
     };
 }
 
-
+pub(crate) use dynamic_controller;
 
 /// Creates a vector of dynamic widgets from a series of widgets, no matter
 /// their type as long as they implement the [`Widget`] trait.

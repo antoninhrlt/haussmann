@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{dynamic_widget, Widget, ToAny, DebugWidget, graphics::{colours::RGBA, Size, Shape, shapes, Point}, Border};
+use crate::{Widget, ToAny, DebugWidget, graphics::{colours::RGBA, Size, Shape, shapes, Point}, Border, widgets};
 
 #[derive(Debug)]
 pub struct Surface {
@@ -10,7 +10,7 @@ pub struct Surface {
     borders: Option<[Border; 4]>,
 }
 
-dynamic_widget!(Surface);
+widgets::dynamic_widget!(Surface);
 
 impl Widget for Surface {
     fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {

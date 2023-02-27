@@ -5,7 +5,7 @@
 use super::{DebugWidget, Label, Widget};
 use crate::{
     graphics::{colours::RGBA, shapes, Shape, Size, Point},
-    Border, Radius, ToAny,
+    Border, Radius, ToAny, widgets,
 };
 
 /// Button widget with a label inside.
@@ -21,7 +21,7 @@ pub struct Button {
     pub borders: Option<[Border; 4]>,
 }
 
-crate::dynamic_widget!(Button);
+widgets::dynamic_widget!(Button);
 
 impl Widget for Button {
     fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {

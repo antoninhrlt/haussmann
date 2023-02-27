@@ -4,7 +4,7 @@
 
 use crate::{
     graphics::{colours::RGBA, shapes, Shape, Size, Point},
-    Align, DebugWidget, ToAny, Widget,
+    Align, DebugWidget, ToAny, Widget, widgets,
 };
 
 use super::{Button, Label};
@@ -30,7 +30,7 @@ pub struct ToolBar {
     pub colour: RGBA,
 }
 
-crate::dynamic_widget!(ToolBar);
+widgets::dynamic_widget!(ToolBar);
 
 impl Widget for ToolBar {
     fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {

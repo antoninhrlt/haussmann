@@ -4,7 +4,7 @@
 
 use crate::{
     graphics::{Shape, Size, Point},
-    DebugWidget, ToAny, Widget,
+    DebugWidget, ToAny, Widget, widgets,
 };
 
 /// Image widget.
@@ -15,7 +15,7 @@ pub struct Image {
     // todo
 }
 
-crate::dynamic_widget!(Image);
+widgets::dynamic_widget!(Image);
 
 impl Widget for Image {
     fn shape(&self, _position: Option<Point>, _size: Option<Size>) -> Shape {

@@ -6,7 +6,7 @@ use super::{DebugWidget, Widget};
 use crate::{
     graphics::{Shape, Size, Point},
     theme::TextTheme,
-    ToAny,
+    ToAny, widgets,
 };
 
 /// Label widget, which is not a "surfaced" widget. The text has to be rendered,
@@ -21,7 +21,7 @@ pub struct Label {
     pub theme: TextTheme,
 }
 
-crate::dynamic_widget!(Label);
+widgets::dynamic_widget!(Label);
 
 impl Widget for Label {
     fn shape(&self, _position: Option<Point>, _size: Option<Size>) -> Shape {

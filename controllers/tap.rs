@@ -9,18 +9,24 @@ use crate::{
     DebugWidget, ToAny, Widget,
 };
 
+// See here, however you need to handle lifetimes lol
+pub type OnTap<T> = fn(widget: &'static mut T);
+
 /// Controller wrapping a widget to detect when it is tapped.
 #[derive(Debug)]
-pub struct Detector<'a, T: Widget> {
+pub struct Detector<T: Widget + 'static> {
     /// Widget where the tap detection will be done.
     pub widget: Box<T>,
     /// Function called when the widget is tapped.
-    pub on_tap: fn(widget: &'a mut T),
+    pub on_tap: OnTap<T>,
+    /// The zone covered by the detector, which is supposed to be the position 
+    /// and size of the widget.
+    pub zone: Option<(Point, Size)>,
 }
 
-crate::dynamic_controller!(Detector<'a, T>);
+crate::dynamic_controller!(Detector<T>);
 
-impl<'a, T: Widget + 'static> Widget for Detector<'a, T> {
+impl<T: Widget + 'static> Widget for Detector<T> {
     /// Calls `Widget::shape()` on `self.widget` and returns the returned value
     /// of this function.
     fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {
@@ -28,15 +34,16 @@ impl<'a, T: Widget + 'static> Widget for Detector<'a, T> {
     }
 }
 
-impl<'a, T: Widget> Detector<'a, T> {
+impl<T: Widget> Detector<T> {
     /// Creates a new detector for a widget calling `on_tap` when it is tapped.
     pub fn new(
         widget: T,
-        on_tap: fn(widget: &'a mut T),
+        on_tap: OnTap<T>,
     ) -> Self {
         Self {
             widget: Box::new(widget),
             on_tap,
+            zone: None,
         }
     }
 

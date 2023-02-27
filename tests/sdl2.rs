@@ -6,7 +6,7 @@ use haussmann::{
     controllers::tap,
     graphics::{
         colours::{RGBA, self},
-        Size, ShapesBuilder,
+        Size, ShapesBuilder, Point,
     },
     widgets::{
         Button, 
@@ -29,7 +29,7 @@ use sdl2::{
     rect::Rect,
 };
 
-use std::time::Duration;
+use std::{time::Duration, any::Any};
 
 #[test]
 fn with_sdl2() {
@@ -51,14 +51,14 @@ fn with_sdl2() {
         .build()
         .unwrap();
 
-    let layout = Layout::coloured(
+    let mut layout = Layout::coloured(
         widgets![
             tap::Detector::new(
                 Button::simple(
                     Label::simple("Button 1"), 
                     RGBA::new(255, 0, 0, 255),
                 ),
-                |button| {
+                move |button| {
                     button.colour = RGBA::new(0, 255, 255, 255);
                     println!("button1 was tapped!");
                 }
@@ -111,9 +111,9 @@ fn with_sdl2() {
         // Creates shapes from the widgets.
         let shapes = ShapesBuilder::new(&layout)
             .build_shapes([0, 0], window_size);
-
+        
         // Draws the shapes.
-        for shape in shapes {
+        for shape in &shapes {
             let size = shape.size();
             
             let colour = shape
@@ -156,10 +156,28 @@ fn with_sdl2() {
                     _ => {}
                 },
                 Event::MouseButtonDown {
-                    mouse_btn, ..
+                    mouse_btn, x, y, ..
                 } => {
                     if mouse_btn != MouseButton::Left {
                         return;
+                    }
+
+                    
+                    let (x, y) = (x as isize, y as isize);
+
+                    let s: Size = shapes[0].size();
+                    let p: Point = shapes[0].position();
+
+                    let tap_detector = layout.widgets[0]
+                        .as_any_mut()
+                        .downcast_mut::<tap::Detector<Button>>()
+                        .unwrap();
+
+                    if 
+                        x >= p[0] && x <= p[0] + s[0] as isize 
+                        && y >= p[1] && y <= p[1] + s[1] as isize 
+                    {
+                        tap_detector.widget.colour = RGBA::new(25, 100, 100, 255);
                     }
                 }
                 _ => {}

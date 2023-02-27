@@ -13,3 +13,4 @@ edition = "2021"
 
 [dev-dependencies]
 sdl2 = "0.35.2"
+rand = "0.8.5"

@@ -21,6 +21,7 @@ use haussmann::{
     Widget,
 };
 
+use rand::Rng;
 use sdl2::{
     event::{Event, WindowEvent},
     keyboard::Keycode,
@@ -58,9 +59,14 @@ fn with_sdl2() {
                     Label::simple("Button 1"), 
                     RGBA::new(255, 0, 0, 255),
                 ),
-                move |button| {
-                    button.colour = RGBA::new(0, 255, 255, 255);
-                    println!("button1 was tapped!");
+                |button| {
+                    let mut rng = rand::thread_rng();
+
+                    let r = rng.gen_range(0..255);
+                    let g = rng.gen_range(0..255);
+                    let b = rng.gen_range(0..255);
+                
+                    button.colour = RGBA::new(r, g, b, 255);
                 }
             ),
             Layout::simple(
@@ -93,8 +99,6 @@ fn with_sdl2() {
         Align::Center,
         Direction::Row,
     );
-
-    let mut i = 0;
 
     // Where to draw the widgets.
     let mut canvas = window
@@ -179,9 +183,7 @@ fn with_sdl2() {
                         x >= p[0] && x <= p[0] + s[0] as isize 
                         && y >= p[1] && y <= p[1] + s[1] as isize 
                     {
-                        tap_detector.widget.colour = RGBA::new(100, i, 100, 255);
-                        //tap_detector.on_tap();
-                        i += 50;
+                        tap_detector.on_tap();
                     }
                 }
                 _ => {}

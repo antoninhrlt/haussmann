@@ -4,7 +4,7 @@
 
 //! Shapes into what the widgets are converted and tools to create shapes.
 
-use super::colours::RGBA;
+use super::{colours::RGBA, Size};
 use super::Point;
 use crate::{Border, Radius};
 
@@ -43,9 +43,46 @@ pub struct Shape {
 impl Shape {
     /// Moves all the points by `position`.
     pub fn move_by(&mut self, position: Point) {
+        if position[0] == 0 && position[1] == 0 {
+            return;
+        }
+
         for point in &mut self.points {
             *point = [position[0] + point[0], position[1] + point[1]];
         }
+    }
+
+    /// Returns the maximum size of a shape (which is a rectangle zone). 
+    pub fn size(&self) -> Size {
+        // Calculates the width of the shape.
+        let mut x_values = self
+            .points()
+            .into_iter()
+            .map(|point| point[0])
+            .collect::<Vec<isize>>();
+
+        x_values.sort();
+
+        let smallest_x = x_values[0];
+        let greatest_x = x_values[x_values.len() - 1];
+
+        let width = greatest_x - smallest_x;
+
+        // Calculates the height of the shape.
+        let mut y_values = self
+            .points()
+            .into_iter()
+            .map(|point| point[1])
+            .collect::<Vec<isize>>();
+
+        y_values.sort();
+
+        let smallest_y = y_values[0];
+        let greatest_y = y_values[y_values.len() - 1];
+
+        let height = greatest_y - smallest_y;
+
+        [width as usize, height as usize]
     }
 
     /// Returns the shape's points.
@@ -54,8 +91,8 @@ impl Shape {
     }
 
     /// Returns the first point of the shape being its position.
-    pub fn position(&self) -> &Point {
-        &self.points[0]
+    pub fn position(&self) -> Point {
+        self.points[0]
     }
 
     /// Returns the shape's borders if they exist, otherwise returns `None`.

@@ -51,6 +51,15 @@ impl<const N: usize> Builder<N> {
         self
     }
 
+    /// Creates the shape at a defined position.
+    pub fn create_at(&mut self, position: Point, points: [Point; N], borders: Option<[Border; N]>) -> &mut Self {
+        self.create(points, borders);
+
+        self.shape.as_mut().unwrap().move_by(position);
+
+        self
+    }
+
     /// Fills the shape.
     pub fn fill(&mut self, colour: RGBA) -> &mut Self {
         self.shape.as_mut().unwrap().filled = (true, Some(colour));
@@ -82,6 +91,20 @@ impl Builder<4> {
                 [0, size[1] as isize],
             ],
             borders,
+        )
+    }
+
+    /// Creates a builder for 4-points shapes actually being rectangles.
+    pub fn rectangle_at(&mut self, position: Point, size: Size, borders: Option<[Border; 4]>) -> &mut Self {
+        self.create_at(
+            position,             
+            [
+                [0, 0],
+                [size[0] as isize, 0],
+                [size[0] as isize, size[1] as isize],
+                [0, size[1] as isize],
+            ], 
+            borders
         )
     }
 }

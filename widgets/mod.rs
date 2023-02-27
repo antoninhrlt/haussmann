@@ -33,6 +33,10 @@ pub trait Widget: DebugWidget + ToAny {
     /// If the `position` parameter or `size` parameter is set as `None`, it 
     /// would be because the widget has a static position or size. 
     fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape;
+
+    fn ok(&mut self) {
+        print!("ok");
+    }
 }
 
 /// Automatically implemented by the macro [`dynamic_widget`](crate::dynamic_widget).
@@ -58,6 +62,10 @@ macro_rules! dynamic_widget {
             fn as_any(&self) -> &dyn std::any::Any {
                 self
             }
+
+            fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+                self
+            }
         }
 
         impl From<$t> for Box<dyn Widget> {
@@ -79,9 +87,13 @@ macro_rules! dynamic_widget {
 #[macro_export]
 macro_rules! dynamic_controller {
     ($t:ty) => {
-        impl<'a, T: Widget + 'static> ToAny for $t {
+        impl<T: Widget + 'static> ToAny for $t {
             fn as_any(&self) -> &dyn std::any::Any {
                 self.widget.as_any()
+            }
+
+            fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+                self
             }
         }
         

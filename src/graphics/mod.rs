@@ -5,12 +5,16 @@
 //! Tools to draw, to align in layouts, to shape and to colour
 //! [`Widget`s](crate::Widget).
 
-mod aligner;
-pub mod colours;
-mod builder;
 pub mod shapes;
 
-pub use builder::ShapesBuilder;
+mod aligner;
+pub mod colours;
+pub mod draw;
+mod sizer;
+
+pub use aligner::Aligner;
+pub use sizer::Sizer;
+
 pub use shapes::Shape;
 
 /// Vector of type `T` with 2 values.

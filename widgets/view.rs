@@ -3,12 +3,15 @@
 // Copyright (c) 2023 Antonin Hérault
 
 use crate::graphics::draw::Drawable;
-use crate::graphics::{Sizer, Aligner, Shape, Point, Size, shapes};
+use crate::graphics::{Sizer, Aligner, Point, Size};
 use crate::Widget;
-use crate::widgets::container;
 
-use super::{Layout, Label, Image, Surface, Container};
+use super::{Layout, Label, Image, Surface};
 
+/// Wraps a [`Layout`] and permit to build [`Drawable`]s from the widgets in.
+/// 
+/// Has a defined position and size in a drawable zone such as a window, a 
+/// canvas...
 pub struct View {
     position: Point,
     size: Size,
@@ -103,15 +106,15 @@ impl View {
     /// - [`Layout::build()`] returns a [`Surface`].
     fn built_to_drawable(built: Box<dyn Widget>, position: Point, size: Size) -> Drawable {
         if let Some(image) = built.as_any().downcast_ref::<Image>() {
-            return Drawable::Image(image.clone(), position, size)
+            return Drawable::Image(image.clone(), position, size);
         }
 
         if let Some(label) = built.as_any().downcast_ref::<Label>() {
-            return Drawable::Label(label.clone(), position, size)
+            return Drawable::Label(label.clone(), position, size);
         }
 
         if let Some(surface) = built.as_any().downcast_ref::<Surface>() {
-            return Drawable::Surface(surface.clone(), position, size)
+            return Drawable::Surface(surface.clone(), position, size);
         }
         
         Drawable::Unknown(built, position, size)

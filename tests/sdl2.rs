@@ -6,13 +6,13 @@ use haussmann::{
     controllers::tap,
     graphics::{
         colours::{RGBA, self},
-        Size, ShapesBuilder, Point,
+        Size, Point, draw::Drawable,
     },
     widgets::{
         Button, 
         Container, 
         Label, 
-        Layout,
+        Layout, View, Surface,
     },
     widgets, 
     Align,
@@ -27,7 +27,7 @@ use sdl2::{
     keyboard::Keycode,
     mouse::MouseButton,
     pixels::Color,
-    rect::Rect,
+    rect::Rect, surface,
 };
 
 use std::time::Duration;
@@ -52,52 +52,60 @@ fn with_sdl2() {
         .build()
         .unwrap();
 
-    let mut layout = Layout::coloured(
-        widgets![
-            tap::Detector::new(
-                Button::simple(
-                    Label::simple("Button 1"), 
-                    RGBA::new(255, 0, 0, 255),
-                ),
-                |button| {
-                    let mut rng = rand::thread_rng();
-
-                    let r = rng.gen_range(0..255);
-                    let g = rng.gen_range(0..255);
-                    let b = rng.gen_range(0..255);
-                
-                    button.colour = RGBA::new(r, g, b, 255);
-                }
-            ),
-            Layout::simple(
-                widgets![
-                    Container::simple(
-                        [200, 100],
-                        Button::simple(
-                            Label::simple("Button 3"), 
-                            RGBA::new(0, 0, 255, 255),
-                        )
-                    ),
+    let mut view = View::new(
+        [0, 0],
+        window_size,
+        Layout::coloured(
+            widgets![
+                tap::Detector::new(
                     Button::simple(
-                        Label::simple("Button 4"), 
-                        RGBA::new(255, 255, 0, 255),
-                    )
-                ],
-                Overflow::Hide,
-                Align::Center,
-                Align::Center,
-                Direction::Column,
-            ),
-            Button::simple(
-                Label::simple("Button 2"), 
-                RGBA::new(0, 255, 0, 255),
-            )
-        ],
-        RGBA::new(255, 255, 255, 255),
-        Overflow::Ignore,
-        Align::Center,
-        Align::Center,
-        Direction::Row,
+                        Label::simple("red button"), 
+                        RGBA::new(255, 0, 0, 255),
+                    ),
+                    |button| {
+                        let mut rng = rand::thread_rng();
+
+                        let r = rng.gen_range(0..255);
+                        let g = rng.gen_range(0..255);
+                        let b = rng.gen_range(0..255);
+                    
+                        button.colour = RGBA::new(r, g, b, 255);
+                    }
+                ),
+                Layout::simple(
+                    widgets![
+                        Container::simple(
+                            [150, 100],
+                            Button::simple(
+                                Label::simple("green button"), 
+                                RGBA::new(0, 255, 0, 255),
+                            )
+                        ),
+                        tap::Detector::new(
+                            Button::simple(
+                                Label::simple("blue button"), 
+                                RGBA::new(0, 0, 255, 255),
+                            ),
+                            |button| {
+                                button.colour.b -= 10;
+                            }
+                        )
+                    ],
+                    Overflow::Hide,
+                    Align::Center,
+                    Align::Center,
+                    Direction::Column,
+                ),
+                Surface::coloured(
+                    RGBA::new(255, 0, 255, 255),
+                )
+            ],
+            RGBA::new(255, 255, 255, 255),
+            Overflow::Ignore,
+            Align::Center,
+            Align::Center,
+            Direction::Row,
+        )
     );
 
     // Where to draw the widgets.
@@ -111,39 +119,43 @@ fn with_sdl2() {
     
     let mut event_pump = sdl_context.event_pump().unwrap();
     
+    // Creates drawables from the widgets.
+    let mut drawables = view.build();
+    
     'running: loop {
+        canvas.set_draw_color(Color::RGBA(0, 0, 0, 0));
         canvas.clear();        
-        
-        // Creates shapes from the widgets.
-        let shapes = ShapesBuilder::new(&layout)
-            .build_shapes([0, 0], window_size);
-        
-        // Draws the shapes.
-        for shape in &shapes {
-            let size = shape.size();
             
-            let colour = shape
-                .fill_colour()
-                .unwrap_or(colours::TRANSPARENT);
-
-            canvas.set_draw_color(Color::RGBA(
-                colour.r as u8,
-                colour.g as u8,
-                colour.b as u8,
-                colour.a as u8,
-            ));
-
-            match shape.points().len() {
-                4 => {
+        // Draws the drawables.
+        for drawable in &drawables {
+            match drawable {
+                Drawable::Surface(surface, position, size) => {
+                    let colour = surface.colour();
+        
+                    canvas.set_draw_color(Color::RGBA(
+                        colour.r as u8,
+                        colour.g as u8,
+                        colour.b as u8,
+                        colour.a as u8,
+                    ));
+        
                     canvas.fill_rect(Rect::new(
-                        shape.position()[0] as i32,
-                        shape.position()[1] as i32,
+                        position[0] as i32,
+                        position[1] as i32,
                         size[0] as u32,
                         size[1] as u32,
                     ))
                     .unwrap();
                 }
-                _ => todo!(),
+                Drawable::Image(image, position, size) => {
+                    //println!("draws image {:?}", image);
+                }
+                Drawable::Label(label, position, size) => {
+                    //println!("draws label {:?}", label);
+                }
+                Drawable::Unknown(widget, position, size) => {
+                    println!("unknown widget to draw : {:?}", widget);
+                }
             }
         }
 
@@ -158,6 +170,9 @@ fn with_sdl2() {
                 Event::Window { win_event, .. } => match win_event {
                     WindowEvent::Resized(width, height) => {
                         window_size = [width as usize, height as usize];
+
+                        // Rebuilds the view to fit the new window's size.
+                        drawables = view.rebuild([0, 0], window_size);
                     }
                     _ => {}
                 },
@@ -168,23 +183,15 @@ fn with_sdl2() {
                         return;
                     }
 
-                    
-                    let (x, y) = (x as isize, y as isize);
+                    // let tap: Point = [x as isize, y as isize];
 
-                    let s: Size = shapes[1].size();
-                    let p: Point = shapes[1].position();
+                    // for tap_detector in view.controllers::<tap::Detector<Button>>() {
+                    //     if tap::is_tapped(tap, tap_detector.zone.0, tap_detector.zone.1) {
+                    //         tap_detector.on_tap();
+                    //     }
+                    // }
 
-                    let tap_detector = layout.widgets[0]
-                        .as_any_mut()
-                        .downcast_mut::<tap::Detector<Button>>()
-                        .unwrap();
-
-                    if 
-                        x >= p[0] && x <= p[0] + s[0] as isize 
-                        && y >= p[1] && y <= p[1] + s[1] as isize 
-                    {
-                        tap_detector.on_tap();
-                    }
+                    // drawables = view.rebuild([0, 0], window_size);
                 }
                 _ => {}
             }

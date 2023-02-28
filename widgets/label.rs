@@ -4,7 +4,7 @@
 
 use super::{DebugWidget, Widget};
 use crate::{
-    graphics::{Shape, Size, Point},
+    graphics::{Shape, Size, Point, colours::RGBA},
     theme::TextTheme,
     ToAny, widgets,
 };
@@ -24,8 +24,12 @@ pub struct Label {
 widgets::dynamic_widget!(Label);
 
 impl Widget for Label {
-    fn shape(&self, _position: Option<Point>, _size: Option<Size>) -> Shape {
-        panic!("cannot return shape for label");
+    fn build(&self) -> Box<dyn Widget> {
+        self.clone().into()
+    }
+
+    fn colour(&self) -> RGBA {
+        self.theme.colour
     }
 }
 

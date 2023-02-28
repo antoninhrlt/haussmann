@@ -2,10 +2,10 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use super::{DebugWidget, Label, Widget};
+use super::{DebugWidget, Label, Widget, Layout};
 use crate::{
     graphics::{colours::RGBA, shapes, Shape, Size, Point},
-    Border, Radius, ToAny, widgets,
+    Border, Radius, ToAny, widgets, Overflow, Align, Direction,
 };
 
 /// Button widget with a label inside.
@@ -23,15 +23,24 @@ pub struct Button {
 
 widgets::dynamic_widget!(Button);
 
+
 impl Widget for Button {
-    fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {
-        assert_ne!(position, None);
-        assert_ne!(size, None);
-        
-        shapes::Builder::new()
-            .rectangle_at(position.unwrap(), size.unwrap(), self.borders)
-            .fill(self.colour)
-            .finish()
+    fn build(&self) -> Box<dyn Widget> {
+        Layout::coloured(
+            widgets![
+                self.label.clone()
+            ],
+            self.colour,
+            Overflow::Hide,
+            Align::Center,
+            Align::Center,
+            Direction::Column,
+        )
+        .into()
+    }
+
+    fn colour(&self) -> RGBA {
+        self.colour
     }
 }
 

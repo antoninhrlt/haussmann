@@ -2,12 +2,12 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use super::{DebugWidget, Widget};
+use super::{DebugWidget, Widget, Surface};
 use crate::{
     graphics::{
         colours::RGBA,
         shapes::{self, Shape},
-        Size, Point,
+        Size, Point, Sizer, Aligner,
     },
     Align, Border, Direction, Overflow, ToAny, widgets,
 };
@@ -49,14 +49,12 @@ impl Default for Layout {
 widgets::dynamic_widget!(Layout);
 
 impl Widget for Layout {
-    fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {
-        assert_ne!(position, None);
-        assert_ne!(size, None);
+    fn build(&self) -> Box<dyn Widget> {
+        Surface::new(self.colour, self.borders).into()
+    }
 
-        shapes::Builder::new()
-            .rectangle_at(position.unwrap(), size.unwrap(), self.borders)
-            .fill(self.colour)
-            .finish()
+    fn colour(&self) -> RGBA {
+        self.colour
     }
 }
 
@@ -170,6 +168,21 @@ impl Layout {
 
         for boxed in &self.widgets {
             match boxed.as_any().downcast_ref::<T>() {
+                Some(widget) => widgets.push(widget),
+                None => {} // not a widget of type `T`.
+            }
+        }
+
+        widgets
+    }
+
+    /// Same as [`Self::widgets`] but returned widgets are 
+    /// mutable references
+    pub fn widgets_mut<T: 'static>(&mut self) -> Vec<&mut T> {
+        let mut widgets = vec![];
+
+        for boxed in &mut self.widgets {
+            match boxed.as_any_mut().downcast_mut::<T>() {
                 Some(widget) => widgets.push(widget),
                 None => {} // not a widget of type `T`.
             }

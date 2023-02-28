@@ -7,7 +7,7 @@
 
 pub mod tap;
 
-use crate::{Widget, widgets, ToAny, DebugWidget, graphics::{Point, Size, Shape}};
+use crate::{Widget, widgets, ToAny, DebugWidget, graphics::{Point, Size, Shape, colours::RGBA}};
 
 /// Function to call when something happen on a widget.
 type ControllerFn<T> = fn(widget: &mut T);
@@ -31,8 +31,12 @@ impl<T: Widget + 'static> std::fmt::Debug for Controller<T> {
 }
 
 impl<T: Widget + 'static> Widget for Controller<T> {
-    fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {
-        self.widget.shape(position, size)
+    fn build(&self) -> Box<dyn Widget> {
+        self.widget.build()
+    }
+
+    fn colour(&self) -> RGBA {
+        self.widget.colour()
     }
 }
 

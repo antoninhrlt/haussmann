@@ -4,31 +4,38 @@
 
 use crate::{Widget, ToAny, DebugWidget, graphics::{colours::RGBA, Size, Shape, shapes, Point}, Border, widgets};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Surface {
-    colour: RGBA,
-    borders: Option<[Border; 4]>,
+    pub colour: RGBA,
+    pub borders: Option<[Border; 4]>,
 }
 
 widgets::dynamic_widget!(Surface);
 
 impl Widget for Surface {
-    fn shape(&self, position: Option<Point>, size: Option<Size>) -> Shape {
-        assert_ne!(position, None);
-        assert_ne!(size, None);
+    fn build(&self) -> Box<dyn Widget> {
+        self.clone().into()
+    }
 
+    fn colour(&self) -> RGBA {
+        self.colour
+    }
+}
+
+impl Surface {
+    pub(crate) fn to_shape(&self, position: Point, size: Size) -> Shape {
         shapes::Builder::new()
-            .rectangle_at(position.unwrap(), size.unwrap(), self.borders)
+            .rectangle_at(position, size, self.borders)
             .fill(self.colour)
             .finish()
     }
 }
 
 impl Surface {
-    pub fn new(colour: RGBA, borders: [Border; 4]) -> Self {
+    pub fn new(colour: RGBA, borders: Option<[Border; 4]>) -> Self {
         Self {
             colour,
-            borders: Some(borders),
+            borders,
         }
     }
 

@@ -2,7 +2,17 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{Widget, ToAny, DebugWidget, graphics::{colours::RGBA, Size, Shape, shapes, Point}, Border, widgets};
+use crate::{
+    graphics::{
+        colours::RGBA, 
+        Size, Point
+    }, 
+    Widget, 
+    ToAny, 
+    DebugWidget, 
+    Border, 
+    widgets
+};
 
 #[derive(Debug, Clone)]
 pub struct Surface {
@@ -19,15 +29,6 @@ impl Widget for Surface {
 
     fn colour(&self) -> RGBA {
         self.colour
-    }
-}
-
-impl Surface {
-    pub(crate) fn to_shape(&self, position: Point, size: Size) -> Shape {
-        shapes::Builder::new()
-            .rectangle_at(position, size, self.borders)
-            .fill(self.colour)
-            .finish()
     }
 }
 

@@ -5,7 +5,7 @@
 //! Widgets are items to be placed on a drawable surface and managed by layouts.
 
 use crate::{
-    graphics::{Shape, Size, Point, colours::RGBA},
+    graphics::colours::RGBA,
     ToAny,
 };
 

@@ -4,7 +4,7 @@
 
 //! Everything related to tapping widgets.
 
-use crate::{Widget, widgets, ToAny, DebugWidget, graphics::{Point, Size, Shape, colours::RGBA}};
+use crate::{Widget, widgets, ToAny, DebugWidget, graphics::{Point, Size, colours::RGBA}};
 
 use super::ControllerFn;
 

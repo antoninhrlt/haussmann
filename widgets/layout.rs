@@ -4,11 +4,7 @@
 
 use super::{DebugWidget, Widget, Surface};
 use crate::{
-    graphics::{
-        colours::RGBA,
-        shapes::{self, Shape},
-        Size, Point, Sizer, Aligner,
-    },
+    graphics::colours::RGBA,
     Align, Border, Direction, Overflow, ToAny, widgets,
 };
 

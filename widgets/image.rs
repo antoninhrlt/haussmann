@@ -3,11 +3,9 @@
 // Copyright (c) 2023 Antonin Hérault
 
 use crate::{
-    graphics::{Shape, Size, Point, colours::RGBA},
+    graphics::colours::RGBA,
     DebugWidget, ToAny, Widget, widgets, Border,
 };
-
-use super::Surface;
 
 /// Image widget.
 #[derive(Debug, Clone, PartialEq)]

@@ -4,10 +4,10 @@
 
 use crate::{
     graphics::{
-        colours::{self, RGBA},
-        shapes, Shape, Size, Point,
+        colours::RGBA,
+        Size,
     },
-    Border, DebugWidget, ToAny, Widget, widgets,
+    DebugWidget, ToAny, Widget, widgets,
 };
 
 /// Wraps a widget giving it a fixed size.

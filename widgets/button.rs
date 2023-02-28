@@ -4,7 +4,7 @@
 
 use super::{DebugWidget, Label, Widget, Layout};
 use crate::{
-    graphics::{colours::RGBA, shapes, Shape, Size, Point},
+    graphics::colours::RGBA,
     Border, Radius, ToAny, widgets, Overflow, Align, Direction,
 };
 

@@ -2,123 +2,126 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{widgets::Layout, Align, Direction};
+use crate::{widgets::Layout, Direction, Align};
 
-use super::{Shape, Size};
+use super::{Point, Size};
 
-/// Aligns shapes following the rules of a [`Layout`] widget.
+/// Generates a vector of [`Point`] which are the positions of every widget 
+/// contained in a [`Layout`].
+/// 
+/// If the layout contains other layouts inside itself, the aligner will 
+/// create positions for the widgets of the sub-layout.
+/// 
+/// In this case, the positions are generated in this order:
+/// ```text
+/// 1: Layout {
+///     2: Widget()
+///     3: Layout {
+///         4: Widget()
+///         5: Widget()
+///     }
+///     6: Widget()
+/// }
+/// ```
 #[derive(Debug)]
-pub struct Aligner {
-    /// All the widths of the shapes.
-    widths: Vec<usize>,
-    /// All the heights of the shapes.
-    heights: Vec<usize>,
-    /// Index of the manipulated shape.
-    pub index: usize,
+pub struct Aligner<'a> {
+    layout: &'a Layout,
+    sizes: Vec<Size>,
 }
 
-impl Aligner {
-    /// Creates a new aligner calculating the size of all the shapes grouped
-    /// to avoid calculating it them at each [`Self::align_shapes`] call.
-    pub fn new(shapes: &Vec<Shape>) -> Self {
-        let mut widths = vec![];
-        let mut heights = vec![];
-
-        for shape in &shapes.clone() {
-            // This calculation creates a rectangle zone containing the whole
-            // shape no matter its actual form.
-            let shape_size: Size = shape.size();
-
-            widths.push(shape_size[0]);
-            heights.push(shape_size[1]);
-        }
-
+impl<'a> Aligner<'a> {
+    pub fn new(layout: &'a Layout, sizes: Vec<Size>) -> Self {
         Self {
-            index: 0,
-            widths,
-            heights,
+            layout,
+            sizes,
         }
     }
 
-    /// Changes the position of `shapes` to be aligned in the layout following
-    /// its rules.
-    pub fn align_shapes(&mut self, layout: &Layout, layout_shape: &Shape, shapes: &mut Vec<Shape>) {
-        for mut shape in shapes {
-            self.align_shape(layout, layout_shape, &mut shape);
+    /// Gets the position of each widget in the correct order, in a positioned zone.
+    pub fn align_at(&self, zone: Point) -> Vec<Point> {
+        // The first size is always the layout's size.
+        let zone_size: Size = self.sizes[0];
+
+        let widths: Vec<usize> = self.sizes[1..]
+            .iter()
+            .map(|size| size[0])
+            .collect();
+        
+        let heights: Vec<usize> = self.sizes[1..]
+            .iter()
+            .map(|size| size[1])
+            .collect();
+
+        // Creates the positions in the correct order.
+        // The first position is the layout's position, which is the position of
+        // the zone.
+        let mut positions: Vec<Point> = vec![zone];
+
+        for (i, size) in self.sizes[1..].iter().enumerate() {
+            // Total of widths of the widgets already placed.
+            let offset_width = widths[..i].iter().sum::<usize>() as isize;
+            // Total of heights of the widgets already placed.
+            let offset_height = heights[..i].iter().sum::<usize>() as isize;
+
+            // Total of widths of the widgets which are not already placed.
+            let setoff_width = widths[i..].iter().sum::<usize>() as isize;
+            // Total of heights of the widgets which are already placed.
+            let setoff_height = heights[i..].iter().sum::<usize>() as isize;
+
+            let (x, y) = match self.layout.direction {
+                Direction::Column => (
+                    match self.layout.wx_align {
+                        Align::Left => offset_width,
+                        Align::Center => {
+                            // Both the width of the remaining space at left and right. 
+                            let space: isize = (zone_size[0] as isize - widths.iter().sum::<usize>() as isize) / 2;
+
+                            if i == 0 {
+                                // First widget placed
+                                space
+                            } else {
+                                space + offset_width
+                            }
+                        }
+                        Align::Right => zone_size[0] as isize - setoff_width,
+                        _ => panic!("layout widgets alignment on the x axis is `Align::{:?}` but should be either `Align::Left`, `Align::Center` or `Align::Right`", self.layout.wx_align),
+                    },
+                    match self.layout.wy_align {
+                        Align::Top => 0,
+                        Align::Center => (zone_size[1] as isize - size[1] as isize) / 2,
+                        Align::Bottom => zone_size[1] as isize - size[1] as isize,
+                        _ => panic!("layout widgets alignment on the y axis is `Align::{:?}` but should be either `Align::Top`, `Align::Center` or `Align::Bottom`", self.layout.wy_align),
+                    }
+                ),
+                Direction::Row => (
+                    match self.layout.wx_align {
+                        Align::Left => 0,
+                        Align::Center => (zone_size[0] as isize - size[0] as isize) / 2,
+                        Align::Right => zone_size[0] as isize - size[0] as isize,
+                        _ => panic!("layout widgets alignment on the x axis is `Align::{:?}` but should be either `Align::Left`, `Align::Center` or `Align::Right`", self.layout.wx_align),
+                    },
+                    match self.layout.wy_align {
+                        Align::Top => offset_height,
+                        Align::Center => {
+                            // Both the height of the remaining space at top and bottom. 
+                            let space: isize = (zone_size[1] as isize - heights.iter().sum::<usize>() as isize) / 2;
+
+                            if i == 0 {
+                                // First widget placed
+                                space
+                            } else {
+                                space + offset_height
+                            }
+                        }
+                        Align::Bottom => zone_size[1] as isize - setoff_height as isize,
+                        _ => panic!("layout widgets alignment on the y axis is `Align::{:?}` but should be either `Align::Top`, `Align::Center` or `Align::Bottom`", self.layout.wy_align),
+                    }
+                )
+            };
+
+            positions.push([zone[0] + x, zone[1] + y]);
         }
-    }
 
-    /// Changes the position of a `shape` to be aligned in the layout following
-    /// its rules.
-    pub fn align_shape(&mut self, layout: &Layout, layout_shape: &Shape, shape: &mut Shape) {
-        // Calculate the size of the `shape`.
-        let shape_size: Size = shape.size();
-        // Gets the size of the layout.
-        let parent_size: Size = layout_shape.size();
-
-        // Total of widths of the shapes already placed.
-        let offset_width = self.widths[..self.index].iter().sum::<usize>() as isize;
-        // Total of heights of the shapes already placed.
-        let offset_height = self.heights[..self.index].iter().sum::<usize>() as isize;
-
-        // Total of widths of the shapes which are not already placed.
-        let setoff_width = self.widths[self.index..].iter().sum::<usize>() as isize;
-        // Total of heights of the shapes which are already placed.
-        let setoff_height = self.heights[self.index..].iter().sum::<usize>() as isize;
-
-        let (x, y) = match layout.direction {
-            Direction::Column => (
-                match layout.wx_align {
-                    Align::Left => offset_width,
-                    Align::Center => {
-                        // Both the width of the remaining space at left and right. 
-                        let space: isize = (parent_size[0] as isize - self.widths.iter().sum::<usize>() as isize) / 2;
-
-                        if self.index == 0 {
-                            // First shape placed
-                            space
-                        } else {
-                            space + offset_width
-                        }
-                    }
-                    Align::Right => parent_size[0] as isize - setoff_width,
-                    _ => panic!("layout widgets alignment on the x axis is `Align::{:?}` but should be either `Align::Left`, `Align::Center` or `Align::Right`", layout.wx_align),
-                },
-                match layout.wy_align {
-                    Align::Top => 0,
-                    Align::Center => (parent_size[1] as isize - shape_size[1] as isize) / 2,
-                    Align::Bottom => parent_size[1] as isize - shape_size[1] as isize,
-                    _ => panic!("layout widgets alignment on the y axis is `Align::{:?}` but should be either `Align::Top`, `Align::Center` or `Align::Bottom`", layout.wy_align),
-                }
-            ),
-            Direction::Row => (
-                match layout.wx_align {
-                    Align::Left => 0,
-                    Align::Center => (parent_size[0] as isize - shape_size[0] as isize) / 2,
-                    Align::Right => parent_size[0] as isize - shape_size[0] as isize,
-                    _ => panic!("layout widgets alignment on the x axis is `Align::{:?}` but should be either `Align::Left`, `Align::Center` or `Align::Right`", layout.wx_align),
-                },
-                match layout.wy_align {
-                    Align::Top => offset_height,
-                    Align::Center => {
-                        // Both the height of the remaining space at top and bottom. 
-                        let space: isize = (parent_size[1] as isize - self.heights.iter().sum::<usize>() as isize) / 2;
-
-                        if self.index == 0 {
-                            // First shape placed
-                            space
-                        } else {
-                            space + offset_height
-                        }
-                    }
-                    Align::Bottom => parent_size[1] as isize - setoff_height as isize,
-                    _ => panic!("layout widgets alignment on the y axis is `Align::{:?}` but should be either `Align::Top`, `Align::Center` or `Align::Bottom`", layout.wy_align),
-                }
-            )
-        };
-
-        let layout_position = layout_shape.points()[0];
-        shape.move_by([layout_position[0] + x, layout_position[1] + y]);
-        self.index += 1;
+        positions
     }
 }

@@ -18,7 +18,7 @@ use haussmann::{
     Align,
     Direction, 
     Overflow, 
-    Widget,
+    Widget, view, layout, rgba, button, label, container, surface
 };
 
 use rand::Rng;
@@ -52,15 +52,72 @@ fn with_sdl2() {
         .build()
         .unwrap();
 
+    let mut view = view! {
+        position: [0, 0],
+        size: window_size,
+        layout! {
+            colour: rgba!(255, 255, 255, a: 255),
+            overflow: Ignore,
+            wx: Align::Center,
+            wy: Align::Center,
+            direction: Row,
+            widgets! [
+                button! {
+                    colour: rgba!(255, 0, 0, a: 255),
+                    label: label!("red button"),
+                    on_tap: |button| {
+                        let mut rng = rand::thread_rng();
+
+                        let r = rng.gen_range(0..255);
+                        let g = rng.gen_range(0..255);
+                        let b = rng.gen_range(0..255);
+                    
+                        button.colour = RGBA::new(r, g, b, 255);
+                    }
+                },
+                layout! {
+                    overflow: Hide,
+                    wx: Align::Center,
+                    wy: Align::Center,
+                    direction: Column,
+                    widgets! [
+                        container! {
+                            size: [150, 100],
+                            widget: button![
+                                colour: rgba![0, 255, 0, a: 255],
+                                label: label!("green button"),
+                            ]
+                        },
+                        button! {
+                            colour: rgba!(0, 0, 255, a: 255),
+                            label: label!("blue button"),
+                            on_tap: |button| {
+                                button.colour.b -= 10;
+                            }
+                        }   
+                    ]
+                },
+                surface! {
+                    colour: rgba!(255, 0, 255, a: 255)
+                }
+            ]
+        }
+    };
+
     let mut view = View::new(
         [0, 0],
         window_size,
         Layout::coloured(
+            RGBA::new(255, 255, 255, 255),
+            Overflow::Ignore,
+            Align::Center,
+            Align::Center,
+            Direction::Row,
             widgets![
                 tap::Detector::new(
                     Button::simple(
-                        Label::simple("red button"), 
                         RGBA::new(255, 0, 0, 255),
+                        Label::simple("red button"), 
                     ),
                     |button| {
                         let mut rng = rand::thread_rng();
@@ -73,38 +130,34 @@ fn with_sdl2() {
                     }
                 ),
                 Layout::simple(
+                    Overflow::Hide,
+                    Align::Center,
+                    Align::Center,
+                    Direction::Column,
                     widgets![
-                        Container::simple(
+                        Container::new(
                             [150, 100],
                             Button::simple(
-                                Label::simple("green button"), 
                                 RGBA::new(0, 255, 0, 255),
+                                Label::simple("green button"), 
                             )
                         ),
                         tap::Detector::new(
                             Button::simple(
-                                Label::simple("blue button"), 
                                 RGBA::new(0, 0, 255, 255),
+                                Label::simple("blue button"), 
                             ),
                             |button| {
                                 button.colour.b -= 10;
                             }
                         )
                     ],
-                    Overflow::Hide,
-                    Align::Center,
-                    Align::Center,
-                    Direction::Column,
                 ),
                 Surface::coloured(
                     RGBA::new(255, 0, 255, 255),
                 )
             ],
-            RGBA::new(255, 255, 255, 255),
-            Overflow::Ignore,
-            Align::Center,
-            Align::Center,
-            Direction::Row,
+
         )
     );
 

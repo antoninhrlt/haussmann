@@ -8,6 +8,9 @@ use super::Size;
 
 /// Generates a vector of [`Size`] which are the sizes of every widget contained
 /// in a [`Layout`].
+/// 
+/// Does not calculate the sizes of the sub-widgets (widgets of the layout's 
+/// widgets) !
 pub struct Sizer<'a> {
     layout: &'a Layout,
 }

@@ -9,20 +9,8 @@ use super::{Point, Size};
 /// Generates a vector of [`Point`] which are the positions of every widget 
 /// contained in a [`Layout`].
 /// 
-/// If the layout contains other layouts inside itself, the aligner will 
-/// create positions for the widgets of the sub-layout.
-/// 
-/// In this case, the positions are generated in this order:
-/// ```text
-/// 1: Layout {
-///     2: Widget()
-///     3: Layout {
-///         4: Widget()
-///         5: Widget()
-///     }
-///     6: Widget()
-/// }
-/// ```
+/// Does not calculate the positions of the sub-widgets (widgets of the 
+/// layout's widgets) !
 #[derive(Debug)]
 pub struct Aligner<'a> {
     layout: &'a Layout,

@@ -10,6 +10,7 @@ version = "0.0.3"
 edition = "2021"
 
 [dependencies]
+haussmann-dev = { path = "./dev" }
 
 [dev-dependencies]
 sdl2 = "0.35.2"

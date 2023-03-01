@@ -2,14 +2,14 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use haussmann_dev::Widget;
+use haussmann_dev::{Widget};
 
 use crate::{
     graphics::{
         colours::RGBA,
         Size,
     },
-    DebugWidget, ToAny, Widget, widgets,
+    DebugWidget, ToAny, Widget,
 };
 
 /// Wraps a widget giving it a fixed size.
@@ -19,6 +19,14 @@ pub struct Container {
     pub size: Size,
     /// The widget contained in this fixed zone.
     pub widget: Box<dyn Widget>,
+}
+
+/// Creates a new container like its [`new`](Container::new) function.
+#[macro_export]
+macro_rules! container {
+    (size: $size:expr, widget: $widget:expr $(,)?) => {
+        Container::new($size, $widget)
+    };
 }
 
 impl Widget for Container {
@@ -32,19 +40,11 @@ impl Widget for Container {
 }
 
 impl Container {
-    /// Creates a new containers.
+    /// Creates a new containers
     pub fn new<T: Widget + 'static>(
         size: Size,
         widget: T,
     ) -> Self {
-        Self {
-            size,
-            widget: Box::new(widget),
-        }
-    }
-
-    /// Creates the simple container possible.
-    pub fn simple<T: Widget + 'static>(size: Size, widget: T) -> Self {
         Self {
             size,
             widget: Box::new(widget),

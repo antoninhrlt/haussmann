@@ -18,8 +18,6 @@ pub struct Layout {
     pub colour: RGBA,
     /// The borders of the layout.
     pub borders: Option<[Border; 4]>,
-    /// The widgets contained in the layout.
-    pub widgets: Vec<Box<dyn Widget>>,
     /// Rules about widget overflowing.
     pub overflow: Overflow,
     /// Widgets alignment on the X axis inside the layout.
@@ -28,6 +26,61 @@ pub struct Layout {
     pub wy_align: Align,
     /// The direction of the widgets arrangement.
     pub direction: Direction,
+    /// The widgets contained in the layout.
+    pub widgets: Vec<Box<dyn Widget>>,
+}
+
+/// Creates different layouts following the different available constructors in 
+/// the [`Layout`] implementation.
+#[macro_export]
+macro_rules! layout {
+    // Transparent
+    (overflow: $overflow:ident, wx: $wx_align:expr, wy: $wy_align:expr, direction: $direction:ident, $widgets:expr $(,)?) => {
+        Layout::simple(
+            Overflow::$overflow,
+            $wx_align,
+            $wy_align,
+            Direction::$direction,
+            $widgets,
+        )
+    };
+    
+    // Coloured
+    (colour: $colour:expr, overflow: $overflow:ident, wx: $wx_align:expr, wy: $wy_align:expr, direction: $direction:ident, $widgets:expr $(,)?) => {
+        Layout::coloured(
+            $colour,
+            Overflow::$overflow,
+            $wx_align,
+            $wy_align,
+            Direction::$direction,
+            $widgets,
+        )
+    };
+
+    // Bordered
+    (borders: $borders:expr, overflow: $overflow:ident, wx: $wx_align:expr, wy: $wy_align:expr, direction: $direction:ident, $widgets:expr $(,)?) => {
+        Layout::bordered(
+            $colour,
+            Overflow::$overflow,
+            $wx_align,
+            $wy_align,
+            Direction::$direction,
+            $widgets,
+        )
+    };
+
+    // Coloured + bordered
+    (colour: $colour:expr, borders: $borders:expr, overflow: $overflow:ident, wx: $wx_align:expr, wy: $wy_align:expr, direction: $direction:ident, $widgets:expr $(,)?) => {
+        Layout::new(
+            $colour,
+            $borders,
+            Overflow::$overflow,
+            $wx_align,
+            $wy_align,
+            Direction::$direction,
+            $widgets,
+        )
+    }
 }
 
 impl Default for Layout {
@@ -35,11 +88,11 @@ impl Default for Layout {
         Self {
             colour: RGBA::default(),
             borders: None,
-            widgets: vec![],
             overflow: Overflow::Ignore,
             wx_align: Align::Center,
             wy_align: Align::Center,
             direction: Direction::Column,
+            widgets: vec![],
         }
     }
 }
@@ -59,79 +112,79 @@ impl Layout {
     pub fn new(
         colour: RGBA,
         borders: [Border; 4],
-        widgets: Vec<Box<dyn Widget>>,
         overflow: Overflow,
         wx_align: Align,
         wy_align: Align,
         direction: Direction,
+        widgets: Vec<Box<dyn Widget>>,
     ) -> Self {
         Self {
             colour,
             borders: Some(borders),
-            widgets,
             overflow,
             wx_align,
             wy_align,
             direction,
+            widgets,
         }
     }
 
     /// Creates the simplest layout possible.
     pub fn simple(
-        widgets: Vec<Box<dyn Widget>>,
         overflow: Overflow,
         wx_align: Align,
         wy_align: Align,
         direction: Direction,
+        widgets: Vec<Box<dyn Widget>>,
     ) -> Self {
         Self {
             colour: RGBA::default(),
             borders: None,
-            widgets,
             overflow,
             wx_align,
             wy_align,
             direction,
+            widgets,
         }
     }
 
     /// Creates a new layout with a colour.
     pub fn coloured(
-        widgets: Vec<Box<dyn Widget>>,
         colour: RGBA,
         overflow: Overflow,
         wx_align: Align,
         wy_align: Align,
         direction: Direction,
+        widgets: Vec<Box<dyn Widget>>,
     ) -> Self {
         Self {
             colour,
             borders: None,
-            widgets,
             overflow,
             wx_align,
             wy_align,
             direction,
+            widgets,
         }
     }
 
     /// Creates a layout with borders.
     pub fn bordered(
         borders: [Border; 4],
-        widgets: Vec<Box<dyn Widget>>,
         overflow: Overflow,
         wx_align: Align,
         wy_align: Align,
         direction: Direction,
+        widgets: Vec<Box<dyn Widget>>,
     ) -> Self {
         Self {
             colour: RGBA::default(),
             borders: Some(borders),
-            widgets,
             overflow,
             wx_align,
             wy_align,
             direction,
+            widgets,
         }
     }
 

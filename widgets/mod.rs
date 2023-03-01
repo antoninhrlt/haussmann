@@ -61,11 +61,7 @@ macro_rules! widgets {
         vec![]
     };
 
-    ($first:expr $(, $widget:expr) *,) => {
-        widgets![$first, $($widget),*]
-    };
-
-    ($first:expr $(, $widget:expr) *) => {
+    ($first:expr $(, $widget:expr)* $(,)*) => {
         // Code block returning a vector of boxes of dynamic widget.
         {
             // The type annotation here is very important. It transforms the

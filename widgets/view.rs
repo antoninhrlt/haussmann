@@ -12,10 +12,21 @@ use super::{Layout, Label, Image, Surface};
 /// 
 /// Has a defined position and size in a drawable zone such as a window, a 
 /// canvas...
+#[derive(Debug)]
 pub struct View {
     position: Point,
     size: Size,
     layout: Layout,
+}
+
+/// Creates a new view like its [`new`](View::new) function.
+/// 
+/// The layout parameter is not named.
+#[macro_export]
+macro_rules! view {
+    (position: $position:expr, size: $size:expr, $layout:expr $(,)?) => {
+        View::new($position, $size, $layout)
+    };
 }
 
 impl View {

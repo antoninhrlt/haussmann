@@ -8,7 +8,7 @@ use super::{DebugWidget, Widget};
 use crate::{
     graphics::colours::RGBA,
     theme::TextTheme,
-    ToAny, widgets,
+    ToAny,
 };
 
 /// Label widget, which is not a "surfaced" widget. The text has to be rendered,
@@ -21,6 +21,23 @@ pub struct Label {
     pub text: String,
     /// The theme for the text.
     pub theme: TextTheme,
+}
+
+/// Creates a new label. When there is only the text specified, it is not 
+/// necessary to name the parameter but it must be a string literal.
+#[macro_export]
+macro_rules! label {
+    ($text:literal $(,)?) => {
+        Label::simple($text)
+    };
+
+    (text: $text:expr $(,)?) => {
+        Label::simple($text),
+    };
+
+    (text: $text:expr, theme: $theme:expr $(,)?) => {
+        Label::new($text, $theme),
+    };
 }
 
 impl Widget for Label {

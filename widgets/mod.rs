@@ -25,8 +25,20 @@ pub use layout::Layout;
 pub use surface::Surface;
 pub use view::View;
 
+/// Collection of the functions required to use and build widgets. All widgets 
+/// implement it. 
+/// 
+/// Can be implemented with the macro derive 
+/// [`#[derive(Widget)]`](haussmann_dev::widget).
+/// 
+/// The controllers also implement this trait since they are widgets, but it 
+/// must be implemented thanks to 
+/// [`#[derive(Controller)]`](haussmann_dev::controller) instead.
 pub trait Widget: DebugWidget + ToAny {
+    /// Builds the widget. The returned value will be transformed into a 
+    /// [`Drawable`](crate::graphics::draw::Drawable) at [`View`] build.
     fn build(&self) -> Box<dyn Widget>;
+    /// Returns the colour of the widget.
     fn colour(&self) -> RGBA;
 }
 

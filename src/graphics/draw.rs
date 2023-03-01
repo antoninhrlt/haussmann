@@ -2,6 +2,8 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+//! Everything related to drawing of widgets.
+
 use crate::{widgets::{Label, Image, Surface}, Widget};
 
 use super::{Size, Point};

@@ -30,6 +30,10 @@ pub struct Aligner<'a> {
 }
 
 impl<'a> Aligner<'a> {
+    /// Creates a new aligner following the rules of a layout.
+    /// 
+    /// The `sizes` parameter is the sizes of every widget calculated thanks to
+    /// [`Sizer`](super::Sizer)).
     pub fn new(layout: &'a Layout, sizes: Vec<Size>) -> Self {
         Self {
             layout,

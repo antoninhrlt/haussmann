@@ -12,9 +12,12 @@ use crate::{
     Border, 
 };
 
+/// A drawable zone which can coloured, bordered or both.
 #[derive(Debug, Clone, Widget)]
 pub struct Surface {
+    /// The colour of the surface.
     pub colour: RGBA,
+    /// The borders of the surface.
     pub borders: Option<[Border; 4]>,
 }
 
@@ -58,6 +61,7 @@ impl Default for Surface {
 }
 
 impl Surface {
+    /// Creates a new surface with a colour and borders.
     pub fn new(colour: RGBA, borders: Option<[Border; 4]>) -> Self {
         Self {
             colour,
@@ -65,6 +69,7 @@ impl Surface {
         }
     }
 
+    /// Creates a new surface with a colour but no borders.
     pub fn coloured(colour: RGBA) -> Self {
         Self {
             colour,
@@ -72,6 +77,7 @@ impl Surface {
         }
     }
 
+    /// Creates a new surface with borders but no colour.
     pub fn bordered(borders: [Border; 4]) -> Self {
         Self {
             colour: RGBA::default(),

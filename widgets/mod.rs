@@ -29,11 +29,11 @@ pub use view::View;
 /// implement it. 
 /// 
 /// Can be implemented with the macro derive 
-/// [`#[derive(Widget)]`](haussmann_dev::widget).
+/// [`#[derive(Widget)]`](haussmann_dev::Widget).
 /// 
 /// The controllers also implement this trait since they are widgets, but it 
 /// must be implemented thanks to 
-/// [`#[derive(Controller)]`](haussmann_dev::controller) instead.
+/// [`#[derive(Controller)]`](haussmann_dev::Controller) instead.
 pub trait Widget: DebugWidget + ToAny {
     /// Builds the widget. The returned value will be transformed into a 
     /// [`Drawable`](crate::graphics::draw::Drawable) at [`View`] build.
@@ -42,7 +42,7 @@ pub trait Widget: DebugWidget + ToAny {
     fn colour(&self) -> RGBA;
 }
 
-/// Automatically implemented by the macro [`dynamic_widget`](crate::dynamic_widget).
+/// Automatically implemented by the macro derives in [`haussmann_dev`].
 pub trait DebugWidget: std::fmt::Debug {
     /// Should not be overridden
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

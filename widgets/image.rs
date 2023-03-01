@@ -2,14 +2,19 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+//
+// TODO: Absolutely everything but it had to be created because of the 
+// drawables.
+#![allow(missing_docs)]
+//
+//
+
 use haussmann_dev::Widget;
 
 use crate::{
     graphics::colours::RGBA,
     DebugWidget, ToAny, Widget, Border,
 };
-
-// TODO: everything here
 
 /// Image widget.
 #[derive(Debug, Clone, PartialEq, Widget)]

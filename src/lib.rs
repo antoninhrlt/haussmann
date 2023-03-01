@@ -24,9 +24,8 @@
 //! application using a system API
 //! ([windows-rs](https://github.com/microsoft/windows-rs),
 //! [x11rb](https://github.com/psychon/x11rb), ...). Furthermore, the crate
-//! contains tools to transform widgets into shapes and to place and align
-//! widgets on a drawable surface. The [`Drawer`](graphics::Drawer) trait can be
-//! implemented on a drawable surface to easily draw widgets on it.
+//! contains tools to transform widgets into 
+//! [`Drawable`s](graphics::draw::Drawable). 
 //!
 //! ## Organization
 //! The crate is organized in different parts:

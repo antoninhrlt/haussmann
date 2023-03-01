@@ -1,0 +1,12 @@
+[package]
+name = "haussmann-dev"
+authors = ["Antonin Hérault <antonherault@gmail.com>"]
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "1.0.109"
+quote = "1.0.23"

@@ -4,6 +4,8 @@
 
 //! Everything related to tapping widgets.
 
+use haussmann_dev::Controller;
+
 use crate::{Widget, widgets, ToAny, DebugWidget, graphics::{Point, Size, colours::RGBA}};
 
 use super::ControllerFn;
@@ -24,6 +26,7 @@ pub fn is_tapped(tap: Point, widget_position: Point, widget_size: Size) -> bool 
 }
 
 /// Controller detecting taps on a widget.
+#[derive(Controller)]
 pub struct Detector<T: Widget> {
     /// The wrapped widget.
     pub widget: Box<T>,
@@ -33,23 +36,6 @@ pub struct Detector<T: Widget> {
     tap: ControllerFn<T>,
 }
 
-impl<T: Widget> std::fmt::Debug for Detector<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "tap::Detector")
-    }
-}
-
-widgets::dynamic_controller!(Detector<T>);
-
-impl<T: Widget + 'static> Widget for Detector<T> {
-    fn build(&self) -> Box<dyn Widget> {
-        self.widget.build()
-    }
-
-    fn colour(&self) -> RGBA {
-        self.widget.colour()
-    }
-}
 
 impl<T: Widget> Detector<T> {
     /// Creates a new tap detector.

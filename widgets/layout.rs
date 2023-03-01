@@ -2,6 +2,8 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+use haussmann_dev::Widget;
+
 use super::{DebugWidget, Widget, Surface};
 use crate::{
     graphics::colours::RGBA,
@@ -10,7 +12,7 @@ use crate::{
 
 /// Layout to contain several widgets and define alignment rules for these
 /// widgets.
-#[derive(Debug)]
+#[derive(Debug, Widget)]
 pub struct Layout {
     /// The colour of the layout.
     pub colour: RGBA,
@@ -41,8 +43,6 @@ impl Default for Layout {
         }
     }
 }
-
-widgets::dynamic_widget!(Layout);
 
 impl Widget for Layout {
     fn build(&self) -> Box<dyn Widget> {

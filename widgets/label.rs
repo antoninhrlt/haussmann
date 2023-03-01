@@ -2,6 +2,8 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+use haussmann_dev::Widget;
+
 use super::{DebugWidget, Widget};
 use crate::{
     graphics::colours::RGBA,
@@ -13,15 +15,13 @@ use crate::{
 /// following its text theme.
 ///
 /// Check <https://github.com/mooman219/fontdue> to render text with font.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Widget)]
 pub struct Label {
     /// The text string of the label.
     pub text: String,
     /// The theme for the text.
     pub theme: TextTheme,
 }
-
-widgets::dynamic_widget!(Label);
 
 impl Widget for Label {
     fn build(&self) -> Box<dyn Widget> {

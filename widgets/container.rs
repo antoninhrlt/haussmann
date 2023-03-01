@@ -2,6 +2,8 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+use haussmann_dev::Widget;
+
 use crate::{
     graphics::{
         colours::RGBA,
@@ -11,15 +13,13 @@ use crate::{
 };
 
 /// Wraps a widget giving it a fixed size.
-#[derive(Debug)]
+#[derive(Debug, Widget)]
 pub struct Container {
     /// The size of the zone.
     pub size: Size,
     /// The widget contained in this fixed zone.
     pub widget: Box<dyn Widget>,
 }
-
-widgets::dynamic_widget!(Container);
 
 impl Widget for Container {
     fn build(&self) -> Box<dyn Widget> {

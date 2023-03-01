@@ -38,67 +38,6 @@ pub trait DebugWidget: std::fmt::Debug {
     }
 }
 
-/// Implements what it is needed to make a widget a clean `dyn Widget` to be
-/// inserted in layouts etc...
-///
-/// The `t` argument is the type of the widget. It can be a [`Button`], a
-/// [`Label`], ...
-///
-/// To use this trait, the [`ToAny`], [`Widget`] and [`DebugWidget`] traits must
-/// be imported in the usage context.
-macro_rules! dynamic_widget {
-    ($t:ty) => {
-        impl ToAny for $t {
-            fn as_any(&self) -> &dyn std::any::Any {
-                self
-            }
-
-            fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
-                self
-            }
-        }
-
-        impl From<$t> for Box<dyn Widget> {
-            fn from(value: $t) -> Self {
-                Box::new(value)
-            }
-        }
-
-        impl DebugWidget for $t {}
-    };
-}
-
-pub(crate) use dynamic_widget;
-
-/// Same as [`dynamic_widget`] but for controller widgets since controllers 
-/// have a generic parameters as following : `<T: Widget + 'static>`.
-/// 
-/// Also, the [`ToAny`] trait implementation returns the widget as 
-/// [`std::any::Any`] and not the controller itself.
-macro_rules! dynamic_controller {
-    ($t:ty) => {
-        impl<T: Widget + 'static> ToAny for $t {
-            fn as_any(&self) -> &dyn std::any::Any {
-                self.widget.as_any()
-            }
-
-            fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
-                self
-            }
-        }
-        
-        impl<T: Widget + 'static> From<$t> for Box<dyn Widget> {
-            fn from(value: $t) -> Self {
-                Box::new(value)
-            }
-        }
-        
-        impl<T: Widget> DebugWidget for $t {}        
-    };
-}
-
-pub(crate) use dynamic_controller;
-
 /// Creates a vector of dynamic widgets from a series of widgets, no matter
 /// their type as long as they implement the [`Widget`] trait.
 ///

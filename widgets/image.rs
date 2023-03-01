@@ -2,21 +2,21 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+use haussmann_dev::Widget;
+
 use crate::{
     graphics::colours::RGBA,
     DebugWidget, ToAny, Widget, widgets, Border,
 };
 
 /// Image widget.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Widget)]
 pub struct Image {
     pub colour: RGBA,
     pub borders: Option<[Border; 4]>,
     /// Aspect ratio of the image.
     pub ratio: (f32, f32),
 }
-
-widgets::dynamic_widget!(Image);
 
 impl Widget for Image {
     fn build(&self) -> Box<dyn Widget> {

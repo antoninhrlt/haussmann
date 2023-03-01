@@ -2,6 +2,8 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+use haussmann_dev::Widget;
+
 use super::{DebugWidget, Label, Widget, Layout};
 use crate::{
     graphics::colours::RGBA,
@@ -9,7 +11,7 @@ use crate::{
 };
 
 /// Button widget with a label inside.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Widget)]
 pub struct Button {
     /// The label in the center of the button.
     pub label: Label,
@@ -20,9 +22,6 @@ pub struct Button {
     /// The borders of the button.
     pub borders: Option<[Border; 4]>,
 }
-
-widgets::dynamic_widget!(Button);
-
 
 impl Widget for Button {
     fn build(&self) -> Box<dyn Widget> {

@@ -2,6 +2,8 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+use haussmann_dev::Widget;
+
 use crate::{
     graphics::{
         colours::RGBA, 
@@ -14,13 +16,11 @@ use crate::{
     widgets
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Widget)]
 pub struct Surface {
     pub colour: RGBA,
     pub borders: Option<[Border; 4]>,
 }
-
-widgets::dynamic_widget!(Surface);
 
 impl Widget for Surface {
     fn build(&self) -> Box<dyn Widget> {

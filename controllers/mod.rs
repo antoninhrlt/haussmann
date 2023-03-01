@@ -13,6 +13,7 @@ use crate::{Widget, widgets, ToAny, DebugWidget, graphics::colours::RGBA};
 type ControllerFn<T> = fn(widget: &mut T);
 
 /// Wraps a widget to call functions when some events happen on it.
+#[derive(Controller)]
 pub struct Controller<T: Widget + 'static> {
     /// The controlled widget.
     pub widget: Box<T>,
@@ -23,24 +24,6 @@ pub struct Controller<T: Widget + 'static> {
     /// Function to call when the widget is unfocused.
     unfocus: Option<ControllerFn<T>>,
 }
-
-impl<T: Widget + 'static> std::fmt::Debug for Controller<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Controller")
-    }
-}
-
-impl<T: Widget + 'static> Widget for Controller<T> {
-    fn build(&self) -> Box<dyn Widget> {
-        self.widget.build()
-    }
-
-    fn colour(&self) -> RGBA {
-        self.widget.colour()
-    }
-}
-
-widgets::dynamic_controller!(Controller<T>);
 
 impl<T: Widget + 'static> Controller<T> {
     /// Creates a new controller for a widget.
@@ -70,4 +53,5 @@ macro_rules! on {
     };
 }
 
+use haussmann_dev::Controller;
 pub(crate) use on;

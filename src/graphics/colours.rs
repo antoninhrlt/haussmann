@@ -98,3 +98,20 @@ impl RGBA {
         (self.a << 24) | (self.b << 16) | (self.g << 8) | self.r
     }
 }
+
+/// Creates a new [`RGBA`] object. The alpha channel is explicitly written with 
+/// `a:`.
+#[macro_export]
+macro_rules! rgba {
+    ($r:expr, $g:expr, $b:expr, a: $a:expr $(,)*) => {
+        RGBA::new($r, $g, $b, $a)
+    };
+}
+
+/// Converts an hexadecimal colour value into a [`RGBA`] object.
+#[macro_export]
+macro_rules! hex {
+    ($colour:expr) => {
+        RGBA::from_hex($colour)
+    };
+}

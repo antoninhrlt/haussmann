@@ -7,7 +7,7 @@
 
 pub mod tap;
 
-use crate::{Widget, widgets, ToAny, DebugWidget, graphics::colours::RGBA};
+use crate::{Widget, ToAny, DebugWidget, graphics::colours::RGBA};
 
 /// Function to call when something happen on a widget.
 type ControllerFn<T> = fn(widget: &mut T);

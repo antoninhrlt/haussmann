@@ -6,7 +6,7 @@
 
 use haussmann_dev::Controller;
 
-use crate::{Widget, widgets, ToAny, DebugWidget, graphics::{Point, Size, colours::RGBA}};
+use crate::{Widget, ToAny, DebugWidget, graphics::{Point, Size, colours::RGBA}};
 
 use super::ControllerFn;
 

@@ -28,6 +28,11 @@ impl<'a> Sizer<'a> {
     /// This sized zone is important because the widgets will together take the 
     /// whole place.
     pub fn size_in(&self, zone: Size) -> Vec<Size> {
+        // No widget in the layout, no size to calculate.
+        if self.layout.widgets.is_empty() {
+            return vec![];
+        }
+
         let containers = self.layout.widgets::<Container>();
         let not_containers = self.layout.not_widget::<Container>();
 

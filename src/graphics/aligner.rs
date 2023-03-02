@@ -31,6 +31,11 @@ impl<'a> Aligner<'a> {
 
     /// Gets the position of each widget in the correct order, in a positioned zone.
     pub fn align_at(&self, zone: Point) -> Vec<Point> {
+        // No size given, no alignment has to be done.
+        if self.sizes.is_empty() {
+            return vec![];
+        }
+
         // The first size is always the layout's size.
         let zone_size: Size = self.sizes[0];
 

@@ -15,3 +15,5 @@ haussmann-dev = { path = "./dev" }
 [dev-dependencies]
 sdl2 = "0.35.2"
 rand = "0.8.5"
+crossterm = "0.26.1"
+tui = "0.19.0"

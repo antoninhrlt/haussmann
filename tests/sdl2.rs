@@ -5,8 +5,8 @@
 use haussmann::{
     controllers::tap,
     graphics::{
-        colours::{RGBA, self},
-        Size, Point, draw::Drawable,
+        colours::RGBA,
+        Size, draw::Drawable,
     },
     widgets::{
         Button, 
@@ -18,7 +18,8 @@ use haussmann::{
     Align,
     Direction, 
     Overflow, 
-    Widget, view, layout, rgba, button, label, container, surface
+    Widget, 
+    view, layout, rgba, button, label, container, surface
 };
 
 use rand::Rng;
@@ -27,7 +28,7 @@ use sdl2::{
     keyboard::Keycode,
     mouse::MouseButton,
     pixels::Color,
-    rect::Rect, surface,
+    rect::Rect,
 };
 
 use std::time::Duration;
@@ -104,63 +105,6 @@ fn with_sdl2() {
         }
     };
 
-    let mut view = View::new(
-        [0, 0],
-        window_size,
-        Layout::coloured(
-            RGBA::new(255, 255, 255, 255),
-            Overflow::Ignore,
-            Align::Center,
-            Align::Center,
-            Direction::Row,
-            widgets![
-                tap::Detector::new(
-                    Button::simple(
-                        RGBA::new(255, 0, 0, 255),
-                        Label::simple("red button"), 
-                    ),
-                    |button| {
-                        let mut rng = rand::thread_rng();
-
-                        let r = rng.gen_range(0..255);
-                        let g = rng.gen_range(0..255);
-                        let b = rng.gen_range(0..255);
-                    
-                        button.colour = RGBA::new(r, g, b, 255);
-                    }
-                ),
-                Layout::simple(
-                    Overflow::Hide,
-                    Align::Center,
-                    Align::Center,
-                    Direction::Column,
-                    widgets![
-                        Container::new(
-                            [150, 100],
-                            Button::simple(
-                                RGBA::new(0, 255, 0, 255),
-                                Label::simple("green button"), 
-                            )
-                        ),
-                        tap::Detector::new(
-                            Button::simple(
-                                RGBA::new(0, 0, 255, 255),
-                                Label::simple("blue button"), 
-                            ),
-                            |button| {
-                                button.colour.b -= 10;
-                            }
-                        )
-                    ],
-                ),
-                Surface::coloured(
-                    RGBA::new(255, 0, 255, 255),
-                )
-            ],
-
-        )
-    );
-
     // Where to draw the widgets.
     let mut canvas = window
         .into_canvas()
@@ -200,13 +144,13 @@ fn with_sdl2() {
                     ))
                     .unwrap();
                 }
-                Drawable::Image(image, position, size) => {
+                Drawable::Image(_image, _position, _size) => {
                     //println!("draws image {:?}", image);
                 }
-                Drawable::Label(label, position, size) => {
+                Drawable::Label(_label, _position, _size) => {
                     //println!("draws label {:?}", label);
                 }
-                Drawable::Unknown(widget, position, size) => {
+                Drawable::Unknown(widget, _position, _size) => {
                     println!("unknown widget to draw : {:?}", widget);
                 }
             }
@@ -230,7 +174,7 @@ fn with_sdl2() {
                     _ => {}
                 },
                 Event::MouseButtonDown {
-                    mouse_btn, x, y, ..
+                    mouse_btn, ..
                 } => {
                     if mouse_btn != MouseButton::Left {
                         return;

@@ -8,7 +8,7 @@ use haussmann_dev::Controller;
 
 use crate::{Widget, ToAny, DebugWidget, graphics::{Point, Size, colours::RGBA}};
 
-use super::ControllerFn;
+use super::{Controller, ControllerFn};
 
 /// Whether a tap is over the tappable zone.
 /// 
@@ -35,7 +35,6 @@ pub struct Detector<T: Widget> {
     /// Function to call when the widget is tapped.
     tap: ControllerFn<T>,
 }
-
 
 impl<T: Widget> Detector<T> {
     /// Creates a new tap detector.

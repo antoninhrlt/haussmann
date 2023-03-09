@@ -7,51 +7,17 @@
 
 pub mod tap;
 
-use crate::{Widget, ToAny, DebugWidget, graphics::colours::RGBA};
+use crate::{Widget, graphics::{Point, Size}};
 
 /// Function to call when something happen on a widget.
 type ControllerFn<T> = fn(widget: &mut T);
 
-/// Wraps a widget to call functions when some events happen on it.
-#[derive(Controller)]
-pub struct Controller<T: Widget + 'static> {
-    /// The controlled widget.
-    pub widget: Box<T>,
-    /// Function to call when the widget is tapped. 
-    tap: Option<ControllerFn<T>>,
-    /// Function to call when the widget is focused.
-    focus: Option<ControllerFn<T>>,
-    /// Function to call when the widget is unfocused.
-    unfocus: Option<ControllerFn<T>>,
+/// Controllers wrap widgets in order to control what happen for them.
+pub trait Controller: Widget {
+    /// Returns the controlled zone which is the the position and size of the 
+    /// drawable corresponding to the controlled widget.
+    fn zone(&self) -> (Point, Size); 
+
+    /// Updates the controlled zone.
+    fn update(&mut self, zone: (Point, Size));
 }
-
-impl<T: Widget + 'static> Controller<T> {
-    /// Creates a new controller for a widget.
-    pub fn new(widget: T, tap: Option<ControllerFn<T>>, focus: Option<ControllerFn<T>>, unfocus: Option<ControllerFn<T>>) -> Self {
-        Self {
-            widget: Box::new(widget),
-            tap,
-            focus,
-            unfocus,
-        }
-    }
-
-    on!(tap, "tapped", on_tap); 
-    on!(focus, "focused", on_focus);
-    on!(unfocus, "unfocused", on_unfocus);
-}
-
-macro_rules! on {
-    ($field:ident, $x:expr, $function:ident) => {
-        #[allow(missing_docs)]
-        pub fn $function(&mut self) -> Result<(), String> {
-            match self.$field {
-                Some(function) => Ok(function(&mut self.widget)), 
-                None => Err(format!("undefined function when widget is {}", $x)),
-            }
-        }
-    };
-}
-
-use haussmann_dev::Controller;
-pub(crate) use on;

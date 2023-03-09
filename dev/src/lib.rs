@@ -91,6 +91,15 @@ pub fn controller(input: TokenStream) -> TokenStream {
     let struct_ident = ast.ident;
 
     let gen = quote! {
+        impl<T: Widget + 'static> Controller for #struct_ident<T> {
+            fn zone(&self) -> (Point, Size) {
+                self.zone
+            }
+
+            fn update(&mut self, zone: (Point, Size)) {
+                self.zone = zone;
+            }
+        }
         
         impl<T: Widget + 'static> Widget for #struct_ident<T> {
             fn build(&self) -> Box<dyn Widget> {

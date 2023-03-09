@@ -8,30 +8,74 @@ use crate::{widgets::{Label, Image, Surface}, Widget};
 
 use super::{Size, Point};
 
-/// Something that can be drawn. Each element has a defined position and size 
+/// The object to draw from a [`Drawable`].
+#[derive(Debug)]
+pub enum Object {
+    /// Wraps an [`Image`] in order to be draw it.
+    Image(Image),
+    /// Wraps an [`Label`] in order to be draw it.
+    Label(Label),
+    /// Wraps an [`Surface`] in order to be draw it.
+    Surface(Surface),
+    /// Wraps a dynamic [`Widget`] in order to be draw it.
+    Unknown(Box<dyn Widget>),
+}
+
+impl From<Image> for Object {
+    fn from(value: Image) -> Self {
+        Self::Image(value)
+    }
+}
+
+impl From<Label> for Object {
+    fn from(value: Label) -> Self {
+        Self::Label(value)
+    }
+}
+
+impl From<Surface> for Object {
+    fn from(value: Surface) -> Self {
+        Self::Surface(value)
+    }
+}
+
+impl From<Box<dyn Widget>> for Object {
+    fn from(value: Box<dyn Widget>) -> Self {
+        Self::Unknown(value)
+    }
+}
+
+/// Something that can be drawn and which has a defined position and size 
 /// calculated at generation.
 #[derive(Debug)]
-pub enum Drawable {
-    /// Image to draw at a defined position with a defined size.
-    Image(Image, Point, Size),
-    /// Label to draw at a defined position with a defined size.
-    Label(Label, Point, Size),
-    /// Surface to draw at a defined position with a defined size.
-    Surface(Surface, Point, Size),
-    /// Unknown widget to draw at a defined position with a defined size.
-    Unknown(Box<dyn Widget>, Point, Size),
+pub struct Drawable {
+    /// The object to be drawn.
+    pub object: Object,
+    /// One widget can create multiple drawables. Thanks to this identifier, 
+    /// the parent (the creator of the drawable) is known.
+    pub parent_id: i32,
+    /// The position of the drawable.
+    pub position: Point,
+    /// The size of the drawable.
+    pub size: Size,
 }
 
 impl Drawable {
-    /// Extracts the position and size of the drawable for the drawable itself.
-    pub fn extract(&self) -> (Point, Size) {
-        let (p, s) = match self {
-            Self::Image(_, p, s) => (p, s),
-            Self::Label(_, p, s) => (p, s),
-            Self::Surface(_, p, s) => (p, s),
-            Self::Unknown(_, p, s) => (p, s),
-        };
+    /// Creates a new drawable from an object at a defined position and size.
+    /// 
+    /// The parent has to be given here, it is not managed by the drawable 
+    /// itself but created at drawables generation.
+    pub fn new<T: Into<Object>>(object: T, position: Point, size: Size, parent: i32) -> Self {
+        Self {
+            object: object.into(),
+            parent_id: parent,
+            position,
+            size,
+        }
+    }
 
-        (p.clone(), s.clone())
+    /// Returns the position and size of the drawable wrapped in a tuple.
+    pub fn zone(&self) -> (Point, Size) {
+        (self.position, self.size)
     }
 }

@@ -11,13 +11,13 @@ use super::{Size, Point};
 /// The object to draw from a [`Drawable`].
 #[derive(Debug)]
 pub enum Object {
-    /// Wraps an [`Image`] in order to be draw it.
+    /// Wraps an [`Image`] in order to draw it.
     Image(Image),
-    /// Wraps an [`Label`] in order to be draw it.
+    /// Wraps an [`Label`] in order to draw it.
     Label(Label),
-    /// Wraps an [`Surface`] in order to be draw it.
+    /// Wraps an [`Surface`] in order to draw it.
     Surface(Surface),
-    /// Wraps a dynamic [`Widget`] in order to be draw it.
+    /// Wraps a boxed dynamic [`Widget`] in order to draw it.
     Unknown(Box<dyn Widget>),
 }
 

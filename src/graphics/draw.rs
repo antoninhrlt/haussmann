@@ -24,12 +24,14 @@ pub enum Drawable {
 
 impl Drawable {
     /// Extracts the position and size of the drawable for the drawable itself.
-    pub fn extract(&self) -> (&Point, &Size) {
-        match self {
+    pub fn extract(&self) -> (Point, Size) {
+        let (p, s) = match self {
             Self::Image(_, p, s) => (p, s),
             Self::Label(_, p, s) => (p, s),
             Self::Surface(_, p, s) => (p, s),
             Self::Unknown(_, p, s) => (p, s),
-        }
+        };
+
+        (p.clone(), s.clone())
     }
 }

@@ -2,6 +2,8 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+#![allow(unused)]
+
 //! This file is designed to run the tests easier from the code studio rather 
 //! than opening the test file and click on the "run test" just above the test
 //! function.

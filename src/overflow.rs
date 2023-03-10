@@ -3,7 +3,7 @@
 // Copyright (c) 2023 Antonin Hérault
 
 /// Rules about widget overflowing.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Overflow {
     /// Does not hide the widgets out of the layout dimensions.
     Ignore,

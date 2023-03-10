@@ -3,7 +3,7 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use haussmann::{widgets::{Container, Label, View, Layout, Surface, Button}, Overflow, Direction, container, label, view, layout, Align, widgets, graphics::draw::Drawable, Widget, rgba, graphics::colours::RGBA, surface, button};
+use haussmann::{widgets::{Container, Label, View, Layout, Surface, Button}, Overflow, Direction, container, label, view, layout, Align, widgets, graphics::draw::{Drawable, self}, Widget, rgba, graphics::colours::RGBA, surface, button};
 use std::{error::Error, io};
 use tui::{
     backend::{Backend, CrosstermBackend},
@@ -66,16 +66,18 @@ impl TuiWidget for TuiView {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let drawables = self.view.build();
         for drawable in drawables {
-            match drawable {
-                Drawable::Label(label, position, size) => {
-                    buf.set_string(position[0] as u16, position[1] as u16, label.text, Style::default());
+            let zone = drawable.zone;
+
+            match drawable.object {
+                draw::Object::Label(label) => {
+                    buf.set_string(zone.position[0] as u16, zone.position[1] as u16, label.text, Style::default());
                 }
-                Drawable::Surface(surface, position, size) => {
+                draw::Object::Surface(surface) => {
                     let rect = Rect {
-                        x: position[0] as u16,
-                        y: position[0] as u16,
-                        width: size[0] as u16,
-                        height: size[1] as u16,
+                        x: zone.position[0] as u16,
+                        y: zone.position[0] as u16,
+                        width: zone.size[0] as u16,
+                        height: zone.size[1] as u16,
                     };
 
                     let style = Style { 

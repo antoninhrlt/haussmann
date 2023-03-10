@@ -6,7 +6,7 @@ use haussmann::{
     controllers::tap,
     graphics::{
         colours::RGBA,
-        Size, draw::Drawable,
+        Size, draw, Point,
     },
     widgets::{
         Button, 
@@ -18,7 +18,8 @@ use haussmann::{
     Align,
     Direction, 
     Overflow, 
-    Widget, 
+    Widget,
+    Zone,
     view, layout, rgba, button, label, container, surface
 };
 
@@ -89,11 +90,29 @@ fn with_sdl2() {
                                 label: label!("green button"),
                             ]
                         },
+                        container! {
+                            size: [50, 50],
+                            widget: button![
+                                colour: rgba![0, 100, 0, a: 255],
+                                label: label!("green2 button"),
+                            ]
+                        },
+                        container! {
+                            size: [50, 50],
+                            widget: button![
+                                colour: rgba![0, 50, 0, a: 255],
+                                label: label!("green3 button"),
+                            ]
+                        },
                         button! {
                             colour: rgba!(0, 0, 255, a: 255),
                             label: label!("blue button"),
                             on_tap: |button| {
-                                button.colour.b -= 10;
+                                if button.colour.b <= 10 {
+                                    button.colour.b = 255;
+                                } else {
+                                    button.colour.b -= 10;
+                                }
                             }
                         }   
                     ]
@@ -125,8 +144,10 @@ fn with_sdl2() {
             
         // Draws the drawables.
         for drawable in &drawables {
-            match drawable {
-                Drawable::Surface(surface, position, size) => {
+            let zone = drawable.zone;
+
+            match &drawable.object {
+                draw::Object::Surface(surface) => {
                     let colour = surface.colour();
         
                     canvas.set_draw_color(Color::RGBA(
@@ -137,20 +158,20 @@ fn with_sdl2() {
                     ));
         
                     canvas.fill_rect(Rect::new(
-                        position[0] as i32,
-                        position[1] as i32,
-                        size[0] as u32,
-                        size[1] as u32,
+                        zone.x() as i32,
+                        zone.y() as i32,
+                        zone.width() as u32,
+                        zone.height() as u32,
                     ))
                     .unwrap();
                 }
-                Drawable::Image(_image, _position, _size) => {
+                draw::Object::Image(_) => {
                     //println!("draws image {:?}", image);
                 }
-                Drawable::Label(_label, _position, _size) => {
+                draw::Object::Label(_) => {
                     //println!("draws label {:?}", label);
                 }
-                Drawable::Unknown(widget, _position, _size) => {
+                draw::Object::Unknown(widget) => {
                     println!("unknown widget to draw : {:?}", widget);
                 }
             }
@@ -174,21 +195,21 @@ fn with_sdl2() {
                     _ => {}
                 },
                 Event::MouseButtonDown {
-                    mouse_btn, ..
+                    mouse_btn, x, y, ..
                 } => {
                     if mouse_btn != MouseButton::Left {
                         return;
                     }
 
-                    // let tap: Point = [x as isize, y as isize];
+                    let tap: Point = [x as isize, y as isize];
 
-                    // for tap_detector in view.controllers::<tap::Detector<Button>>() {
-                    //     if tap::is_tapped(tap, tap_detector.zone.0, tap_detector.zone.1) {
-                    //         tap_detector.on_tap();
-                    //     }
-                    // }
+                    view.controllers::<tap::Detector<Button>>(&drawables, |controller| {
+                        if tap::is_tapped(tap, controller.zone) {
+                            controller.on_tap();
+                        }
+                    });
 
-                    // drawables = view.rebuild([0, 0], window_size);
+                    drawables = view.rebuild([0, 0], window_size);
                 }
                 _ => {}
             }

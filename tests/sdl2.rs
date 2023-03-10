@@ -137,6 +137,8 @@ fn with_sdl2() {
     
     // Creates drawables from the widgets.
     let mut drawables = view.build();
+
+    println!("{:#?}", drawables);
     
     'running: loop {
         canvas.set_draw_color(Color::RGBA(0, 0, 0, 0));

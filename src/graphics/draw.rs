@@ -4,7 +4,7 @@
 
 //! Everything related to drawing of widgets.
 
-use crate::{widgets::{Label, Image, Surface}, Widget};
+use crate::{widgets::{Label, Image, Surface, Layout, View}, Widget, Zone, graphics::{Sizer, Aligner}};
 
 use super::{Size, Point};
 
@@ -54,10 +54,8 @@ pub struct Drawable {
     /// One widget can create multiple drawables. Thanks to this identifier, 
     /// the parent (the creator of the drawable) is known.
     pub parent_id: i32,
-    /// The position of the drawable.
-    pub position: Point,
-    /// The size of the drawable.
-    pub size: Size,
+    /// The zone covered by the drawable.
+    pub zone: Zone,
 }
 
 impl Drawable {
@@ -65,17 +63,144 @@ impl Drawable {
     /// 
     /// The parent has to be given here, it is not managed by the drawable 
     /// itself but created at drawables generation.
-    pub fn new<T: Into<Object>>(object: T, position: Point, size: Size, parent: i32) -> Self {
+    pub fn new<T: Into<Object>>(object: T, zone: Zone, parent: i32) -> Self {
         Self {
             object: object.into(),
             parent_id: parent,
-            position,
-            size,
+            zone,
+        }
+    }
+}
+
+/// Builds drawables for a vector of widgets.
+/// 
+/// The widgets of the layouts found in the vector of widgets are also built.
+#[derive(Debug)]
+pub struct Builder {
+    /// Current created drawables.
+    pub drawables: Vec<Drawable>,
+    /// The zone where to build the drawables.
+    pub zone: Zone,
+    /// The identifier of the current manipulated widget.
+    /// 
+    /// It is given to the drawable built by the widget.
+    current_id: i32,
+    /// The current manipulated zone.
+    current_zone: Zone,
+}
+
+impl Builder {
+    /// Creates a new drawables builder for a vector of widgets. 
+    pub fn new(zone: Zone) -> Self {
+        Self {
+            zone,
+            drawables: vec![],
+            current_id: 0,
+            current_zone: zone,
         }
     }
 
-    /// Returns the position and size of the drawable wrapped in a tuple.
-    pub fn zone(&self) -> (Point, Size) {
-        (self.position, self.size)
+    /// Builds the widgets contained in the view's layout.
+    pub fn build_view(&mut self, view: &View) {
+        self.build_layout(&view.layout);
+    }
+}
+
+impl Builder {
+    /// Builds drawables for a layout. Adds the layout's drawable.
+    /// 
+    /// Recursive when another layout is encountered is the layout's widgets.
+    fn build_layout(&mut self, layout: &Layout) {
+        self.current_id += 1;
+
+        // Builds the layout's surface.
+        let layout_surface = layout.build();
+        // Creates a drawable for it.
+        let layout_drawable = self.create_drawable(layout_surface);
+        // Pushes it to the drawables.
+        self.drawables.push(layout_drawable);
+
+        // The size of every widget.
+        let sizes: Vec<Size> = Sizer::new(layout)
+            .size_in(self.current_zone.size);
+
+        // The position of every widget.
+        let positions: Vec<Point> = Aligner::new(layout, sizes.clone())
+            .align_at(self.current_zone.position);
+
+        // There must be the same number of sizes than positions. 
+        assert_eq!(sizes.len(), positions.len());
+
+        // Iterates over the layout's widgets and build them has a normal 
+        // widgets or layouts following their actual types.
+        for (i, widget) in layout.widgets.iter().enumerate() {
+            // Updates the current drawable zone.
+            self.current_zone = (positions[i + 1], sizes[i + 1]).into();
+
+            // Checks if it is a layout or a normal widget.
+            if let Some(layout) = widget.as_any().downcast_ref::<Layout>() {
+                // Builds the layout.
+                self.build_layout(&layout);
+            } else {
+                // Builds drawables for the widget.
+                self.build_widget(widget);
+            }
+        }
+    }
+    
+    /// Builds drawables for a widget. Adds new drawables to the `drawables`.
+    fn build_widget(&mut self, widget: &Box<dyn Widget>) {
+        self.current_id += 1;
+
+        // Builds the widget.
+        // The built widget can be a layout.
+        let built = widget.build();
+
+        // Checks for built widget to be a layout.
+        if let Some(layout) = built.as_any().downcast_ref::<Layout>() {
+            // Builds the layout.
+            self.build_layout(layout);
+            return;
+        }
+
+        // The built widget is not a layout.
+
+        // Creates the drawable for the built widget.
+        let drawable = self.create_drawable(built);
+        // Adds the drawable of the built widget to the created drawables.
+        self.drawables.push(drawable);
+    }
+
+    /// Creates a drawable for the returned widget by [`Widget::build()`].
+    fn create_drawable(&self, built: Box<dyn Widget>) -> Drawable {
+        // The built widget is an image.
+        if let Some(image) = built.as_any().downcast_ref::<Image>() {
+            return Drawable::new(
+                image.clone(), 
+                self.current_zone, 
+                self.current_id
+            );
+        }
+
+        // The built widget is a label.
+        if let Some(label) = built.as_any().downcast_ref::<Label>() {
+            return Drawable::new(
+                label.clone(), 
+                self.current_zone, 
+                self.current_id
+            );
+        }
+
+        // The built widget is a surface.
+        if let Some(surface) = built.as_any().downcast_ref::<Surface>() {
+            return Drawable::new(
+                surface.clone(), 
+                self.current_zone, 
+                self.current_id
+            );
+        }
+        
+        // The built widget is not an image, a label nor a surface.
+        Drawable::new(built, self.current_zone, self.current_id)
     }
 }

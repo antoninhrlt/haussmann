@@ -46,6 +46,7 @@
 //! they are not all defined (check the widgets documentation).
 
 #![warn(missing_docs)]
+#![warn(missing_debug_implementations)]
 
 #[path = "../controllers/mod.rs"]
 pub mod controllers;
@@ -62,6 +63,7 @@ mod font;
 mod overflow;
 mod radius;
 mod theme;
+mod zone;
 
 pub use align::{Align, TextAlign};
 pub use border::Border;
@@ -70,6 +72,7 @@ pub use font::*;
 pub use overflow::Overflow;
 pub use radius::Radius;
 pub use theme::{TextTheme, Theme};
+pub use zone::Zone;
 
 pub use widgets::{DebugWidget, Widget};
 

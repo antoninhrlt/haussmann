@@ -2,11 +2,12 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::graphics::draw::Drawable;
-use crate::graphics::{Sizer, Aligner, Point, Size};
-use crate::Widget;
+use crate::controllers::Controller;
+use crate::graphics::{Point, Size};
+use crate::graphics::draw::{Drawable, self};
+use crate::Zone;
 
-use super::{Layout, Label, Image, Surface};
+use super::Layout;
 
 /// Wraps a [`Layout`] and permit to build [`Drawable`]s from the widgets in.
 /// 
@@ -14,9 +15,10 @@ use super::{Layout, Label, Image, Surface};
 /// canvas...
 #[derive(Debug)]
 pub struct View {
-    position: Point,
-    size: Size,
-    layout: Layout,
+    /// The zone contained by the view.
+    zone: Zone,
+    /// The layout for the view.
+    pub layout: Layout,
 }
 
 /// Creates a new view like its [`new`](View::new) function.
@@ -25,109 +27,79 @@ pub struct View {
 #[macro_export]
 macro_rules! view {
     (position: $position:expr, size: $size:expr, $layout:expr $(,)?) => {
-        View::new($position, $size, $layout)
+        View::new(
+            ($position, $size).into(), 
+            $layout
+        )
     };
 }
 
 impl View {
     /// Creates a new view at a certain point with a specified size.
-    pub fn new(position: Point, size: Size, layout: Layout) -> Self {
+    pub fn new(zone: Zone, layout: Layout) -> Self {
         Self {
-            position,
-            size,
+            zone,
             layout,
         }
     }
 
-    /// Creates shapes for the widgets in the layout.
+    /// Creates drawables for the widgets in the view's layout.
     pub fn build(&self) -> Vec<Drawable> {
-        Self::build_layout(&self.layout, self.position, self.size)
+        // Creates a builder.
+        let mut builder = draw::Builder::new(self.zone);
+        // Builds the widgets of the view's layout.
+        builder.build_view(self);
+        // Returns the created drawables.
+        builder.drawables
     }
 
-    /// Updates the position and the size of the view, and builds again.
+    /// Updates the zone of the view, and builds again.
+    /// 
+    /// There is no need to rebuild if the view is contained in the same zone.
     pub fn rebuild(&mut self, position: Point, size: Size) -> Vec<Drawable> {
-        self.position = position;
-        self.size = size;
-
+        self.zone = (position, size).into();
         self.build()
     }
 
-    fn build_layout(layout: &Layout, position: Point, size: Size) -> Vec<Drawable> {
-        // Initialises the drawables with the layout's drawable.
-        let mut drawables = vec![];
-        drawables.push(Self::built_to_drawable(layout.build(), position, size));
+    fn controllers_in<T>(layout: &mut Layout, drawables: &Vec<Drawable>, callback: &impl Fn(&mut T), i: &mut usize) 
+        where T: Controller + 'static,
+    {
+        for widget in &mut layout.widgets {
+            for j in *i..drawables.len() - 2 {
+                if drawables[j].parent_id == drawables[j + 1].parent_id {
+                    *i += 1;
+                    continue;
+                }
 
-        // The size of every widget.
-        let sizes: Vec<Size> = Sizer::new(layout)
-            .size_in(size);
+                break
+            }
 
-        // The position of every widget.
-        let positions: Vec<Point> = Aligner::new(layout, sizes.clone())
-            .align_at(position);
-
-        assert_eq!(sizes.len(), positions.len());
-
-        for (i, widget) in layout.widgets.iter().enumerate() {
-            // The widget is actually a layout.
-            if let Some(layout) = widget.as_any().downcast_ref::<Layout>() {
-                // Builds the layout and its widgets.
-                drawables.extend(
-                    Self::build_layout(layout, positions[i + 1], sizes[i + 1])
-                );
-            
+            // Encounters a layout, calls itself but with the retrieved layout 
+            // as parameter.
+            if let Some(layout) = widget.as_any_mut().downcast_mut::<Layout>() {
+                *i += 1;
+                Self::controllers_in(layout, drawables, callback, i);
                 continue;
             }
 
-            // Builds the widget.
-            drawables.extend(
-                Self::build_widget(widget, positions[i + 1], sizes[i + 1])
-            );
+            // Encounters a controller, calls the callback.
+            if let Some(controller) = widget.as_any_mut().downcast_mut::<T>() {
+                // Update the controller's zone.
+                controller.update(drawables[*i].zone);
+                // Calls the callback giving the controller as mutable reference.
+                callback(controller);
+            }
         }
-        
-        drawables
     }
 
-    fn build_widget(widget: &Box<dyn Widget>, position: Point, size: Size) -> Vec<Drawable> {
-        let mut drawables: Vec<Drawable> = vec![];
-
-        // Builds the widget.
-        let built = widget.build();
-
-        // The built widget is a layout.
-        if let Some(layout) = built.as_any().downcast_ref::<Layout>() {
-            // Builds the layout.
-            drawables.extend(
-                Self::build_layout(layout, position, size)
-            );
-        } else {
-            // Transforms the built widget into a drawable.
-            drawables.push(Self::built_to_drawable(built, position, size));
-        }
-
-        drawables
-    }
-
-    /// The `built` parameter is the value returned by [`Widget::build()`].
+    /// Browses all the widgets to find controllers and call the given callback
+    /// when encountered.
     /// 
-    /// ## Notes
-    /// - [`Image::build()`] returns itself.
-    /// - [`Label::build()`] returns itself. 
-    /// - [`Surface::build()`] returns itself.
-    /// - [`Container::build()`] returns its widget, built.
-    /// - [`Layout::build()`] returns a [`Surface`].
-    fn built_to_drawable(built: Box<dyn Widget>, position: Point, size: Size) -> Drawable {
-        if let Some(image) = built.as_any().downcast_ref::<Image>() {
-            return Drawable::Image(image.clone(), position, size);
-        }
-
-        if let Some(label) = built.as_any().downcast_ref::<Label>() {
-            return Drawable::Label(label.clone(), position, size);
-        }
-
-        if let Some(surface) = built.as_any().downcast_ref::<Surface>() {
-            return Drawable::Surface(surface.clone(), position, size);
-        }
-        
-        Drawable::Unknown(built, position, size)
+    /// Browses in the same order as drawables are created.
+    pub fn controllers<T>(&mut self, drawables: &Vec<Drawable>, callback: impl Fn(&mut T)) 
+        where T: Controller + 'static,
+    {
+        let mut i: usize = 1;
+        Self::controllers_in(&mut self.layout, drawables, &callback, &mut i);
     }
 }

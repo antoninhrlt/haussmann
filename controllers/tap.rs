@@ -6,7 +6,7 @@
 
 use haussmann_dev::Controller;
 
-use crate::{Widget, ToAny, DebugWidget, graphics::{Point, Size, colours::RGBA}};
+use crate::{Widget, ToAny, DebugWidget, graphics::{Point, colours::RGBA}, Zone};
 
 use super::{Controller, ControllerFn};
 
@@ -14,15 +14,11 @@ use super::{Controller, ControllerFn};
 /// 
 /// This function must be called after the widget is drawn, never before.
 #[inline]
-pub fn is_tapped(tap: Point, widget_position: Point, widget_size: Size) -> bool {
-    let p: Point = widget_position;
-    let s: Size = widget_size;
+pub fn is_tapped(tap: Point, zone: Zone) -> bool {
+    let (x, y) = (tap[0], tap[1]);
 
-    let x = tap[0];
-    let y = tap[1];
-
-    x >= p[0] && x <= p[0] + s[0] as isize 
-        && y >= p[1] && y <= p[1] + s[1] as isize
+    x >= zone.x() && x <= zone.x() + zone.width() as isize 
+        && y >= zone.y() && y <= zone.y() + zone.height() as isize
 }
 
 /// Controller detecting taps on a widget.
@@ -31,7 +27,7 @@ pub struct Detector<T: Widget> {
     /// The wrapped widget.
     pub widget: Box<T>,
     /// The zone covered by the tap detection.
-    pub zone: (Point, Size),
+    pub zone: Zone,
     /// Function to call when the widget is tapped.
     tap: ControllerFn<T>,
 }
@@ -41,7 +37,7 @@ impl<T: Widget> Detector<T> {
     pub fn new(widget: T, tap: ControllerFn<T>) -> Self {
         Self {
             widget: Box::new(widget),
-            zone: ([-1, -1], [0, 0]),
+            zone: Zone::default(),
             tap,
         }
     }

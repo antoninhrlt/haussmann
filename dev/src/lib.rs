@@ -92,11 +92,11 @@ pub fn controller(input: TokenStream) -> TokenStream {
 
     let gen = quote! {
         impl<T: Widget + 'static> Controller for #struct_ident<T> {
-            fn zone(&self) -> (Point, Size) {
-                self.zone
+            fn zone(&self) -> &Zone {
+                &self.zone
             }
 
-            fn update(&mut self, zone: (Point, Size)) {
+            fn update(&mut self, zone: Zone) {
                 self.zone = zone;
             }
         }

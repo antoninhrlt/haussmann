@@ -7,7 +7,7 @@
 
 pub mod tap;
 
-use crate::{Widget, graphics::{Point, Size}};
+use crate::{Widget, Zone};
 
 /// Function to call when something happen on a widget.
 type ControllerFn<T> = fn(widget: &mut T);
@@ -16,8 +16,8 @@ type ControllerFn<T> = fn(widget: &mut T);
 pub trait Controller: Widget {
     /// Returns the controlled zone which is the the position and size of the 
     /// drawable corresponding to the controlled widget.
-    fn zone(&self) -> (Point, Size); 
+    fn zone(&self) -> &Zone; 
 
     /// Updates the controlled zone.
-    fn update(&mut self, zone: (Point, Size));
+    fn update(&mut self, zone: Zone);
 }

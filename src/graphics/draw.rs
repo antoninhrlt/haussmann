@@ -51,24 +51,37 @@ impl From<Box<dyn Widget>> for Object {
 pub struct Drawable {
     /// The object to be drawn.
     pub object: Object,
-    /// One widget can create multiple drawables. Thanks to this identifier, 
-    /// the parent (the creator of the drawable) is known.
-    pub parent_id: i32,
+    /// Identifier for the group this drawable belongs to. A group for a 
+    /// drawable is all the drawables created by the same built widget.
+    pub group_id: i32,
     /// The zone covered by the drawable.
     pub zone: Zone,
 }
 
 impl Drawable {
     /// Creates a new drawable from an object at a defined position and size.
-    /// 
-    /// The parent has to be given here, it is not managed by the drawable 
-    /// itself but created at drawables generation.
-    pub fn new<T: Into<Object>>(object: T, zone: Zone, parent: i32) -> Self {
+    pub fn new<T: Into<Object>>(object: T, zone: Zone, group_id: i32) -> Self {
         Self {
             object: object.into(),
-            parent_id: parent,
+            group_id,
             zone,
         }
+    }
+}
+
+pub trait DrawableAt {
+    fn at(&self, i: usize) -> Option<&Drawable>;
+}
+
+impl DrawableAt for Vec<Drawable> {
+    fn at(&self, i: usize) -> Option<&Drawable> {
+        for drawable in self {
+            if drawable.group_id as usize == i {
+                return Some(drawable);
+            }
+        }
+
+        None
     }
 }
 
@@ -102,7 +115,7 @@ impl Builder {
 
     /// Builds the widgets contained in the view's layout.
     pub fn build_view(&mut self, view: &View) {
-        self.build_layout(&view.layout);
+        self.build_layout(&view.layout, false);
     }
 }
 
@@ -110,9 +123,7 @@ impl Builder {
     /// Builds drawables for a layout. Adds the layout's drawable.
     /// 
     /// Recursive when another layout is encountered is the layout's widgets.
-    fn build_layout(&mut self, layout: &Layout) {
-        self.current_id += 1;
-
+    fn build_layout(&mut self, layout: &Layout, from_built: bool) {
         // Builds the layout's surface.
         let layout_surface = layout.build();
         // Creates a drawable for it.
@@ -134,13 +145,17 @@ impl Builder {
         // Iterates over the layout's widgets and build them has a normal 
         // widgets or layouts following their actual types.
         for (i, widget) in layout.widgets.iter().enumerate() {
+            if !from_built {
+                self.current_id += 1;
+            }
+            
             // Updates the current drawable zone.
             self.current_zone = (positions[i + 1], sizes[i + 1]).into();
 
             // Checks if it is a layout or a normal widget.
             if let Some(layout) = widget.as_any().downcast_ref::<Layout>() {
                 // Builds the layout.
-                self.build_layout(&layout);
+                self.build_layout(&layout, false);
             } else {
                 // Builds drawables for the widget.
                 self.build_widget(widget);
@@ -150,8 +165,6 @@ impl Builder {
     
     /// Builds drawables for a widget. Adds new drawables to the `drawables`.
     fn build_widget(&mut self, widget: &Box<dyn Widget>) {
-        self.current_id += 1;
-
         // Builds the widget.
         // The built widget can be a layout.
         let built = widget.build();
@@ -159,10 +172,10 @@ impl Builder {
         // Checks for built widget to be a layout.
         if let Some(layout) = built.as_any().downcast_ref::<Layout>() {
             // Builds the layout.
-            self.build_layout(layout);
+            self.build_layout(layout, true);
             return;
         }
-
+        
         // The built widget is not a layout.
 
         // Creates the drawable for the built widget.

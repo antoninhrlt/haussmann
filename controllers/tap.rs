@@ -7,7 +7,8 @@
 use haussmann_dev::Controller;
 
 use crate::{
-    graphics::{Point, colours::RGBA}, 
+    graphics::{Point, colours::RGBA},
+    themes::{Theme, Style},
     DebugWidget, 
     ToAny, 
     Widget, 
@@ -49,8 +50,8 @@ impl<T: Widget> Detector<T> {
     }
 
     /// Function to call when the wrapped widget was tapped.
-    pub fn on_tap(&mut self) {
+    pub fn on_tap(&mut self, theme: &Theme) {
         let tap = self.tap;
-        tap(&mut self.widget);
+        tap(&mut self.widget, theme);
     }
 }

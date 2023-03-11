@@ -5,9 +5,8 @@
 use haussmann_dev::Widget;
 
 use crate::{
-    graphics::colours::RGBA,
     widgets,
-    Align, Border, Direction, Overflow, Radius, ToAny,
+    Align, Direction, Overflow, ToAny, themes::{Style, Theme},
 };
 
 use super::{DebugWidget, Label, Layout, Widget};
@@ -15,97 +14,70 @@ use super::{DebugWidget, Label, Layout, Widget};
 /// Button widget with a label inside.
 #[derive(Debug, Clone, Widget)]
 pub struct Button {
-    /// The colour of the button.
-    pub colour: RGBA,
-    /// The radius of the button.
-    pub radius: Radius,
-    /// The borders of the button.
-    pub borders: Option<[Border; 4]>,
     /// The label in the center of the button.
     pub label: Label,
+    /// Independent style for the button.
+    /// 
+    /// If set as `None`, the default button style from the global theme will 
+    /// be used.
+    pub style: Option<Style>,
 }
 
-/// Creates a button controller to detect taps on it.
-/// 
-/// The "on tap" event closure is not necessary. In this case, it's not a button
-/// controller which is created but a basic button.
 #[macro_export]
 macro_rules! button {
-    (colour: $colour:expr, label: $label:expr $(,)?) => {
-        Button::simple($colour, $label)
+    ($label:expr, on_tap: |$button:ident, $theme:ident| $on_tap:block $(,)?) => {
+        tap::Detector::new(Button::simple($label), |$button| $on_tap)
     };
 
-    (colour: $colour:expr, label: $label:expr, on_tap: |$button:ident| $on_tap:block $(,)?) => {
-        tap::Detector::new(Button::simple($colour, $label), |$button| $on_tap)
+    ($style:expr, $label:expr, on_tap: |$button:ident, $theme:ident| $on_tap:block $(,)?) => {
+        tap::Detector::new(Button::new($style, $label), |$button, $theme| $on_tap)
     };
 }
 
 impl Widget for Button {
     fn build(&self) -> Box<dyn Widget> {
-        Layout::coloured(
-            self.colour,
-            Overflow::Hide,
-            Align::Center,
-            Align::Center,
-            Direction::Column,
-            widgets![self.label.clone()],
-        )
+        Layout {
+            style: self.style.clone(),
+            overflow: Overflow::Hide,
+            wx_align: Align::Center,
+            wy_align: Align::Center,
+            direction: Direction::Column,
+            widgets: widgets![self.label.clone()],
+        }
         .into()
     }
 
-    fn colour(&self) -> RGBA {
-        self.colour
-    }
-}
-
-impl Default for Button {
-    fn default() -> Self {
-        Self {
-            label: Label::default(),
-            colour: RGBA::new(0, 0, 0, 0),
-            radius: Radius::new(0.0),
-            borders: None,
+    fn style(&self, theme: &Theme) -> Style {
+        match &self.style {
+            Some(style) => style,
+            None => &theme.style
         }
+        .clone()
+    }
+
+    fn style_mut(&mut self, theme: &Theme) -> &mut Style {
+        if let None = self.style {
+            self.style = Some(theme.style.clone()); 
+        }
+
+        self.style.as_mut().unwrap()
     }
 }
 
 impl Button {
-    /// Creates a new button.
-    pub fn new(colour: RGBA, radius: Radius, borders: [Border; 4], label: Label) -> Self {
+    /// Creates a new button with an independent style.
+    pub fn new(style: Style, label: Label) -> Self {
         Self {
-            colour,
-            radius,
-            borders: Some(borders),
+            style: Some(style),
             label,
         }
     }
 
-    /// Creates the simplest button possible, without radius nor borders.
-    pub fn simple(colour: RGBA, label: Label) -> Self {
+    /// Creates a button without independent style.
+    pub fn simple(label: Label) -> Self {
         Self {
-            colour,
+            style: None,
             label,
-            ..Self::default()
-        }
-    }
-
-    /// Creates a button with a `radius` but no borders.
-    pub fn rounded(colour: RGBA, radius: Radius, label: Label) -> Self {
-        Self {
-            colour,
-            radius,
-            label,
-            ..Self::default()
-        }
-    }
-
-    /// Creates a button with `borders` but no radius.
-    pub fn bordered(colour: RGBA, borders: [Border; 4], label: Label) -> Self {
-        Self {
-            colour,
-            borders: Some(borders),
-            label,
-            ..Self::default()
         }
     }
 }

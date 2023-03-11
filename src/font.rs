@@ -4,27 +4,26 @@
 
 use std::collections::HashMap;
 
-/// Font family with a name for the whole family.
-///
-/// Each font from `fonts` is the font associated to each font's weight.
-#[derive(Debug, Clone)]
-pub struct FontFamily {
-    /// The name of the font family.
+/// Local path for a font file, to be associated to a name.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Font {
+    /// Name for the font. Used to identify it.
     pub name: String,
-    /// Font for each available [`FontWeight`].
-    pub fonts: HashMap<FontWeight, TTFFont>,
-}
-
-/// Named local TTF font.
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct TTFFont {
-    /// The font's name identifier.
-    pub name: String,
-    /// The path of the TTF file.
+    /// Local path to the font file.
     pub path: String,
 }
 
-/// The weight for a font.
+/// Named collection of [`Font`s](Font) where each font is associated to a 
+/// [`FontWeight`].
+#[derive(Debug, Clone)]
+pub struct FontFamily {
+    /// Name for the font family. Used to identify it.
+    pub name: String,
+    /// Font for each available [`FontWeight`].
+    pub fonts: HashMap<FontWeight, Font>,
+}
+
+/// Font weight to be associated to a [`Font`] in a [`FontFamily`].
 #[allow(missing_docs)]
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum FontWeight {

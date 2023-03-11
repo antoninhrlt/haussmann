@@ -6,7 +6,7 @@
 
 use crate::{
     graphics::colours::RGBA,
-    ToAny,
+    ToAny, themes::{Theme, Style},
 };
 
 mod button;
@@ -38,8 +38,18 @@ pub trait Widget: DebugWidget + ToAny {
     /// Builds the widget. The returned value will be transformed into a 
     /// [`Drawable`](crate::graphics::draw::Drawable) at [`View`] build.
     fn build(&self) -> Box<dyn Widget>;
-    /// Returns the colour of the widget.
-    fn colour(&self) -> RGBA;
+
+    /// Returns a style for the widget. It is either its independent style or 
+    /// the default style from the global theme.
+    fn style(&self, theme: &Theme) -> Style;
+
+    /// Returns a mutable style for the widget. It is either its independent 
+    /// style or the default style from the global theme.
+    /// 
+    /// When the style is initially set to `None`, it is replaced by the default 
+    /// style from the global theme. So, the widget's style could only be `None`
+    /// between the creation of the widget and the first call of this function.
+    fn style_mut(&mut self, theme: &Theme) -> &mut Style;
 }
 
 /// Automatically implemented by the macro derives in [`haussmann_dev`].

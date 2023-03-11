@@ -13,11 +13,11 @@ use crate::{
     graphics::draw::{Drawable, DrawableAt}, 
     widgets::Layout,
     Widget,
-    Zone,
+    Zone, themes::Theme,
 };
 
 /// Function to call when something happen on a widget.
-type ControllerFn<T> = fn(widget: &mut T);
+type ControllerFn<T> = fn(widget: &mut T, theme: &Theme);
 
 /// Controllers wrap widgets in order to control what happen for them.
 pub trait Controller: Widget {

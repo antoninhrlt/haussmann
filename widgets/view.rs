@@ -5,7 +5,7 @@
 use crate::{
     controllers::{Controller, ControllersBrowser},
     graphics::{draw::{Drawable, self}, Point, Size},
-    Zone,
+    Zone, themes::Theme,
 };
 
 use super::Layout;
@@ -20,19 +20,6 @@ pub struct View {
     zone: Zone,
     /// The layout for the view.
     pub layout: Layout,
-}
-
-/// Creates a new view like its [`new`](View::new) function.
-/// 
-/// The layout parameter is not named.
-#[macro_export]
-macro_rules! view {
-    (position: $position:expr, size: $size:expr, $layout:expr $(,)?) => {
-        View::new(
-            ($position, $size).into(), 
-            $layout
-        )
-    };
 }
 
 impl View {

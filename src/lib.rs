@@ -55,6 +55,7 @@ pub mod controllers;
 pub mod widgets;
 
 pub mod graphics;
+pub mod themes;
 
 mod align;
 mod border;
@@ -62,7 +63,6 @@ mod direction;
 mod font;
 mod overflow;
 mod radius;
-mod theme;
 mod zone;
 
 pub use align::{Align, TextAlign};
@@ -71,29 +71,9 @@ pub use direction::Direction;
 pub use font::*;
 pub use overflow::Overflow;
 pub use radius::Radius;
-pub use theme::{TextTheme, Theme};
 pub use zone::Zone;
 
 pub use widgets::{DebugWidget, Widget};
-
-/// Imports all the macros and required items by the macros.
-/// 
-/// # Usage
-/// ```
-/// use haussmann::macros::*;
-/// ```
-pub mod macros {
-    // Needed by `layout!`
-    pub use super::Overflow;
-    pub use super::Direction;
-
-    pub use super::graphics::colours::RGBA;
-    pub use super::rgba;
-    
-    pub use super::widgets::*;
-    pub use super::widgets;
-    pub use super::{button, container, label, layout, surface, view};
-}
 
 /// Trait to implement on *any* object in order to be able to convert it as a
 /// [`std::any::Any`] value.

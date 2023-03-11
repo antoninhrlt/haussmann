@@ -5,11 +5,8 @@
 use haussmann_dev::Widget;
 
 use crate::{
-    graphics::{
-        colours::RGBA,
-        Size,
-    },
-    DebugWidget, ToAny, Widget,
+    graphics::Size,
+    DebugWidget, ToAny, Widget, themes::{Theme, Style},
 };
 
 /// Wraps a widget giving it a fixed size.
@@ -34,8 +31,12 @@ impl Widget for Container {
         self.widget.build()
     }
 
-    fn colour(&self) -> RGBA {
-        self.widget.colour()
+    fn style(&self, theme: &Theme) -> Style {
+        self.widget.style(theme)
+    }
+
+    fn style_mut(&mut self, theme: &Theme) -> &mut Style {
+        self.widget.style_mut(theme)
     }
 }
 

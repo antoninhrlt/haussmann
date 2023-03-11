@@ -5,8 +5,7 @@
 use haussmann_dev::Widget;
 
 use crate::{
-    graphics::colours::RGBA,
-    theme::TextTheme,
+    themes::{Theme, Style, LabelStyle},
     ToAny,
 };
 
@@ -20,25 +19,11 @@ use super::{DebugWidget, Widget};
 pub struct Label {
     /// The text string of the label.
     pub text: String,
-    /// The theme for the text.
-    pub theme: TextTheme,
-}
-
-/// Creates a new label. When there is only the text specified, it is not 
-/// necessary to name the parameter but it must be a string literal.
-#[macro_export]
-macro_rules! label {
-    ($text:literal $(,)?) => {
-        Label::simple($text)
-    };
-
-    (text: $text:expr $(,)?) => {
-        Label::simple($text),
-    };
-
-    (text: $text:expr, theme: $theme:expr $(,)?) => {
-        Label::new($text, $theme),
-    };
+    /// An independent style from the global theme.
+    /// 
+    /// If set as `None`, the style for labels defined in the global theme 
+    /// will be used.
+    pub style: Option<LabelStyle>,
 }
 
 impl Widget for Label {
@@ -46,8 +31,12 @@ impl Widget for Label {
         self.clone().into()
     }
 
-    fn colour(&self) -> RGBA {
-        self.theme.colour
+    fn style(&self, theme: &Theme) -> Style {
+        panic!("labels have special styles (TextStyle). check the `Label::label_style()` function");
+    }
+
+    fn style_mut(&mut self, theme: &Theme) -> &mut Style {
+        panic!("labels have special styles (TextStyle). check the `Label::label_style_mut()` function");
     }
 }
 
@@ -55,17 +44,17 @@ impl Default for Label {
     fn default() -> Self {
         Self {
             text: String::new(),
-            theme: TextTheme::default(),
+            style: None,
         }
     }
 }
 
 impl Label {
-    /// Creates a label with a specific `theme`.
-    pub fn new(text: &str, theme: TextTheme) -> Self {
+    /// Creates a label with an independent style from the global theme.
+    pub fn new(text: &str, style: Option<LabelStyle>) -> Self {
         Self {
             text: text.to_string(),
-            theme,
+            style,
         }
     }
 
@@ -76,5 +65,26 @@ impl Label {
             text: text.to_string(),
             ..Self::default()
         }
+    }
+
+    fn label_style(&self, theme: &Theme) -> LabelStyle {
+        match &self.style {
+            Some(label_style) => label_style,
+            None => &theme.label_style
+        }
+        .clone()
+    }
+
+    /// Same as [`Widget::style()`] but labels return [`LabelStyle`] instead of
+    /// normal [`Style`].
+    /// 
+    /// ## Note
+    /// Calling [`Label::style`] panics. 
+    pub fn label_style_mut(&mut self, theme: &Theme) -> &mut LabelStyle {
+        if let None = self.style {
+            self.style = Some(theme.label_style.clone()); 
+        }
+
+        self.style.as_mut().unwrap()
     }
 }

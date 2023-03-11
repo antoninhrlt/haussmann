@@ -11,16 +11,16 @@
 
 use haussmann_dev::Widget;
 
-use crate::{
-    graphics::colours::RGBA,
-    Border, DebugWidget, ToAny, Widget,
-};
+use crate::{ DebugWidget, ToAny, Widget, themes::{Style, Theme} };
 
 /// Image widget.
 #[derive(Debug, Clone, PartialEq, Widget)]
 pub struct Image {
-    pub colour: RGBA,
-    pub borders: Option<[Border; 4]>,
+    /// Independent style for the image.
+    /// 
+    /// If set as `None`, the default widget style of the global theme will be 
+    /// used. 
+    pub style: Option<Style>,
     /// Aspect ratio of the image.
     pub ratio: (f32, f32),
 }
@@ -30,16 +30,27 @@ impl Widget for Image {
         self.clone().into()
     }
 
-    fn colour(&self) -> RGBA {
-        self.colour
+    fn style(&self, theme: &Theme) -> Style {
+        match &self.style {
+            Some(style) => style,
+            None => &theme.style
+        }
+        .clone()
+    }
+    
+    fn style_mut(&mut self, theme: &Theme) -> &mut Style {
+        if let None = self.style {
+            self.style = Some(theme.style.clone()); 
+        }
+
+        self.style.as_mut().unwrap()
     }
 }
 
 impl Default for Image {
     fn default() -> Self {
         Self {
-            colour: RGBA::default(),
-            borders: None,
+            style: None,
             ratio: (1.0, 1.0),
         }
     }

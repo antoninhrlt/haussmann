@@ -5,83 +5,51 @@
 use haussmann_dev::Widget;
 
 use crate::{
-    graphics::colours::RGBA, 
-    Border, 
     DebugWidget, 
     ToAny, 
-    Widget, 
+    Widget, themes::{Theme, Style}, 
 };
 
-/// A drawable zone which can coloured, bordered or both.
+/// A drawable zone which can be coloured, bordered or both.
 #[derive(Debug, Clone, Widget)]
 pub struct Surface {
-    /// The colour of the surface.
-    pub colour: RGBA,
-    /// The borders of the surface.
-    pub borders: Option<[Border; 4]>,
-}
-
-/// Creates a new surface, either transparent, with colour or borders or both.
-#[macro_export]
-macro_rules! surface {
-    () => {
-        Surface::default()
-    };
-    
-    (colour: $colour:expr $(,)*) => {
-        Surface::coloured($colour)
-    };
-
-    (borders: $borders:expr $(,)*) => {
-        Surface::bordered($borders)
-    };
-
-    (colour: $colour:expr, borders: $borders:expr $(,)*) => {
-        Surface::new($colour, Some($borders))
-    };
+    /// Independent style for the surface.
+    /// 
+    /// If set as `None`, the default widget style from the global theme will 
+    /// be used.
+    style: Option<Style>,
 }
 
 impl Widget for Surface {
     fn build(&self) -> Box<dyn Widget> {
         self.clone().into()
     }
-
-    fn colour(&self) -> RGBA {
-        self.colour
-    }
-}
-
-impl Default for Surface {
-    fn default() -> Self {
-        Self {
-            colour: RGBA::default(),
-            borders: None,
+    
+    fn style(&self, theme: &Theme) -> Style {
+        match &self.style {
+            Some(style) => style,
+            None => &theme.style
         }
+        .clone()
+    }
+
+    fn style_mut(&mut self, theme: &Theme) -> &mut Style {
+        if let None = self.style {
+            self.style = Some(theme.style.clone()); 
+        }
+
+        self.style.as_mut().unwrap()
     }
 }
 
 impl Surface {
     /// Creates a new surface with a colour and borders.
-    pub fn new(colour: RGBA, borders: Option<[Border; 4]>) -> Self {
-        Self {
-            colour,
-            borders,
-        }
+    pub fn new(style: Option<Style>) -> Self {
+        Self { style }
     }
 
-    /// Creates a new surface with a colour but no borders.
-    pub fn coloured(colour: RGBA) -> Self {
-        Self {
-            colour,
-            borders: None,
-        }
-    }
-
-    /// Creates a new surface with borders but no colour.
-    pub fn bordered(borders: [Border; 4]) -> Self {
-        Self {
-            colour: RGBA::default(),
-            borders: Some(borders),
-        }
+    /// Creates a new surface without independent style.
+    pub fn simple() -> Self {
+        Self { style: None }
     }
 }

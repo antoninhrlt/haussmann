@@ -2,28 +2,8 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use haussmann::{
-    controllers::tap,
-    graphics::{
-        colours::RGBA,
-        Size, draw, Point,
-    },
-    widgets::{
-        Button, 
-        Container, 
-        Label, 
-        Layout, View, Surface,
-    },
-    widgets, 
-    Align,
-    Direction, 
-    Overflow, 
-    Widget,
-    Zone,
-    view, layout, rgba, button, label, container, surface
-};
+use std::time::Duration;
 
-use rand::Rng;
 use sdl2::{
     event::{Event, WindowEvent},
     keyboard::Keycode,
@@ -32,7 +12,22 @@ use sdl2::{
     rect::Rect,
 };
 
-use std::time::Duration;
+use rand::Rng;
+
+use haussmann::{
+    controllers::tap, 
+    graphics::{Size, draw, Point, colours::{self, RGBA}}, 
+    themes::{self, Style},  
+    widgets::*, 
+    Align,
+    Direction, 
+    Overflow,  
+    Zone, 
+    button, 
+    rgba, 
+    style,
+    widgets,
+};
 
 #[test]
 fn with_sdl2() {
@@ -54,75 +49,72 @@ fn with_sdl2() {
         .build()
         .unwrap();
 
-    let mut view = view! {
-        position: [0, 0],
-        size: window_size,
-        layout! {
-            colour: rgba!(255, 255, 255, a: 255),
-            overflow: Ignore,
-            wx: Align::Center,
-            wy: Align::Center,
-            direction: Row,
+    let theme = themes::default(vec![]);
+
+    let mut view = View::new(
+        Zone {
+            position: [0, 0],
+            size: window_size,
+        },
+        Layout::styled(
+            style!(colour: rgba!(255, 255, 255, a: 255)),
+            Overflow::Ignore,
+            Align::Center,
+            Align::Center,
+            Direction::Row,
             widgets! [
-                button! {
-                    colour: rgba!(255, 0, 0, a: 255),
-                    label: label!("red button"),
-                    on_tap: |button| {
+                button!(
+                    style!(colour: rgba!(255, 0, 0, a: 255)),
+                    Label::normal("red button"),
+                    on_tap: |button, theme| {
                         let mut rng = rand::thread_rng();
 
                         let r = rng.gen_range(0..255);
                         let g = rng.gen_range(0..255);
                         let b = rng.gen_range(0..255);
                     
-                        button.colour = RGBA::new(r, g, b, 255);
+                        button.style_mut(&theme).colour = Some(rgba!(r, g, b, a: 255));
                     }
-                },
-                layout! {
-                    overflow: Hide,
-                    wx: Align::Center,
-                    wy: Align::Center,
-                    direction: Column,
+                ),
+                Layout::styled(
+                    style!(colour: colours::TRANSPARENT),
+                    Overflow::Hide,
+                    Align::Center,
+                    Align::Center,
+                    Direction::Column,
                     widgets! [
-                        container! {
-                            size: [150, 100],
-                            widget: button![
-                                colour: rgba![0, 255, 0, a: 255],
-                                label: label!("green button"),
-                            ]
-                        },
-                        container! {
-                            size: [50, 50],
-                            widget: button![
-                                colour: rgba![0, 100, 0, a: 255],
-                                label: label!("green2 button"),
-                            ]
-                        },
-                        container! {
-                            size: [50, 50],
-                            widget: button![
-                                colour: rgba![0, 50, 0, a: 255],
-                                label: label!("green3 button"),
-                            ]
-                        },
-                        button! {
-                            colour: rgba!(0, 0, 255, a: 255),
-                            label: label!("blue button"),
-                            on_tap: |button| {
-                                if button.colour.b <= 10 {
-                                    button.colour.b = 255;
+                        Container::new(
+                            [150, 100],
+                            Button::normal(
+                                Label::normal("default-styled button"),
+                            )
+                        ),
+                        Container::new(
+                            [50, 50],
+                            Button::styled(
+                                style!(colour: rgba![0, 50, 0, a: 255]),
+                                Label::normal("green3 button"),
+                            )
+                        ),
+                        button!(
+                            style!(colour: rgba!(0, 0, 255, a: 255)),
+                            Label::normal("blue button"),
+                            on_tap: |button, theme| {
+                                let b_channel = &mut button.style_mut(&theme).colour.as_mut().unwrap().b;
+
+                                if *b_channel <= 10 {
+                                    *b_channel = 255;
                                 } else {
-                                    button.colour.b -= 10;
+                                    *b_channel -= 10;
                                 }
                             }
-                        }   
+                        ),
                     ]
-                },
-                surface! {
-                    colour: rgba!(255, 0, 255, a: 255)
-                }
+                ),
+                Surface::normal(),
             ]
-        }
-    };
+        )
+    );
 
     // Where to draw the widgets.
     let mut canvas = window
@@ -137,8 +129,6 @@ fn with_sdl2() {
     
     // Creates drawables from the widgets.
     let mut drawables = view.build();
-
-    println!("{:#?}", drawables);
     
     'running: loop {
         canvas.set_draw_color(Color::RGBA(0, 0, 0, 0));
@@ -150,8 +140,8 @@ fn with_sdl2() {
 
             match &drawable.object {
                 draw::Object::Surface(surface) => {
-                    let colour = surface.colour();
-        
+                    let colour = surface.style(&theme).colour.unwrap();
+
                     canvas.set_draw_color(Color::RGBA(
                         colour.r as u8,
                         colour.g as u8,
@@ -205,9 +195,9 @@ fn with_sdl2() {
 
                     let tap: Point = [x as isize, y as isize];
 
-                    view.controllers::<tap::Detector<Button>>(&drawables, |controller| {
+                    view.controllers::<tap::Detector<Button>>(drawables, |controller| {
                         if tap::is_tapped(tap, controller.zone) {
-                            controller.on_tap();
+                            controller.on_tap(&theme);
                         }
                     });
 

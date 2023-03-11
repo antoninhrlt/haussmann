@@ -1,6 +1,13 @@
 //! Any usage of haussmann that might be unusual and that might go into panics
 
-use haussmann::{view, layout, Align, widgets::{Layout, View, Surface, Widget}, widgets, Overflow, Direction, rgba, graphics::colours::RGBA, Zone};
+use haussmann::{
+    widgets::{Layout, View, Surface, Widget}, 
+    widgets, 
+    Align, 
+    Overflow, 
+    Direction,
+    Zone
+};
 
 #[test]
 fn no_widget() {
@@ -9,7 +16,7 @@ fn no_widget() {
             position: [0, 0],
             size: [1, 1]
         },
-        Layout::simple(
+        Layout::normal(
             Overflow::Ignore,
             Align::Center,
             Align::Center,
@@ -28,13 +35,13 @@ fn void_view() {
             position: [0, 0],
             size: [0, 0]
         },
-        Layout::simple(
+        Layout::normal(
             Overflow::Ignore,
             Align::Center,
             Align::Center,
             Direction::Column,
             widgets![
-                Surface::coloured(rgba!(255, 255, 255, a: 255))
+                Surface::normal()
             ],
         ),
     );

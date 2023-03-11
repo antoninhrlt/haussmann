@@ -9,7 +9,12 @@ pub mod tap;
 
 use std::marker::PhantomData;
 
-use crate::{Widget, Zone, graphics::draw::{Drawable, DrawableAt}, widgets::Layout};
+use crate::{
+    graphics::draw::{Drawable, DrawableAt}, 
+    widgets::Layout,
+    Widget,
+    Zone,
+};
 
 /// Function to call when something happen on a widget.
 type ControllerFn<T> = fn(widget: &mut T);

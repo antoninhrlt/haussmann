@@ -6,10 +6,10 @@ use haussmann_dev::Widget;
 
 use crate::{
     graphics::colours::RGBA, 
-    Widget, 
-    ToAny, 
-    DebugWidget, 
     Border, 
+    DebugWidget, 
+    ToAny, 
+    Widget, 
 };
 
 /// A drawable zone which can coloured, bordered or both.

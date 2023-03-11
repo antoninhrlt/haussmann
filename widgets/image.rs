@@ -13,7 +13,7 @@ use haussmann_dev::Widget;
 
 use crate::{
     graphics::colours::RGBA,
-    DebugWidget, ToAny, Widget, Border,
+    Border, DebugWidget, ToAny, Widget,
 };
 
 /// Image widget.

@@ -4,7 +4,12 @@
 
 //! Everything related to drawing of widgets.
 
-use crate::{widgets::{Label, Image, Surface, Layout, View}, Widget, Zone, graphics::{Sizer, Aligner}};
+use crate::{
+    graphics::{Aligner, Sizer},
+    widgets::{Image, Label, Layout, Surface , View}, 
+    Widget, 
+    Zone, 
+};
 
 use super::{Size, Point};
 
@@ -69,7 +74,11 @@ impl Drawable {
     }
 }
 
+/// Implements a function to retrieve a drawable in a data structure of 
+/// drawables.
 pub trait DrawableAt {
+    /// Returns the first drawable in the data structure of drawables which have
+    /// the same identifier as the given index.
     fn at(&self, i: usize) -> Option<&Drawable>;
 }
 

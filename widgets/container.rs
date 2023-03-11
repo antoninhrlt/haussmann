@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use haussmann_dev::{Widget};
+use haussmann_dev::Widget;
 
 use crate::{
     graphics::{

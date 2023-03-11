@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{widgets::Layout, Direction, Align};
+use crate::{widgets::Layout, Align, Direction};
 
 use super::{Point, Size};
 

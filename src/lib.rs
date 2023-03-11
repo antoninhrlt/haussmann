@@ -76,6 +76,25 @@ pub use zone::Zone;
 
 pub use widgets::{DebugWidget, Widget};
 
+/// Imports all the macros and required items by the macros.
+/// 
+/// # Usage
+/// ```
+/// use haussmann::macros::*;
+/// ```
+pub mod macros {
+    // Needed by `layout!`
+    pub use super::Overflow;
+    pub use super::Direction;
+
+    pub use super::graphics::colours::RGBA;
+    pub use super::rgba;
+    
+    pub use super::widgets::*;
+    pub use super::widgets;
+    pub use super::{button, container, label, layout, surface, view};
+}
+
 /// Trait to implement on *any* object in order to be able to convert it as a
 /// [`std::any::Any`] value.
 pub trait ToAny {

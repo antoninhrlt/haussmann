@@ -4,12 +4,13 @@
 
 use haussmann_dev::Widget;
 
-use super::{DebugWidget, Widget};
 use crate::{
     graphics::colours::RGBA,
     theme::TextTheme,
     ToAny,
 };
+
+use super::{DebugWidget, Widget};
 
 /// Label widget, which is not a "surfaced" widget. The text has to be rendered,
 /// following its text theme.

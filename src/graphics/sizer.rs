@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{widgets::{Layout, Container}, Direction};
+use crate::{widgets::{Container, Layout}, Direction};
 
 use super::Size;
 
@@ -11,6 +11,7 @@ use super::Size;
 /// 
 /// Does not calculate the sizes of the sub-widgets (widgets of the layout's 
 /// widgets) !
+#[derive(Debug)]
 pub struct Sizer<'a> {
     layout: &'a Layout,
 }

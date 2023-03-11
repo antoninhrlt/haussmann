@@ -4,11 +4,13 @@
 
 use haussmann_dev::Widget;
 
-use super::{DebugWidget, Label, Widget, Layout};
 use crate::{
     graphics::colours::RGBA,
-    Border, Radius, ToAny, widgets, Overflow, Align, Direction,
+    widgets,
+    Align, Border, Direction, Overflow, Radius, ToAny,
 };
+
+use super::{DebugWidget, Label, Layout, Widget};
 
 /// Button widget with a label inside.
 #[derive(Debug, Clone, Widget)]

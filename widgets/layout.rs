@@ -4,11 +4,12 @@
 
 use haussmann_dev::Widget;
 
-use super::{DebugWidget, Widget, Surface};
 use crate::{
     graphics::colours::RGBA,
     Align, Border, Direction, Overflow, ToAny,
 };
+
+use super::{DebugWidget, Surface, Widget};
 
 /// Layout to contain several widgets and define alignment rules for these
 /// widgets.

@@ -2,7 +2,13 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{font::FontWeight, graphics::colours::RGBA, Align, FontFamily, TextAlign};
+use crate::{
+    font::FontWeight, 
+    graphics::colours::RGBA, 
+    Align, 
+    FontFamily, 
+    TextAlign
+};
 
 /// Theme for a text with a font.
 #[derive(Debug, Clone, PartialEq)]

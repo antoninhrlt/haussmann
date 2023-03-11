@@ -2,12 +2,11 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use std::marker::PhantomData;
-
-use crate::controllers::{Controller, ControllersBrowser};
-use crate::graphics::{Point, Size};
-use crate::graphics::draw::{Drawable, DrawableAt, self};
-use crate::Zone;
+use crate::{
+    controllers::{Controller, ControllersBrowser},
+    graphics::{draw::{Drawable, self}, Point, Size},
+    Zone,
+};
 
 use super::Layout;
 

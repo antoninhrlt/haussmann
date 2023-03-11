@@ -17,13 +17,13 @@ use super::{DebugWidget, Widget};
 /// Check <https://github.com/mooman219/fontdue> to render text with font.
 #[derive(Debug, Clone, PartialEq, Widget)]
 pub struct Label {
-    /// The text string of the label.
-    pub text: String,
     /// An independent style from the global theme.
     /// 
     /// If set as `None`, the style for labels defined in the global theme 
     /// will be used.
     pub style: Option<LabelStyle>,
+    /// The text string of the label.
+    pub text: String,
 }
 
 impl Widget for Label {
@@ -31,48 +31,30 @@ impl Widget for Label {
         self.clone().into()
     }
 
-    fn style(&self, theme: &Theme) -> Style {
+    fn style(&self, _: &Theme) -> Style {
         panic!("labels have special styles (TextStyle). check the `Label::label_style()` function");
     }
 
-    fn style_mut(&mut self, theme: &Theme) -> &mut Style {
+    fn style_mut(&mut self, _: &Theme) -> &mut Style {
         panic!("labels have special styles (TextStyle). check the `Label::label_style_mut()` function");
     }
 }
 
-impl Default for Label {
-    fn default() -> Self {
-        Self {
-            text: String::new(),
-            style: None,
-        }
-    }
-}
-
 impl Label {
-    /// Creates a label with an independent style from the global theme.
-    pub fn new(text: &str, style: Option<LabelStyle>) -> Self {
+    /// Creates a label with an independent style.
+    pub fn styled(text: &str, style: LabelStyle) -> Self {
         Self {
+            style: Some(style),
             text: text.to_string(),
-            style,
         }
     }
 
-    /// Creates a label without specific `theme`, the global theme for texts
-    /// is used.
-    pub fn simple(text: &str) -> Self {
+    /// Creates a label without independent style.
+    pub fn normal(text: &str) -> Self {
         Self {
+            style: None,
             text: text.to_string(),
-            ..Self::default()
         }
-    }
-
-    fn label_style(&self, theme: &Theme) -> LabelStyle {
-        match &self.style {
-            Some(label_style) => label_style,
-            None => &theme.label_style
-        }
-        .clone()
     }
 
     /// Same as [`Widget::style()`] but labels return [`LabelStyle`] instead of
@@ -80,6 +62,19 @@ impl Label {
     /// 
     /// ## Note
     /// Calling [`Label::style`] panics. 
+    pub fn label_style(&self, theme: &Theme) -> LabelStyle {
+        match &self.style {
+            Some(label_style) => label_style,
+            None => &theme.label_style
+        }
+        .clone()
+    }
+
+    /// Same as [`Widget::style_mut()`] but labels return [`LabelStyle`] instead of
+    /// normal [`Style`].
+    /// 
+    /// ## Note
+    /// Calling [`Label::style_mut`] panics. 
     pub fn label_style_mut(&mut self, theme: &Theme) -> &mut LabelStyle {
         if let None = self.style {
             self.style = Some(theme.label_style.clone()); 

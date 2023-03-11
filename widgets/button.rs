@@ -14,23 +14,25 @@ use super::{DebugWidget, Label, Layout, Widget};
 /// Button widget with a label inside.
 #[derive(Debug, Clone, Widget)]
 pub struct Button {
-    /// The label in the center of the button.
-    pub label: Label,
     /// Independent style for the button.
     /// 
     /// If set as `None`, the default button style from the global theme will 
     /// be used.
     pub style: Option<Style>,
+    /// The label in the center of the button.
+    pub label: Label,
 }
 
+/// Creates a new [`Button`] wrapped in a 
+/// [`tap::Detector`](crate::controllers::tap::Detector).
 #[macro_export]
 macro_rules! button {
     ($label:expr, on_tap: |$button:ident, $theme:ident| $on_tap:block $(,)?) => {
-        tap::Detector::new(Button::simple($label), |$button| $on_tap)
+        tap::Detector::new(Button::normal($label), |$button| $on_tap)
     };
 
     ($style:expr, $label:expr, on_tap: |$button:ident, $theme:ident| $on_tap:block $(,)?) => {
-        tap::Detector::new(Button::new($style, $label), |$button, $theme| $on_tap)
+        tap::Detector::new(Button::styled($style, $label), |$button, $theme| $on_tap)
     };
 }
 
@@ -66,7 +68,7 @@ impl Widget for Button {
 
 impl Button {
     /// Creates a new button with an independent style.
-    pub fn new(style: Style, label: Label) -> Self {
+    pub fn styled(style: Style, label: Label) -> Self {
         Self {
             style: Some(style),
             label,
@@ -74,7 +76,7 @@ impl Button {
     }
 
     /// Creates a button without independent style.
-    pub fn simple(label: Label) -> Self {
+    pub fn normal(label: Label) -> Self {
         Self {
             style: None,
             label,

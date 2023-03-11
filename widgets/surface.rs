@@ -17,7 +17,7 @@ pub struct Surface {
     /// 
     /// If set as `None`, the default widget style from the global theme will 
     /// be used.
-    style: Option<Style>,
+    pub style: Option<Style>,
 }
 
 impl Widget for Surface {
@@ -43,13 +43,13 @@ impl Widget for Surface {
 }
 
 impl Surface {
-    /// Creates a new surface with a colour and borders.
-    pub fn new(style: Option<Style>) -> Self {
+    /// Creates a new surface with an independent style.
+    pub fn styled(style: Option<Style>) -> Self {
         Self { style }
     }
 
     /// Creates a new surface without independent style.
-    pub fn simple() -> Self {
+    pub fn normal() -> Self {
         Self { style: None }
     }
 }

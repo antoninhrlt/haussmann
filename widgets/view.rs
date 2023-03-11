@@ -5,7 +5,7 @@
 use crate::{
     controllers::{Controller, ControllersBrowser},
     graphics::{draw::{Drawable, self}, Point, Size},
-    Zone, themes::Theme,
+    Zone,
 };
 
 use super::Layout;

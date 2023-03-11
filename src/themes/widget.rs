@@ -38,8 +38,62 @@ pub struct Style {
     pub radius: Option<Radius>,
 }
 
-impl Default for Style {
-    fn default() -> Self {
-        Style { colour: None, borders: None, radius: None }
-    }
+/// Creates ""dynamically"" a new [`Style`].
+#[macro_export]
+macro_rules! style {
+    (colour: $colour:expr, borders: $borders:expr, radius: $radius:expr $(,)?) => {
+        Style {
+            colour: Some($colour),
+            borders: Some($borders),
+            radius: Some($radius),
+        }
+    };
+
+    (colour: $colour:expr, borders: $borders:expr $(,)?) => {
+        Style {
+            colour: Some($colour),
+            borders: Some($borders),
+            radius: None,
+        }
+    };
+
+    (colour: $colour:expr, radius: $radius:expr $(,)?) => {
+        Style {
+            colour: Some($colour),
+            borders: None,
+            radius: Some($radius),
+        }
+    };
+
+    (borders: $borders:expr, radius: $radius:expr $(,)?) => {
+        Style {
+            colour: $colour,
+            borders: Some($borders),
+            radius: Some($radius),
+        }
+    };
+
+    (colour: $colour:expr $(,)?) => {
+        Style {
+            colour: Some($colour),
+            borders: None,
+            radius: None,
+        }
+    };
+
+    (borders: $borders:expr $(,)?) => {
+        Style {
+            colour: None,
+            borders: Some($borders),
+            radius: None,
+        }
+    };
+
+    (radius: $radius:expr $(,)?) => {
+        Style {
+            colour: None,
+            borders: None,
+            radius: Some($radius),
+        }
+    };
 }

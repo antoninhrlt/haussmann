@@ -12,7 +12,6 @@
 //! the size, etc...
 
 mod text;
-mod view;
 mod widget;
 
 pub use text::*;
@@ -20,6 +19,8 @@ pub use widget::*;
 
 use crate::{FontFamily, FontWeight, graphics::colours::RGBA, Radius};
 
+/// What is called a "global theme" in the whole project. Contains fonts, text 
+/// theme and styles. 
 #[derive(Debug)]
 pub struct Theme {
     /// All the font families used in the view.
@@ -37,7 +38,7 @@ pub struct Theme {
 
 impl Theme {
     /// Returns the font with the same name if exists.
-    fn font(&self, name: String) -> Option<FontFamily> {
+    pub fn font(&self, name: String) -> Option<FontFamily> {
         // Browses all the fonts to find a font with the same name.
         for font in &self.fonts {
             // The font has the same name, returns it.

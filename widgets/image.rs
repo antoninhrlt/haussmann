@@ -46,12 +46,3 @@ impl Widget for Image {
         self.style.as_mut().unwrap()
     }
 }
-
-impl Default for Image {
-    fn default() -> Self {
-        Self {
-            style: None,
-            ratio: (1.0, 1.0),
-        }
-    }
-}

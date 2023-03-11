@@ -4,10 +4,7 @@
 
 //! Widgets are items to be placed on a drawable surface and managed by layouts.
 
-use crate::{
-    graphics::colours::RGBA,
-    ToAny, themes::{Theme, Style},
-};
+use crate::{ themes::{Theme, Style}, ToAny };
 
 mod button;
 mod container;

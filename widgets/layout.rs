@@ -41,7 +41,9 @@ impl Default for Layout {
 
 impl Widget for Layout {
     fn build(&self) -> Box<dyn Widget> {
-        Surface::new(self.style.clone()).into()
+        Surface {
+            style: self.style.clone(),
+        }.into()
     }
     
     fn style(&self, theme: &Theme) -> Style {
@@ -62,7 +64,7 @@ impl Widget for Layout {
 }
 
 impl Layout {
-    /// Creates a new layout with an independent style from the global theme.
+    /// Creates a new layout with an independent style.
     pub fn styled(
         style: Style,
         overflow: Overflow,

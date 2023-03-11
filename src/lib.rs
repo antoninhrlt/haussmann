@@ -24,8 +24,8 @@
 //! application using a system API
 //! ([windows-rs](https://github.com/microsoft/windows-rs),
 //! [x11rb](https://github.com/psychon/x11rb), ...). Furthermore, the crate
-//! contains tools to transform widgets into 
-//! [`Drawable`s](graphics::draw::Drawable). 
+//! contains tools to transform widgets into drawables, align and size them in 
+//! a layout.
 //!
 //! ## Organization
 //! The crate is organized in different parts:

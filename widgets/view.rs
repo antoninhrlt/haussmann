@@ -2,7 +2,9 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::controllers::Controller;
+use std::marker::PhantomData;
+
+use crate::controllers::{Controller, ControllersBrowser};
 use crate::graphics::{Point, Size};
 use crate::graphics::draw::{Drawable, DrawableAt, self};
 use crate::Zone;
@@ -61,42 +63,16 @@ impl View {
         self.build()
     }
 
-
     /// Browses all the widgets to find controllers and call the given callback
     /// when encountered.
     /// 
-    /// Browses in the same order as drawables are created.
-    pub fn controllers<T>(&mut self, drawables: &Vec<Drawable>, callback: impl Fn(&mut T)) 
-        where T: Controller + 'static,
+    /// Browses in the same order as drawables are created. So, the zones of the 
+    /// controllers are updated to the corresponding drawable.
+    pub fn controllers<T>(&mut self, drawables: Vec<Drawable>, callback: impl Fn(&mut T)) 
+    where 
+        T: Controller + 'static,
     {
-        let mut i: usize = 1;
-        Self::controllers_in(&mut self.layout, drawables, &callback, &mut i);
-    }
-}
-
-impl View {
-    /// Checks [`controllers()`].
-    fn controllers_in<T>(layout: &mut Layout, drawables: &Vec<Drawable>, callback: &impl Fn(&mut T), i: &mut usize) 
-        where T: Controller + 'static,
-    {
-        for widget in &mut layout.widgets {
-            // Encounters a layout, calls itself but with the retrieved layout 
-            // as parameter.
-            if let Some(layout) = widget.as_any_mut().downcast_mut::<Layout>() {
-                *i += 1;
-                Self::controllers_in(layout, drawables, callback, i);
-                continue;
-            }
-
-            // Encounters a controller, calls the callback.
-            if let Some(controller) = widget.as_any_mut().downcast_mut::<T>() {
-                // Update the controller's zone.
-                controller.update(drawables.at(*i).unwrap().zone);
-                // Calls the callback giving the controller as mutable reference.
-                callback(controller);
-            }
-
-            *i += 1;
-        }
+        let mut browser = ControllersBrowser::new(drawables, callback);
+        browser.browse_layout(&mut self.layout);
     }
 }

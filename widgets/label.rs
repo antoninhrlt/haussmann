@@ -76,7 +76,7 @@ impl Label {
     /// ## Note
     /// Calling [`Label::style_mut`] panics. 
     pub fn label_style_mut(&mut self, theme: &Theme) -> &mut LabelStyle {
-        if let None = self.style {
+        if self.style.is_none() {
             self.style = Some(theme.label_style.clone()); 
         }
 

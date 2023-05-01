@@ -84,13 +84,7 @@ pub trait DrawableAt {
 
 impl DrawableAt for Vec<Drawable> {
     fn at(&self, i: usize) -> Option<&Drawable> {
-        for drawable in self {
-            if drawable.group_id as usize == i {
-                return Some(drawable);
-            }
-        }
-
-        None
+        self.iter().find(|&drawable| drawable.group_id as usize == i)
     }
 }
 
@@ -164,7 +158,7 @@ impl Builder {
             // Checks if it is a layout or a normal widget.
             if let Some(layout) = widget.as_any().downcast_ref::<Layout>() {
                 // Builds the layout.
-                self.build_layout(&layout, false);
+                self.build_layout(layout, false);
             } else {
                 // Builds drawables for the widget.
                 self.build_widget(widget);

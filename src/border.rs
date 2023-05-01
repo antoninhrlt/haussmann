@@ -8,7 +8,7 @@ use crate::{graphics::colours::RGBA, Zone, Side};
 ///
 /// Borders are more commonly use in arrays like `[Border; 4]` to define a
 /// border on each side of a shape.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Border {
     /// The width of the border.
     pub width: usize,

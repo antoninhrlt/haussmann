@@ -35,7 +35,7 @@ pub const TRANSPARENT: RGBA = RGBA {
 };
 
 /// Colour with red, green and blue values + an alpha channel.
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Default)]
 pub struct RGBA {
     /// Red part of the colour corresponding to the first two bytes of an
     /// hexadecimal colour value.
@@ -57,17 +57,6 @@ pub struct RGBA {
     ///
     /// Must be in range from 0 to 255.
     pub a: u32,
-}
-
-impl Default for RGBA {
-    fn default() -> Self {
-        RGBA {
-            r: 0,
-            g: 0,
-            b: 0,
-            a: 0,
-        }
-    }
 }
 
 impl RGBA {

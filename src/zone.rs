@@ -5,21 +5,12 @@
 use crate::graphics::{Point, Size};
 
 /// Sized and positioned rectangle.
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Default)]
 pub struct Zone {
     /// The top-left position of the zone.
     pub position: Point,
     /// the size of the zone.
     pub size: Size,
-}
-
-impl Default for Zone {
-    fn default() -> Self {
-        Self {
-            position: [0, 0],
-            size: [0, 0]
-        }
-    }
 }
 
 impl From<(Point, Size)> for Zone {

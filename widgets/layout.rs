@@ -55,7 +55,7 @@ impl Widget for Layout {
     }
     
     fn style_mut(&mut self, theme: &Theme) -> &mut Style {
-        if let None = self.style {
+        if self.style.is_none() {
             self.style = Some(theme.style.clone()); 
         }
 
@@ -128,9 +128,8 @@ impl Layout {
         let mut widgets = vec![];
 
         for boxed in &self.widgets {
-            match boxed.as_any().downcast_ref::<T>() {
-                Some(widget) => widgets.push(widget),
-                None => {} // not a widget of type `T`.
+            if let Some(widget) = boxed.as_any().downcast_ref::<T>()  {
+                widgets.push(widget);
             }
         }
 
@@ -143,9 +142,8 @@ impl Layout {
         let mut widgets = vec![];
 
         for boxed in &mut self.widgets {
-            match boxed.as_any_mut().downcast_mut::<T>() {
-                Some(widget) => widgets.push(widget),
-                None => {} // not a widget of type `T`.
+            if let Some(widget) = boxed.as_any_mut().downcast_mut::<T>()  {
+                widgets.push(widget);
             }
         }
 
@@ -157,9 +155,8 @@ impl Layout {
         let mut widgets = vec![];
 
         for boxed in &self.widgets {
-            match boxed.as_any().downcast_ref::<T>() {
-                Some(_) => {} // type `T`, ignore it.
-                None => widgets.push(boxed),
+            if boxed.as_any().downcast_ref::<T>().is_none() {
+                widgets.push(boxed);
             }
         }
 

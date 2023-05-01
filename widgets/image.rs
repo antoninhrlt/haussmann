@@ -39,7 +39,7 @@ impl Widget for Image {
     }
     
     fn style_mut(&mut self, theme: &Theme) -> &mut Style {
-        if let None = self.style {
+        if self.style.is_none() {
             self.style = Some(theme.style.clone()); 
         }
 

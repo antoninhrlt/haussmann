@@ -5,7 +5,7 @@
 use std::collections::HashMap;
 
 /// Local path for a font file, to be associated to a name.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Font {
     /// Name for the font. Used to identify it.
     pub name: String,

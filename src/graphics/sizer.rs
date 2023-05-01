@@ -46,7 +46,7 @@ impl<'a> Sizer<'a> {
         }
         
         // The layout only contains containers.
-        if not_containers.len() == 0 {
+        if not_containers.is_empty() {
             // Returns the sizes of the containers.
             return containers.iter().map(|c| c.size).collect();
         }

@@ -63,6 +63,7 @@ mod direction;
 mod font;
 mod overflow;
 mod radius;
+mod side;
 mod zone;
 
 pub use align::{Align, TextAlign};
@@ -71,6 +72,7 @@ pub use direction::Direction;
 pub use font::*;
 pub use overflow::Overflow;
 pub use radius::Radius;
+pub use side::Side;
 pub use zone::Zone;
 
 pub use widgets::{DebugWidget, Widget};

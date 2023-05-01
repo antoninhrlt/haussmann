@@ -11,10 +11,8 @@
 // Run this test to use the project on "SDL2".
 mod sdl2;
 
-// // Run this test to use the project with "ratatui".
-// mod tui;
-// // Run this test to check unusual usages of the project.
-// mod unusual;
+// Run this test to check unusual usages of the project.
+mod unusual;
 
 // Run the tests associated to Rust-things more than the project.
 mod rust {

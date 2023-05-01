@@ -2,7 +2,7 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use std::time::Duration;
+use std::{time::Duration, borrow::Borrow};
 
 use sdl2::{
     event::{Event, WindowEvent},
@@ -20,8 +20,10 @@ use haussmann::{
     themes::{self, Style},  
     widgets::*, 
     Align,
+    Border,
     Direction, 
-    Overflow,  
+    Overflow,
+    Side,  
     Zone, 
     button, 
     rgba, 
@@ -64,7 +66,15 @@ fn with_sdl2() {
             Direction::Row,
             widgets! [
                 button!(
-                    style!(colour: rgba!(255, 0, 0, a: 255)),
+                    style!(
+                        colour: rgba!(255, 0, 0, a: 255),
+                        borders: [
+                            None,
+                            Some(Border::new(5, rgba!(0, 0, 0, a: 255), Side::Bottom)),
+                            Some(Border::new(10, rgba!(0, 0, 0, a: 255), Side::Top)),
+                            None,
+                        ]
+                    ),
                     Label::normal("red button"),
                     on_tap: |button, theme| {
                         let mut rng = rand::thread_rng();
@@ -156,6 +166,35 @@ fn with_sdl2() {
                         zone.height() as u32,
                     ))
                     .unwrap();
+
+                    // Draws the borders of this surface.
+                    let borders = surface.style(&theme)
+                        .borders
+                        .unwrap_or([None, None, None, None]);
+                    
+                    for border in borders {
+                        if border == None {
+                            continue;
+                        }
+
+                        let zone = border.clone().unwrap().as_zone(&zone);
+                        let colour = border.unwrap().colour;
+
+                        canvas.set_draw_color(Color::RGBA(
+                            colour.r as u8,
+                            colour.g as u8,
+                            colour.b as u8,
+                            colour.a as u8,
+                        ));
+
+                        canvas.fill_rect(Rect::new(
+                            zone.x() as i32,
+                            zone.y() as i32,
+                            zone.width() as u32,
+                            zone.height() as u32,
+                        ))
+                        .unwrap();
+                    }
                 }
                 draw::Object::Image(_) => {
                     //println!("draws image {:?}", image);

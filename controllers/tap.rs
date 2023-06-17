@@ -7,7 +7,7 @@
 use haussmann_dev::Controller;
 
 use crate::{
-    graphics::Point,
+    graphics::{Point, Size},
     themes::{Theme, Style},
     DebugWidget, 
     ToAny, 
@@ -44,7 +44,10 @@ impl<T: Widget> Detector<T> {
     pub fn new(widget: T, tap: ControllerFn<T>) -> Self {
         Self {
             widget: Box::new(widget),
-            zone: Zone::default(),
+            zone: Zone {
+                position: Point::from([0, 0]),
+                size: Size::from([0, 0]),
+            },
             tap,
         }
     }

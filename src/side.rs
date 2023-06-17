@@ -4,6 +4,7 @@
 
 /// Sides of a rectangle.
 #[derive(Debug, Clone, Eq, PartialEq)]
+#[allow(missing_docs)]
 pub enum Side {
     Bottom,
     Left,

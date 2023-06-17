@@ -5,7 +5,7 @@
 use crate::graphics::{Point, Size};
 
 /// Sized and positioned rectangle.
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Default)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Zone {
     /// The top-left position of the zone.
     pub position: Point,

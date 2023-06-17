@@ -2,7 +2,11 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
-use crate::{graphics::colours::RGBA, Zone, Side};
+use crate::{
+    graphics::{ colours::RGBA, Point, Size, }, 
+    Zone, 
+    Side
+};
 
 /// Rectangle border of width a width and a colour.
 ///
@@ -27,16 +31,16 @@ impl Border {
     /// Creates a zone of the border's size and width or height of the parent.
     pub fn as_zone(&self, parent_zone: &Zone) -> Zone {
         Zone {
-            position: match self.side {
+            position: Point::from(match self.side {
                 Side::Left => [parent_zone.x(), parent_zone.y()],
                 Side::Right => [parent_zone.x() + parent_zone.width() as isize, parent_zone.y()],
                 Side::Bottom => [parent_zone.x(), parent_zone.y() + parent_zone.height() as isize],
                 Side::Top => [parent_zone.x(), parent_zone.y()],
-            },
-            size: match self.side {
+            }),
+            size: Size::from(match self.side {
                 Side::Left | Side::Right => [self.width, parent_zone.height()],
                 Side::Top | Side::Bottom => [parent_zone.width(), self.width],
-            },
+            }),
         }
     }
 }

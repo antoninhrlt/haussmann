@@ -5,6 +5,8 @@
 //! Tools to draw, to align in layouts, to shape and to colour
 //! [`Widget`s](crate::Widget).
 
+use linbra::vector::Vector;
+
 mod aligner;
 pub mod colours;
 pub mod draw;
@@ -13,11 +15,8 @@ mod sizer;
 pub use aligner::Aligner;
 pub use sizer::Sizer;
 
-/// Vector of type `T` with 2 values.
-pub type Vec2<T> = [T; 2];
-
 /// Point on a 2D surface of coordinates `[x, y]` being `isize` values.
-pub type Point = Vec2<isize>;
+pub type Point = Vector<isize, 2>;
 
 /// Size of `[width, height]` being `usize` values.
-pub type Size = Vec2<usize>;
+pub type Size = Vector<usize, 2>;

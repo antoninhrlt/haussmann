@@ -116,7 +116,7 @@ impl<'a> Aligner<'a> {
                 )
             };
 
-            positions.push([zone[0] + x, zone[1] + y]);
+            positions.push(Point::from([zone[0] + x, zone[1] + y]));
         }
 
         positions

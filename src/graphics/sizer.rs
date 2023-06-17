@@ -38,7 +38,7 @@ impl<'a> Sizer<'a> {
         let not_containers = self.layout.not_widget::<Container>();
 
         // The size of all the containers grouped together.
-        let mut size_containers: Size = [0, 0];
+        let mut size_containers: Size = Size::from([0, 0]);
         // Calculates this size.
         for container in &containers {
             size_containers[0] += container.size[0];
@@ -55,7 +55,7 @@ impl<'a> Sizer<'a> {
         assert_ne!(not_containers.len(), 0);
 
         // Each widget which is not a container has the same size.
-        let size_not_container: Size = match self.layout.direction {
+        let size_not_container = match self.layout.direction {
             Direction::Column => [
                 // Shares the width with the other widgets.
                 if size_containers[0] > zone[0] {
@@ -92,7 +92,7 @@ impl<'a> Sizer<'a> {
                     sizes.push(container.size);
                     continue;
                 },
-                None => sizes.push(size_not_container)
+                None => sizes.push(Size::from(size_not_container))
             };
         }
 

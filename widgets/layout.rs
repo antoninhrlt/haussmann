@@ -2,9 +2,11 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+use any::ToAny;
+
 use haussmann_dev::Widget;
 
-use crate::{ Align, Direction, Overflow, ToAny, themes::{Theme, Style} };
+use crate::{ Align, Direction, Overflow, themes::{Theme, Style} };
 
 use super::{DebugWidget, Surface, Widget};
 

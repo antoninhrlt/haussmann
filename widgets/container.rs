@@ -2,11 +2,13 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+use any::ToAny;
+
 use haussmann_dev::Widget;
 
 use crate::{
     graphics::Size,
-    DebugWidget, ToAny, Widget, themes::{Theme, Style},
+    DebugWidget, Widget, themes::{Theme, Style},
 };
 
 /// Wraps a widget giving it a fixed size.

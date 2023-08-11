@@ -2,11 +2,13 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+use any::ToAny;
+
 use haussmann_dev::Widget;
 
 use crate::{
     widgets,
-    Align, Direction, Overflow, ToAny, themes::{Style, Theme},
+    Align, Direction, Overflow, themes::{Style, Theme},
 };
 
 use super::{DebugWidget, Label, Layout, Widget};

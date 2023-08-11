@@ -2,11 +2,12 @@
 // Under the MIT License
 // Copyright (c) 2023 Antonin Hérault
 
+use any::ToAny;
+
 use haussmann_dev::Widget;
 
 use crate::{
     themes::{Theme, Style, LabelStyle},
-    ToAny,
 };
 
 use super::{DebugWidget, Widget};

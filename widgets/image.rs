@@ -9,9 +9,11 @@
 //
 //
 
+use any::ToAny;
+
 use haussmann_dev::Widget;
 
-use crate::{ DebugWidget, ToAny, Widget, themes::{Style, Theme} };
+use crate::{ DebugWidget, Widget, themes::{Style, Theme} };
 
 /// Image widget.
 #[derive(Debug, Clone, PartialEq, Widget)]

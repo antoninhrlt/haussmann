@@ -4,13 +4,14 @@
 
 //! Everything related to tapping widgets.
 
+use any::ToAny;
+
 use haussmann_dev::Controller;
 
 use crate::{
     graphics::{Point, Size},
     themes::{Theme, Style},
     DebugWidget, 
-    ToAny, 
     Widget, 
     Zone
 };

@@ -12,6 +12,7 @@ edition = "2021"
 [dependencies]
 linbra = "0.0.3"
 haussmann-dev = { path = "./dev" }
+any = { git = "https://github.com/antoninhrlt/any" }
 
 [dev-dependencies]
 sdl2 = "0.35.2"

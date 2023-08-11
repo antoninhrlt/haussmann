@@ -24,7 +24,7 @@
 //! application using a system API
 //! ([windows-rs](https://github.com/microsoft/windows-rs),
 //! [x11rb](https://github.com/psychon/x11rb), ...). Furthermore, the crate
-//! contains tools to transform widgets into drawables, align and size them in 
+//! contains tools to transform widgets into drawables, align and size them in
 //! a layout.
 //!
 //! ## Organization
@@ -75,32 +75,5 @@ pub use radius::Radius;
 pub use side::Side;
 pub use zone::Zone;
 
-pub use widgets::{DebugWidget, Widget};
-
-/// Trait to implement on *any* object in order to be able to convert it as a
-/// [`std::any::Any`] value.
-pub trait ToAny {
-    /// Converts the `self` value into a [`std::any::Any`] value.
-    ///
-    /// Generally implemented as following:
-    /// ```
-    /// impl ToAny for Foo {
-    ///     fn as_any(&self) -> &dyn std::any::Any {
-    ///         self
-    ///     }    
-    /// }
-    /// ```
-    fn as_any(&self) -> &dyn std::any::Any;
-
-    /// Converts the `self` value into a [`std::any::Any`] mutable value.
-    ///
-    /// Generally implemented as following:
-    /// ```
-    /// impl ToAny for Foo {
-    ///     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
-    ///         self
-    ///     }    
-    /// }
-    /// ```
-    fn as_any_mut(&mut self) -> &mut dyn std::any::Any;
-}
+pub use widgets::DebugWidget;
+pub use widgets::Widget;
